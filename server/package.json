@@ -13,9 +13,14 @@
     "watch": "nodemon"
   },
   "dependencies": {
+    "bcrypt": "^3.0.7",
+    "connect-mongo": "^3.2.0",
+    "connect-redis": "^4.0.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
     "express": "~4.16.1",
+    "express-session": "^1.17.0",
     "mongoose": "^5.8.1",
     "morgan": "^1.9.1",
     "redis": "^2.8.0",
