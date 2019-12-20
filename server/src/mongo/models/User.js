@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose'
 import bcrypt from 'bcrypt';
 
 const saltRounds = 10;
-const userSchema = new Schema({
+const UserSchema = new Schema({
     userName: String,
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -30,8 +30,8 @@ UserSchema.pre('save', function (next) {
     }
 });
 
-UserSchema.methods.isCorrectPassword = function (password, callback) {
-    bcrypt.compare(password, this.password, function (err, same) {
+UserSchema.methods.isCorrectPassword = function(password, callback)  {
+    bcrypt.compare(password, this.password, (err,same) => {
         if (err) {
             callback(err);
         } else {
@@ -39,4 +39,4 @@ UserSchema.methods.isCorrectPassword = function (password, callback) {
         }
     });
 }
-export default model('Product', userSchema)
+export default model('Product', UserSchema)
