@@ -21,7 +21,6 @@ router.post('/register', (req, res) => {
                                 .send("Error registering new user please try again.");
                 } else {
                         logger.info("Registered user: " + email);
-                        req.session.sessid = email;
                         res.status(200).send("Welcome to the club!");
                 }
         });
@@ -52,10 +51,7 @@ router.post('/login',  (req, res) => {
                                                         error: 'Internal error please try again'
                                                 });
                                 } else if (!isMatch) {
-                                        res.status(401)
-                                                .json({
-                                                        error: 'Incorrect email or password'
-                                                });
+                                        res.status(401).send('wrong creds');
                                 } else {
                                         // Issue token
                                         const payload = { email };
@@ -70,6 +66,6 @@ router.post('/login',  (req, res) => {
         });
 });
 router.get('/logout', (req,res) => {
-
+        res.clearCookie('token').sendStatus(200);
 })
 export default router;

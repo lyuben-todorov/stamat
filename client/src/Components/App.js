@@ -1,63 +1,70 @@
 import React, { Component } from 'react'
-import '../Sass/App.css';
+import './_sass/App.scss';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 import Home from './Auth/Home';
 import axios from 'axios';
+import sessionStore from '../Mobx/SessionStore';
+import { Segment, Button, Header } from 'semantic-ui-react';
+import { observer } from 'mobx-react';
 import Dashboard from './Auth/Dashboard';
 
-const root = "http://localhost:3001/user";
+const root = "http://localhost:3001/auth";
 
+@observer
 export default class App extends Component {
         constructor(props) {
-                super();
+                super(props);
                 this.state = { secret: "i dont know" };
-                this.handleButton = this.handleButton.bind(this);
+                this.handleLogout = this.handleLogout.bind(this);
         }
-        handleButton(event) {
-                event.preventDefault();
-                axios.get(root + "/kur", {withCredentials:true}).then((value) => {
-                        this.setState({secret:value})
-                }).catch((err)=>{
-                        console.log("kur")
+
+        handleLogout() {
+
+                axios.get(root + "/logout").catch((err) => {
+                        console.log(err);
+                }).then(()=>{
+                        this.props.store.logout();
                 })
         }
         render() {
+                const loggedIn = this.props.store.loggedIn;
                 return (
                         <div className="App">
+                                <BrowserRouter>
+                                        <Segment>
+                                                <Button floated="left" >
+                                                        <Link to="/home"> Home</Link>
+                                                </Button>
 
-                                <Router>
-                                        <header className="App-header">
-                                                <ul>
-                                                        <li>
-                                                                <Link to="/">Home</Link>
-                                                        </li>
-                                                        <li>
-                                                                <Link to="/login">Login</Link>
-                                                        </li>
-                                                        <li>
-                                                                <Link to="/register">Register</Link>
-                                                        </li>
-                                                </ul>
-                                        </header>
 
-                                        <hr />
-                                        <p>{this.state.secret}</p>
-                                        {
-                                                <Switch>
-                                                        <Route exact path="/">
-                                                                <Dashboard />
-                                                        </Route>
-                                                        <Route path="/login">
-                                                                <Login />
-                                                        </Route>
-                                                        <Route path="/register">
-                                                                <Register />
-                                                        </Route>
-                                                </Switch>
-                                        }
-                                </Router>
+                                                {loggedIn ?
+                                                        <div>
+                                                                <Button floated="right">
+                                                                        <Link to={"#"} onClick={this.handleLogout}>Logout</Link>
+                                                                </Button>
+                                                        </div>
+                                                        :
+                                                        <div>
+                                                                <Button floated="right">
+                                                                        <Link to="/login"> Login</Link>
+                                                                </Button>
+
+                                                                <Button floated="right" >
+                                                                        <Link to="/register"> Register</Link>
+                                                                </Button>
+                                                        </div>
+                                                }
+                                                <Header size="huge">Ebre-debre</Header>
+
+                                        </Segment>
+                                        <Switch>
+                                                <Route path="/login" render={() => <Login sessionStore={sessionStore} />} />
+                                                <Route path="/register" render={() => <Register sessionStore={sessionStore} />} />
+                                                <Route path="/*" component={Dashboard} />
+                                        </Switch>
+                                </BrowserRouter>
                         </div>
                 )
         }

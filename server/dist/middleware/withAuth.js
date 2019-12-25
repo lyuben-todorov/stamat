@@ -9,14 +9,16 @@ var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
 
 var _logger = _interopRequireDefault(require("../logger"));
 
+var _env = _interopRequireDefault(require("../env"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+var secret = _env["default"].APP_SECRET;
 var logger = (0, _logger["default"])("Auth middleware");
 
 var withAuth = function withAuth(req, res, next) {
-  var token = req.cookies.token;
   logger.info(JSON.stringify(req.cookies));
-  logger.info(req.user_sid);
+  var token = req.cookies.token;
 
   if (!token) {
     res.status(401).send('Unauthorized: No token provided');

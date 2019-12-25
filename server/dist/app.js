@@ -1,10 +1,5 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
 var _express = _interopRequireDefault(require("express"));
 
 var _path = _interopRequireDefault(require("path"));
@@ -23,7 +18,7 @@ var _mongoClient = _interopRequireDefault(require("./mongo/mongoClient"));
 
 var _index = _interopRequireDefault(require("./routes/index"));
 
-var _user = _interopRequireDefault(require("./routes/user"));
+var _auth = _interopRequireDefault(require("./routes/auth"));
 
 var _env = _interopRequireDefault(require("./env"));
 
@@ -31,6 +26,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 var app = (0, _express["default"])();
 var MongoStore = (0, _connectMongo["default"])(_expressSession["default"]);
+var PORT = _env["default"].PORT || 5000;
 app.use((0, _cors["default"])({
   credentials: true,
   origin: 'http://localhost:3000'
@@ -55,6 +51,7 @@ app.use((0, _expressSession["default"])({
 }));
 app.use(_express["default"]["static"](_path["default"].join(__dirname, '../public')));
 app.use('/', _index["default"]);
-app.use('/user', _user["default"]);
-var _default = app;
-exports["default"] = _default;
+app.use('/auth', _auth["default"]);
+app.listen(PORT, function () {
+  return console.log("Listening on ".concat(PORT));
+});

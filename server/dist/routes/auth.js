@@ -40,7 +40,6 @@ router.post('/register', function (req, res) {
       res.status(500).send("Error registering new user please try again.");
     } else {
       logger.info("Registered user: " + email);
-      req.session.sessid = email;
       res.status(200).send("Welcome to the club!");
     }
   });
@@ -54,35 +53,42 @@ router.post('/login', function (req, res) {
     email: email
   }, function (err, user) {
     if (err) {
-      logger.error(err);
-      res.statusCode = 500;
-      res.send();
-    }
-
-    if (!user) {
-      logger.error("User not found");
-      res.statusCode = 401;
-      res.send();
+      console.error(err);
+      res.status(500).json({
+        error: 'Internal error please try again'
+      });
+    } else if (!user) {
+      res.status(401).json({
+        error: 'Incorrect email or password'
+      });
     } else {
-      // test a matching password
       user.comparePassword(password, function (err, isMatch) {
         if (err) {
-          logger.error(err);
-          res.statusCode(404).send();
-        }
-
-        if (!isMatch) {
-          logger.error("Wrong password");
-          res.statusCode(403).send();
+          res.status(500).json({
+            error: 'Internal error please try again'
+          });
+        } else if (!isMatch) {
+          res.sendStatus(401);
         } else {
-          logger.info("User logged in:" + email);
-          req.session.sessid = email;
-          res.cookie('sessid', email);
-          res.status(200);
+          // Issue token
+          var payload = {
+            email: email
+          };
+
+          var token = _jsonwebtoken["default"].sign(payload, secret, {
+            expiresIn: '1h'
+          });
+
+          res.cookie('token', token, {
+            httpOnly: true
+          }).sendStatus(200);
         }
       });
     }
   });
+});
+router.get('/logout', function (req, res) {
+  res.clearCookie('token').sendStatus(200);
 });
 var _default = router;
 exports["default"] = _default;
