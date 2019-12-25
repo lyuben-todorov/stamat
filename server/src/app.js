@@ -4,15 +4,17 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import connectMongo from 'connect-mongo';
 import session from 'express-session';
-
+import cors from 'cors';
 import mongoConnection from './mongo/mongoClient';
 import indexRouter from './routes/index';
-import userRouter from './routes/user';
+import userRouter from './routes/auth';
 import env from './env';
 
 const app = express();
 const MongoStore = connectMongo(session)
+const PORT = env.PORT || 5000;
 
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -29,15 +31,10 @@ app.use(session({
         saveUninitialized: false
 }))
 
-// This middleware will check if user's cookie is still saved in browser and user is not set, then automatically log the user out.
-app.use((req, res, next) => {
-        if (req.cookies.user_sid && !req.session.user) {
-                res.clearCookie('user_sid');
-        }
-        next();
-});
+
 
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/', indexRouter);
-app.use('/user', userRouter)
-export default app;
+app.use('/auth', userRouter)
+
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));

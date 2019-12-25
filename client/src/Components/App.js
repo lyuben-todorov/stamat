@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
-import '../../Sass/App.css';
-import Login from './Login';
-import Register from '../Register';
+import '../Sass/App.css';
+import Login from './Auth/Login';
+import Register from './Auth/Register';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
-import Home from './Home';
+import Home from './Auth/Home';
 import axios from 'axios';
+import Dashboard from './Auth/Dashboard';
 
-const root = "http://localhost:3001";
+const root = "http://localhost:3001/user";
 
 export default class App extends Component {
         constructor(props) {
@@ -15,7 +16,8 @@ export default class App extends Component {
                 this.handleButton = this.handleButton.bind(this);
         }
         handleButton(event) {
-                axios.get(root + "/kur").then((value) => {
+                event.preventDefault();
+                axios.get(root + "/kur", {withCredentials:true}).then((value) => {
                         this.setState({secret:value})
                 }).catch((err)=>{
                         console.log("kur")
@@ -38,7 +40,6 @@ export default class App extends Component {
                                                                 <Link to="/register">Register</Link>
                                                         </li>
                                                 </ul>
-                                                <button onClick={this.handleButton}> AAAAAAAAAAA</button>
                                         </header>
 
                                         <hr />
@@ -46,7 +47,7 @@ export default class App extends Component {
                                         {
                                                 <Switch>
                                                         <Route exact path="/">
-                                                                <Home />
+                                                                <Dashboard />
                                                         </Route>
                                                         <Route path="/login">
                                                                 <Login />

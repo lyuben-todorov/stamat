@@ -1,9 +1,11 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 import createLogger from '../logger';
+import env from '../env';
+const secret = env.APP_SECRET;
 const logger = createLogger("Auth middleware")
 const withAuth = function (req, res, next) {
+        logger.info(JSON.stringify(req.cookies));
         const token = req.cookies.token;
-        logger.info(req.cookies.token);
         if (!token) {
                 res.status(401).send('Unauthorized: No token provided');
         } else {

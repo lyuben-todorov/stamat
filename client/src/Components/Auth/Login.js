@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 
-const root = "http://localhost:3001/user";
+const root = "http://localhost:3001/auth";
 
 export default class Login extends Component {
         constructor(props) {
@@ -28,13 +28,7 @@ export default class Login extends Component {
                 axios.post(root + "/login", {
                         email: this.state.email,
                         password: this.state.password
-                }).then(res => {
-                        if (res.status === 200) {
-                        } else {
-                                const error = new Error(res.error);
-                                throw error;
-                        }
-                }).catch(err => {
+                },{withCredentials:true}).catch(err => {
                         console.log(err);
                         this.setState({ status: "not ok" })
                 })
