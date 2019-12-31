@@ -3,33 +3,55 @@ import './_sass/App.scss';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
-import Home from './Auth/Home';
 import axios from 'axios';
 import sessionStore from '../Mobx/SessionStore';
 import { Segment, Button, Header } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
-import Dashboard from './Auth/Dashboard';
+import { Cookies, withCookies } from 'react-cookie';
+import { instanceOf } from 'prop-types'
+import Game from './Auth/Game';
+import SessionStore from '../Mobx/SessionStore';
+import GameStore from '../Mobx/GameStore';
 
 const root = "http://localhost:3001/auth";
 
 @observer
-export default class App extends Component {
+class App extends Component {
+        static propTypes = {
+                cookies: instanceOf(Cookies).isRequired
+        }
         constructor(props) {
                 super(props);
-                this.state = { secret: "i dont know" };
+
+                const { cookies } = props;
+
+                this.state = {
+                        sessionToken: cookies.get('token',{doNotParse:true})
+                };
                 this.handleLogout = this.handleLogout.bind(this);
+        }
+
+
+
+        componentDidMount() {
+                console.log(this.state.sessionToken)
+                if (this.state.sessionToken) {
+                        this.props.store.login(this.state.sessionToken);
+                } else {
+                        this.props.store.logout();
+                }
         }
 
         handleLogout() {
 
                 axios.get(root + "/logout").catch((err) => {
                         console.log(err);
-                }).then(()=>{
+                }).then(() => {
                         this.props.store.logout();
                 })
         }
         render() {
-                const loggedIn = this.props.store.loggedIn;
+
                 return (
                         <div className="App">
                                 <BrowserRouter>
@@ -39,7 +61,7 @@ export default class App extends Component {
                                                 </Button>
 
 
-                                                {loggedIn ?
+                                                {this.props.store.loggedIn ?
                                                         <div>
                                                                 <Button floated="right">
                                                                         <Link to={"#"} onClick={this.handleLogout}>Logout</Link>
@@ -62,7 +84,7 @@ export default class App extends Component {
                                         <Switch>
                                                 <Route path="/login" render={() => <Login sessionStore={sessionStore} />} />
                                                 <Route path="/register" render={() => <Register sessionStore={sessionStore} />} />
-                                                <Route path="/*" component={Dashboard} />
+                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} gameStore={GameStore} />} />
                                         </Switch>
                                 </BrowserRouter>
                         </div>
@@ -70,3 +92,4 @@ export default class App extends Component {
         }
 }
 
+export default withCookies(App)
