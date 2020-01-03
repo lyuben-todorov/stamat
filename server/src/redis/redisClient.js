@@ -1,7 +1,7 @@
 import redis from 'redis';
 import createLgger from '../logger';
 
-const logger = createLgger('Redis');
+const logger = createLgger('Redis | Server');
 const redisClient = redis.createClient();
 
 redisClient.on("error", function (err) {

@@ -9,9 +9,8 @@ import { Segment, Button, Header } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import { Cookies, withCookies } from 'react-cookie';
 import { instanceOf } from 'prop-types'
-import Game from './Auth/Game';
+import Game from './Game/Game';
 import SessionStore from '../Mobx/SessionStore';
-import GameStore from '../Mobx/GameStore';
 
 const root = "http://localhost:3001/auth";
 
@@ -56,35 +55,14 @@ class App extends Component {
                         <div className="App">
                                 <BrowserRouter>
                                         <Segment>
-                                                <Button floated="left" >
-                                                        <Link to="/home"> Home</Link>
-                                                </Button>
 
-
-                                                {this.props.store.loggedIn ?
-                                                        <div>
-                                                                <Button floated="right">
-                                                                        <Link to={"#"} onClick={this.handleLogout}>Logout</Link>
-                                                                </Button>
-                                                        </div>
-                                                        :
-                                                        <div>
-                                                                <Button floated="right">
-                                                                        <Link to="/login"> Login</Link>
-                                                                </Button>
-
-                                                                <Button floated="right" >
-                                                                        <Link to="/register"> Register</Link>
-                                                                </Button>
-                                                        </div>
-                                                }
                                                 <Header size="huge">Ebre-debre</Header>
 
                                         </Segment>
                                         <Switch>
                                                 <Route path="/login" render={() => <Login sessionStore={sessionStore} />} />
                                                 <Route path="/register" render={() => <Register sessionStore={sessionStore} />} />
-                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} gameStore={GameStore} />} />
+                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore}  />} />
                                         </Switch>
                                 </BrowserRouter>
                         </div>
