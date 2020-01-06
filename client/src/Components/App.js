@@ -33,7 +33,6 @@ class App extends Component {
 
 
         componentDidMount() {
-                console.log(this.state.sessionToken)
                 if (this.state.sessionToken) {
                         this.props.store.login(this.state.sessionToken);
                 } else {

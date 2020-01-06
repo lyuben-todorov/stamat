@@ -5,7 +5,7 @@ import createLogger from './logger';
 import connectMongo from 'connect-mongo';
 import session from 'express-session';
 import cors from 'cors';
-import io from 'socket.io'
+import socketio from 'socket.io'
 import http from 'http'
 import mongoConnection from './mongo/mongoClient';
 import indexRouter from './routes/index';
@@ -49,43 +49,77 @@ app.use('/auth', userRouter)
 
 
 redisClient.set("mmqueue", 0);
-
 /** SOCKETS */
 //app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 const server = http.createServer(app);
-const socket = io(server)
+const io = socketio(server)
 
-socket.on("connection", (socket) => {
+io.on("connection", (socket) => {
         socketLogger.info("Socket connected: " + socket.id);
+
+
+        socket.emit('action',{type:"client/REGISTER", data: socket.id})
         socket.on('action', (action) => {
                 socketLogger.info("Received action on socket:" + JSON.stringify(action))
                 switch (action.type) {
                         case START_MATCHMAKING:
+//01:36:05 | [Socket] [info]: Received action on socket:{"type":"matchmaking/START_MATCHMAKING","payload":{"username":"gosho","socketId":"-sp2x_yx-0HFeyU7AAAI"}}
                                 // this is where matchmaking is supposed to go
                                 // maybe connect to internal socket channel 'matchmaking', post the matchup and listen for found games
                                 // mm logic should be handled by a third server
                                 // base implementation works like 0/2 => 1/2 => 2/2 => 0/2
+                                // this is ugly 
+                                //get size of queue
+                                redisClient.get("mmqueue", (err, queueSize) => {
+                                        const userid = action.payload.socketId;
+                                        if (queueSize <= 0) {
+                                                redisClient.rpush('matchmaking_queue', userid)
+                                                redisClient.incr("mmqueue")
+                                        } else {
+                                                redisClient.rpop('matchmaking_queue', (err,reply) => {
+                                                        if(err)redisLogger.error(err);
+
+                                                        // found opponent
+                                                        console.log(reply)
+                                                        redisClient.publish(reply, "proposematchup:" + userid)
+                                                })
+                                        }
+                                        //listen on personal channel for opponent
+                                        const personalChannel = redis.createClient()
+                                        personalChannel.subscribe(userid);
+                                        personalChannel.on("message", (channel, message) => {
+                                                switch(message){
+                                                        case "acceptmatchup":
+                                                                const gameId = channel + userid;
+                                                                
+                                                                redisClient.publish(channel,"gameon:" + gameId);
+                                                                redisClient.publish(userid,"gameon:" + gameId);
+
+                                                                break;
+                                                        case "proposematchup":
+                                                                //ask client 
+                                                                //wait for client reply
+                                                                redisClient.publish("","acceptmatchup")
+                                                                break;
+                                                }
+                                        })
+
+                                })
                                 break;
+
+
 
                 }
 
 
                 const redisSubscriber = redis.createClient();
 
-                redisSubscriber.on("error", function (err) {
-                        redisLogger.error("Redis error: " + err);
-                });
-                redisSubscriber.on("ready", () => {
-                        redisLogger.info("Established redis connection!")
-
-                });
-
 
 
         })
 })
 
-socket.on("disconnect", () => {
+io.on("disconnect", () => {
         socketLogger.info("Disconnected");
 })
 

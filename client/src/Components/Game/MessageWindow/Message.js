@@ -12,8 +12,8 @@ export default class Message extends Component {
     render() {
         var messageBody;
         switch (this.props.type) {
-            case "startMatchmake":
-                messageBody = <Button onClick={() => this.props.onMessageAction({ type: "startMatchmake" })}>Start</Button>
+            case "startMatchmaking":
+                messageBody = <Button onClick={() => this.props.onMessageAction({ type: "startMatchmaking" })}>Start</Button>
                 break;
             case "askUsername":
                 messageBody =
@@ -22,7 +22,7 @@ export default class Message extends Component {
                             <Input type="text"></Input>
                         </Grid.Column>
                         <Grid.Column width={6}>
-                            <Button onClick={() => this.props.onMessageAction({ type: "username", payload: "gosho" })}>Submit</Button>
+                            <Button onClick={() => this.props.onMessageAction({ type: "postUsername", payload: "gosho" })}>Submit</Button>
                         </Grid.Column>
                     </Grid>
                 break;

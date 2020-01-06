@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { Segment, Divider } from 'semantic-ui-react'
-import '../../_sass/MessageWindow.scss'
-import MessageBox from './MessageBox'
-import ChatBox from './ChatBox'
+import '../_sass/MessageWindow.scss'
+import MessageBox from './MessageWindow/MessageBox'
+import ChatBox from './MessageWindow/ChatBox'
 import { observer } from 'mobx-react'
 
 @observer

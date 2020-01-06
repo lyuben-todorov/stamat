@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { observer } from 'mobx-react'
 import Chessboard from 'chessboardjsx';
-import MessageWindow from './MessageWindow/MessageWindow';
+import MessageWindow from './MessageWindow';
 import MoveWindow from './MoveWindow';
 import { Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';

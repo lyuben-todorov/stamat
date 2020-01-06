@@ -1,6 +1,6 @@
-import { START_MATCHMAKING } from "./gameState";
+import { SOCKET_START_MATCHMAKING } from "./gameState";
 
 export const startMatchmaking = (matchup) => ({
-    type: START_MATCHMAKING,
+    type: SOCKET_START_MATCHMAKING,
     payload: matchup
 })

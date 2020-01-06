@@ -12,8 +12,11 @@ class MessageBox extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            messages: []
+            messages: [],
+            startedMatchmaking: false,
+            username:"none"
         }
+        this.addMatchmakingButton = this.addMatchmakingButton.bind(this);
     }
     componentDidMount() {
         if (this.props.state === "guest") {
@@ -24,31 +27,38 @@ class MessageBox extends Component {
             })
         }
     }
+    addMatchmakingButton() {
+        if (!this.state.startedMatchmaking) {
+
+            this.setState(state => {
+                const messages = [...state.messages, { type: "startMatchmaking", message: "" }]
+
+                return { messages }
+            })
+            this.setState({startedMatchmaking:true})
+        }
+    }
     onMessageAction = (message) => {
         console.log(message.type)
         switch (message.type) {
-            case "startMatchmake":
+            case "startMatchmaking":
                 this.startMatchmaking();
-            break;
-            case "username":
-                this.setState({username:message.payload})
-                this.setState(state => {
-                    const messages = [...state.messages, { type: "startMatchmake", message: "" }]
-    
-                    return { messages }
-                })
-            break;
+                break;
+            case "postUsername":
+                this.setState({ username: message.payload })
+                this.addMatchmakingButton();
+                break;
 
             default:
                 break;
         }
     }
-    startMatchmaking(){
-        var {username} =this.state;
+    startMatchmaking() {
+        var { username } = this.state;
         var matchup = {
-            username:username
+            username: username,
+            socketId: this.props.socketId
         }
-        console.log('boing')
         this.props.startMatchmaking(matchup);
 
     }
@@ -65,7 +75,8 @@ class MessageBox extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        state: state.gameState
+        state: state.gameState,
+        socketId: state.socketId
     }
 }
 
