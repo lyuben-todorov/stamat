@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Grid, Input } from 'semantic-ui-react'
+import { SOCKET_START_MATCHMAKING, CLIENT_REGISTER, CLIENT_PROPOSE_MATCHUP, SOCKET_REPLY_MATCHUP } from '../../../redux/gameState';
+
 
 export default class Message extends Component {
     constructor(props) {
@@ -12,22 +14,38 @@ export default class Message extends Component {
     render() {
         var messageBody;
         switch (this.props.type) {
-            case "startMatchmaking":
-                messageBody = <Button onClick={() => this.props.onMessageAction({ type: "startMatchmaking" })}>Start</Button>
+            case SOCKET_START_MATCHMAKING:
+                messageBody = <Button onClick={() => this.props.onMessageAction({ type: SOCKET_START_MATCHMAKING })}>Start</Button>
                 break;
-            case "askUsername":
+            case CLIENT_REGISTER:
                 messageBody =
                     <Grid>
                         <Grid.Column width={10}>
                             <Input type="text"></Input>
                         </Grid.Column>
                         <Grid.Column width={6}>
-                            <Button onClick={() => this.props.onMessageAction({ type: "postUsername", payload: "gosho" })}>Submit</Button>
+                            <Button onClick={() => this.props.onMessageAction({ type: CLIENT_REGISTER, payload: "gosho" })}>Submit</Button>
                         </Grid.Column>
                     </Grid>
                 break;
+            case CLIENT_PROPOSE_MATCHUP:
+                messageBody =
+                    <Grid columns={2}>
+                        {this.props.message}
+                        <Grid.Column>
+                            <Button positive onClick={() =>
+                                this.props.onMessageAction({ type: SOCKET_REPLY_MATCHUP, payload: { reply: false, opponentId: this.props.message } })}>Refuse</Button>
+                        </Grid.Column>
+                        <Grid.Column>
+                            <Button positive onClick={() =>
+                                this.props.onMessageAction({ type: SOCKET_REPLY_MATCHUP, payload: { reply: true, opponentId: this.props.message } })}>Accept</Button>
+                        </Grid.Column>
+                    </Grid>
+                break;
+            case "message":
+                messageBody = <div>{this.props.message}</div>
+                break;
             default:
-                messageBody = this.props.message
                 break;
         }
 

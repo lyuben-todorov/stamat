@@ -5,13 +5,16 @@ let socket = io('http://localhost:3001');
 let socketIoMiddleware = createSocketIoMiddleware(socket, "matchmaking/");
 
 export const SOCKET_START_MATCHMAKING = "matchmaking/START_MATCHMAKING";
+export const SOCKET_REPLY_MATCHUP = "matchmaking/REPLY_MATCHUP";
 
 export const CLIENT_REGISTER = "client/REGISTER";
-
+export const CLIENT_PROPOSE_MATCHUP = "client/PROPOSE_MATCHUP";
+export const CLIENT_START_GAME = "client/START_GAME";
 const initialState = {
     gameState: "guest",
     socketId: "none",
-    game: "none"
+    gameId: "none",
+    opponent: "none"
 }
 
 function reducer(state = initialState, action) {
@@ -19,7 +22,13 @@ function reducer(state = initialState, action) {
         case SOCKET_START_MATCHMAKING:
             return { ...state, gameState: "matchmaking", game: action.payload };
         case CLIENT_REGISTER:
-            return {...state, socketId:action.data};
+            return { ...state, socketId: action.payload };
+        case CLIENT_PROPOSE_MATCHUP:
+            return { ...state, gameState: "proposal", opponent: action.payload }
+        case SOCKET_REPLY_MATCHUP:
+            return state;
+        case CLIENT_START_GAME:
+            return { ...state, gameState: "game", gameId: action.payload }
         default:
             console.log(action);
             return state;

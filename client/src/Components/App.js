@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import './_sass/App.scss';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
-import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import axios from 'axios';
 import sessionStore from '../Mobx/SessionStore';
-import { Segment, Button, Header } from 'semantic-ui-react';
+import { Segment, Header } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import { Cookies, withCookies } from 'react-cookie';
 import { instanceOf } from 'prop-types'

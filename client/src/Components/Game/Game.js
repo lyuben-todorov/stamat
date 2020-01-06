@@ -9,12 +9,6 @@ import { startMatchmaking } from '../../redux/actionCreators'
 
 @observer
 class Game extends Component {
-        constructor(props) {
-                super(props);
-                this.state = {
-                        mode: "default",
-                };
-        }
 
         componentDidMount() {
         }
