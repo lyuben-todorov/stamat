@@ -1,13 +1,11 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import Chess from "chess.js"; // import Chess from  "chess.js"(default) if recieving an error about new Chess() not being a constructor
 
 import Chessboard from "chessboardjsx";
 import { connect } from "react-redux";
-import { startGame } from "../../../redux/actionCreators";
+import { playerReady } from "../../../redux/actionCreators";
 
 class ChessGame extends Component {
-        static propTypes = { children: PropTypes.func };
         constructor(props) {
                 super(props)
 
@@ -22,7 +20,9 @@ class ChessGame extends Component {
                         // currently clicked square
                         square: "",
                         // array of past game moves
-                        history: []
+                        history: [],
+                        // orientation from player prespective
+                        orientation: 'white'
                 }
                 this.updateGameAndServerState = this.updateGameAndServerState.bind(this);
                 this.updateGameState = this.updateGameState.bind(this);
@@ -35,8 +35,26 @@ class ChessGame extends Component {
         }
         componentDidUpdate(prevProps) {
 
-                if (this.props.state !== prevProps.state) {
+                if (this.props.gameState !== prevProps.gameState) {
 
+                        // called when state receives new game object and sets gamestate to initiategame
+                        if (this.props.gameState === "initiateGame") {
+                                let { gameId, playerOne, playerTwo, white, toMove, boardState, history } = this.props.game
+                                this.setState({
+                                        orientation: white === this.props.playerId ? 'white' : 'black',
+                                        fen: boardState,
+                                        gameId: gameId,
+                                        playerOne: playerOne,
+                                        playerTwo: playerTwo,
+                                        toMove: toMove === this.props.playerId ? true : false,
+                                        history: history
+                                })
+                                this.props.playerReady();
+                                return
+                        }
+                }
+                if (this.props.game !== prevProps.game) {
+                        console.log("turn");
                 }
 
         }
@@ -150,7 +168,7 @@ class ChessGame extends Component {
                         history: this.game.history({ verbose: true }),
                         pieceSquare: ""
                 }
-                this.updateGameStates(this.gameState);
+                this.updateGameStates(gameState);
         };
 
         onSquareRightClick = square =>
@@ -159,12 +177,13 @@ class ChessGame extends Component {
                 });
 
         render() {
-                const { fen, dropSquareStyle, squareStyles } = this.state;
+                const { fen, dropSquareStyle, squareStyles, orientation } = this.state;
 
                 return (
                         <Chessboard
                                 id="mainChessboard"
                                 position={fen}
+                                orientation={orientation}
                                 onDrop={this.onDrop}
                                 onMouseOverSquare={this.onMouseOverSquare}
                                 onMouseOutSquare={this.onMouseOutSquare}
@@ -180,10 +199,12 @@ class ChessGame extends Component {
 
 const mapStateToProps = (state /*, ownProps*/) => {
         return {
-                counter: state.counter
+                playerId: state.socketId,
+                gameState: state.gameState,
+                game: state.game
         }
 }
-const mapDispatchToProps = { startGame }
+const mapDispatchToProps = { playerReady }
 
 export default connect(
         mapStateToProps,

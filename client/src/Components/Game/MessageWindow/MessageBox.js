@@ -19,11 +19,11 @@ class MessageBox extends Component {
                 }
                 this.addMatchmakingButton = this.addMatchmakingButton.bind(this);
                 this.addMatchupProposalButton = this.addMatchupProposalButton.bind(this);
-                this.startGame = this.startGame.bind(this);
+                this.addStartGameMessage = this.addStartGameMessage.bind(this);
                 this.addTextMessage = this.addTextMessage.bind(this);
         }
         componentDidMount() {
-                if (this.props.gameState === "guest") {
+                if (this.props.userType === "guest") {
                         this.setState(state => {
                                 const messages = [...state.messages, { type: CLIENT_REGISTER, message: "" }]
 
@@ -37,8 +37,8 @@ class MessageBox extends Component {
                         if (this.props.gameState === "proposal") {
                                 this.addMatchupProposalButton();
                         }
-                        if (this.props.gameState === "game") {
-                                this.startGame();
+                        if (this.props.gameState === "initiateGame") {
+                                this.addStartGameMessage();
                         }
 
                 }
@@ -67,7 +67,7 @@ class MessageBox extends Component {
                         return { messages }
                 })
         }
-        startGame() {
+        addStartGameMessage() {
                 this.addTextMessage("Started Game!");
         }
         onMessageAction = (message) => {
@@ -110,6 +110,7 @@ class MessageBox extends Component {
 
 const mapStateToProps = (state) => {
         return {
+                userType: state.userType,
                 gameState: state.gameState,
                 socketId: state.socketId,
                 oponent: state.oponent
