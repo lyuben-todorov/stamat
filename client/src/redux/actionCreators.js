@@ -11,7 +11,7 @@ export const replyMatchmaking = (message) => ({
 export const playerReady = () => ({
     type: GAME_PLAYER_READY
 })
-export const playerMove = (move) => ({
+export const playerMove = (payload) => ({
     type: GAME_PLAYER_MOVE,
-    payload:move
+    payload:payload
 })

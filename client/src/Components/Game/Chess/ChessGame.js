@@ -3,7 +3,7 @@ import Chess from "chess.js"; // import Chess from  "chess.js"(default) if recie
 
 import Chessboard from "chessboardjsx";
 import { connect } from "react-redux";
-import { playerReady } from "../../../redux/actionCreators";
+import { playerReady, playerMove } from "../../../redux/actionCreators";
 
 class ChessGame extends Component {
         constructor(props) {
@@ -38,14 +38,17 @@ class ChessGame extends Component {
                 if (this.props.gameState !== prevProps.gameState) {
                         // called when state receives new game object and sets gamestate to initiategame
                         if (this.props.gameState === "initiateGame") {
-                                let { gameId, playerOne, playerTwo, white, toMove, boardState, history } = this.props.game
+                                let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game
+                                console.log(this.props.game);
                                 this.setState({
                                         orientation: white === this.props.playerId ? 'white' : 'black',
-                                        position: boardState,
+                                        playerColor: white === this.props.playerId ? 'white' : 'black',
                                         gameId: gameId,
                                         playerOne: playerOne,
                                         playerTwo: playerTwo,
-                                        toMove: toMove === this.props.playerId ? true : false,
+                                        // changing props
+                                        position: position,
+                                        toMove: toMove,
                                         history: history
                                 })
 
@@ -54,12 +57,27 @@ class ChessGame extends Component {
                                 return
                         }
                 }
-                if (this.props.game !== prevProps.game) {
+
+                // this should happen when opponent moves
+                if (this.props.gameState === "ongoing" && this.props.game !== prevProps.game) {
+                        console.log("game is updating");
+                        console.log(this.state.toMove)
+                        console.log(this.props.game.toMove);
+                        let { position, history, squareStyles, toMove } = this.props.game
+                        this.setState({
+                                toMove: toMove,
+                                position: position,
+                                history: history,
+                                squareStyles: squareStyles,
+                        }, () => {
+                                this.game.move(this.props.move)
+                        })
                 }
 
         }
-        updateGameAndServerState(updatedGameState) {
-                this.updateGameStates(updatedGameState)
+        updateGameAndServerState(updatedGameState, moveObject) {
+                this.updateGameState(updatedGameState);
+                this.props.playerMove({ game: updatedGameState, move: moveObject, gameId: this.state.gameId });
         }
         updateGameState(updatedGameState) {
                 this.setState(updatedGameState);
@@ -100,20 +118,24 @@ class ChessGame extends Component {
         };
 
         onDrop = ({ sourceSquare, targetSquare }) => {
-
                 // is it the player's turn; this is enforced on the server-side as well
-                if (this.state.toMove) {
 
-                        // see if the move is legal
-                        let move = this.game.move({
+                if (this.props.playerId === this.state.toMove) {
+
+
+                        let moveObject = {
                                 from: sourceSquare,
                                 to: targetSquare,
                                 promotion: "q" // always promote to a queen for example simplicity
-                        });
+                        };
+                        // see if the move is legal
+                        let move = this.game.move(moveObject);
 
                         // illegal move
-                        if (move === null) return;
-
+                        if (move === null) {
+                                console.log("illeagl");
+                                return;
+                        }
                         let { history, pieceSquare } = this.state;
 
                         const gameState = {
@@ -121,7 +143,7 @@ class ChessGame extends Component {
                                 history: this.game.history({ verbose: true }),
                                 squareStyles: squareStyling({ pieceSquare, history })
                         }
-                        this.updateGameStates(gameState);
+                        this.updateGameAndServerState(gameState, moveObject);
                 } else {
                         console.log("not your turn");
                         return;
@@ -194,6 +216,7 @@ class ChessGame extends Component {
                                 position={position}
                                 orientation={orientation}
                                 onDrop={this.onDrop}
+                                transitionDuration={300}
                                 onMouseOverSquare={this.onMouseOverSquare}
                                 onMouseOutSquare={this.onMouseOutSquare}
                                 squareStyles={squareStyles}
@@ -210,10 +233,11 @@ const mapStateToProps = (state /*, ownProps*/) => {
         return {
                 playerId: state.socketId,
                 gameState: state.gameState,
-                game: state.game
+                game: state.game,
+                move: state.move
         }
 }
-const mapDispatchToProps = { playerReady }
+const mapDispatchToProps = { playerReady, playerMove }
 
 export default connect(
         mapStateToProps,

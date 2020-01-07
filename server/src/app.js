@@ -12,7 +12,7 @@ import indexRouter from './routes/index';
 import userRouter from './routes/auth';
 import env from './env';
 import redis from 'redis';
-import { START_MATCHMAKING, REPLY_MATCHUP, GAME_PLAYER_READY } from './clientActions';
+import { START_MATCHMAKING, REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE } from './clientActions';
 import redisClient from './redis/redisClient'
 
 const app = express();
@@ -61,7 +61,6 @@ function serializeRedisMessage(type, payload) {
 function createGame(gameId, p1id, p2id) {
 
         const startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        let fen = 'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1';
         let white = Math.floor(Math.random() * 2) ? p1id : p2id;
 
 
@@ -70,12 +69,11 @@ function createGame(gameId, p1id, p2id) {
                 playerOne: p1id,
                 playerTwo: p2id,
                 white: white,
-                toMove: 'white',
-                boardState: fen,
+                toMove: white,
+                position: startingPosition,
                 history: "thinking"
         }
-        const gameObjectSerialized = JSON.stringify(gameObject);
-        return gameObjectSerialized;
+        return gameObject;
 }
 
 io.on("connection", (socket) => {
@@ -103,12 +101,11 @@ io.on("connection", (socket) => {
                                 redisClient.get(gameId, (err, reply) => {
                                         matchmakingLogger.info("Matchup accepted:" + gameId)
                                         matchmakingLogger.info("Waiting for players: " + reply + "/2");
-                                        console.log(reply)
                                         if (reply === "2") {
                                                 matchmakingLogger.info("STARTED GAME:" + gameId)
 
                                                 let game = createGame(gameId, clientId, opponentId);
-                                                redisClient.set(gameId + "object", game);
+                                                redisClient.set(gameId + "object", JSON.stringify(game));
 
 
                                                 redisClient.publish(clientId, serializeRedisMessage("gamestart", game));
@@ -126,10 +123,15 @@ io.on("connection", (socket) => {
 
 
                                 break;
-                        case "gamestart":
-                                let deserializedGame = JSON.parse(payload);
-                                socket.emit('action', { type: "client/START_GAME", payload: deserializedGame })
+                        case "gamestart":{
+                                socket.emit('action', { type: "client/START_GAME", payload: payload })
                                 break;
+                        }
+                        case "gamemove": {
+                                console.log(payload)
+                                socket.emit('action', { type: "client/UPDATE_GAME", payload: payload })
+                                break;
+                        }
                 }
         })
         socket.on('action', (action) => {
@@ -144,7 +146,6 @@ io.on("connection", (socket) => {
 
                                 //get size of queue
                                 redisClient.get("mmqueue", (err, queueSize) => {
-                                        console.log(queueSize)
                                         if (queueSize <= 0) {
                                                 redisClient.rpush('matchmaking_queue', clientId)
                                                 redisClient.incr("mmqueue")
@@ -156,9 +157,9 @@ io.on("connection", (socket) => {
                                                                 matchmakingLogger.info("Popped client from MM queue:" + foundOpponentId)
 
                                                                 host = true;
+                                                                opponentId = foundOpponentId;
                                                                 gameId = clientId + opponentId;
                                                                 redisClient.set(gameId, 0);
-                                                                opponentId = foundOpponentId;
 
 
                                                                 // propose to found 
@@ -177,12 +178,29 @@ io.on("connection", (socket) => {
                                 // we don't handle rejects for now;
                                 if (true) {
 
-                                        redisClient.incr(gameId); 2
+                                        redisClient.incr(gameId);
                                         redisClient.publish(opponentId, serializeRedisMessage("acceptmatchup", clientId));
                                 }
                                 break;
                         case GAME_PLAYER_READY:
                                 // player has received game state 
+                                break;
+                        case GAME_PLAYER_MOVE:
+                                let { move, game } = action.payload;
+
+                                redisClient.get(action.payload.gameId + "object", (err, reply) => {
+                                        let oldGame = JSON.parse(reply);
+
+                                        // player is on move
+                                        if (oldGame.toMove === clientId) {
+                                                oldGame.toMove === oldGame.playerOne ? oldGame.toMove = oldGame.playerTwo : oldGame.toMove = oldGame.playerOne;
+                                                let newGame = Object.assign(oldGame, game);
+                                                redisClient.set(action.payload.gameId + "object", JSON.stringify(newGame))
+                                                redisClient.publish(opponentId, serializeRedisMessage("gamemove", {game:newGame,move:move}));
+                                        } else {
+                                                console.log("no move")
+                                        }
+                                })
                                 break;
                         default:
                                 console.log(action);
