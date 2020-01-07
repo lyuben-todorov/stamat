@@ -1,11 +1,13 @@
 import React, { Component } from 'react'
 import { observer } from 'mobx-react'
-import Chessboard from 'chessboardjsx';
 import MessageWindow from './MessageWindow';
 import MoveWindow from './MoveWindow';
 import { Grid } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { startMatchmaking } from '../../redux/actionCreators'
+import ChessGame from './Chess/ChessGame';
+import '../_sass/Game.scss'
+
 
 @observer
 class Game extends Component {
@@ -20,7 +22,8 @@ class Game extends Component {
                                                 <MessageWindow></MessageWindow>
                                         </Grid.Column>
                                         <Grid.Column>
-                                                <Chessboard position="start"></Chessboard>
+                                                <ChessGame className="MainChessboard"
+                                                ></ChessGame>
                                         </Grid.Column>
                                         <Grid.Column>
                                                 <MoveWindow></MoveWindow>

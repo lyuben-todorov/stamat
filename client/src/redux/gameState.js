@@ -2,7 +2,8 @@ import { createStore, applyMiddleware } from 'redux';
 import createSocketIoMiddleware from 'redux-socket.io';
 import io from 'socket.io-client';
 let socket = io('http://localhost:3001');
-let socketIoMiddleware = createSocketIoMiddleware(socket, "matchmaking/");
+let matchmakingMiddleware = createSocketIoMiddleware(socket, "matchmaking/");
+let gameMiddleware = createSocketIoMiddleware(socket, "game/");
 
 export const SOCKET_START_MATCHMAKING = "matchmaking/START_MATCHMAKING";
 export const SOCKET_REPLY_MATCHUP = "matchmaking/REPLY_MATCHUP";
@@ -10,11 +11,17 @@ export const SOCKET_REPLY_MATCHUP = "matchmaking/REPLY_MATCHUP";
 export const CLIENT_REGISTER = "client/REGISTER";
 export const CLIENT_PROPOSE_MATCHUP = "client/PROPOSE_MATCHUP";
 export const CLIENT_START_GAME = "client/START_GAME";
+
+export const GAME_START_GAME = "game/START_GAME";
+
 const initialState = {
     gameState: "guest",
     socketId: "none",
     gameId: "none",
-    opponent: "none"
+    opponent: "none",
+    game:{
+
+    }
 }
 
 function reducer(state = initialState, action) {
@@ -36,6 +43,6 @@ function reducer(state = initialState, action) {
 
 }
 
-let gameState = applyMiddleware(socketIoMiddleware)(createStore)(reducer);
+let gameState = applyMiddleware(matchmakingMiddleware, gameMiddleware)(createStore)(reducer);
 
 export default gameState;
