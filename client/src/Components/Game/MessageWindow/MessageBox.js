@@ -15,6 +15,7 @@ class MessageBox extends Component {
                 this.state = {
                         messages: [],
                         startedMatchmaking: false,
+                        startedGame:false,
                         username: "none"
                 }
                 this.addMatchmakingButton = this.addMatchmakingButton.bind(this);
@@ -37,8 +38,9 @@ class MessageBox extends Component {
                         if (this.props.gameState === "proposal") {
                                 this.addMatchupProposalButton();
                         }
-                        if (this.props.gameState === "initiateGame") {
+                        if (this.props.gameState === "ongoing" && !this.state.startedGame) {
                                 this.addStartGameMessage();
+                                this.setState({startedGame:true});
                         }
 
                 }
@@ -80,7 +82,6 @@ class MessageBox extends Component {
                                 this.addMatchmakingButton();
                                 break;
                         case SOCKET_REPLY_MATCHUP:
-                                console.log(message.payload);
                                 this.props.replyMatchmaking(message.payload);
                                 break;
                         default:

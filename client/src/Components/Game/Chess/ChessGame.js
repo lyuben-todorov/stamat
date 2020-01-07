@@ -10,7 +10,7 @@ class ChessGame extends Component {
                 super(props)
 
                 this.state = {
-                        fen: "start",
+                        position: "start",
                         // square styles for active drop square
                         dropSquareStyle: {},
                         // custom square styles
@@ -36,25 +36,25 @@ class ChessGame extends Component {
         componentDidUpdate(prevProps) {
 
                 if (this.props.gameState !== prevProps.gameState) {
-
                         // called when state receives new game object and sets gamestate to initiategame
                         if (this.props.gameState === "initiateGame") {
                                 let { gameId, playerOne, playerTwo, white, toMove, boardState, history } = this.props.game
                                 this.setState({
                                         orientation: white === this.props.playerId ? 'white' : 'black',
-                                        fen: boardState,
+                                        position: boardState,
                                         gameId: gameId,
                                         playerOne: playerOne,
                                         playerTwo: playerTwo,
                                         toMove: toMove === this.props.playerId ? true : false,
                                         history: history
                                 })
+
                                 this.props.playerReady();
+
                                 return
                         }
                 }
                 if (this.props.game !== prevProps.game) {
-                        console.log("turn");
                 }
 
         }
@@ -100,24 +100,33 @@ class ChessGame extends Component {
         };
 
         onDrop = ({ sourceSquare, targetSquare }) => {
-                // see if the move is legal
-                let move = this.game.move({
-                        from: sourceSquare,
-                        to: targetSquare,
-                        promotion: "q" // always promote to a queen for example simplicity
-                });
 
-                // illegal move
-                if (move === null) return;
+                // is it the player's turn; this is enforced on the server-side as well
+                if (this.state.toMove) {
 
-                let { history, pieceSquare } = this.state;
+                        // see if the move is legal
+                        let move = this.game.move({
+                                from: sourceSquare,
+                                to: targetSquare,
+                                promotion: "q" // always promote to a queen for example simplicity
+                        });
 
-                const gameState = {
-                        fen: this.game.fen(),
-                        history: this.game.history({ verbose: true }),
-                        squareStyles: squareStyling({ pieceSquare, history })
+                        // illegal move
+                        if (move === null) return;
+
+                        let { history, pieceSquare } = this.state;
+
+                        const gameState = {
+                                position: this.game.fen(),
+                                history: this.game.history({ verbose: true }),
+                                squareStyles: squareStyling({ pieceSquare, history })
+                        }
+                        this.updateGameStates(gameState);
+                } else {
+                        console.log("not your turn");
+                        return;
                 }
-                this.updateGameStates(gameState);
+
         };
 
         onMouseOverSquare = square => {
@@ -177,12 +186,12 @@ class ChessGame extends Component {
                 });
 
         render() {
-                const { fen, dropSquareStyle, squareStyles, orientation } = this.state;
+                const { position, dropSquareStyle, squareStyles, orientation } = this.state;
 
                 return (
                         <Chessboard
                                 id="mainChessboard"
-                                position={fen}
+                                position={position}
                                 orientation={orientation}
                                 onDrop={this.onDrop}
                                 onMouseOverSquare={this.onMouseOverSquare}

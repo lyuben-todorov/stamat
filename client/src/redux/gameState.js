@@ -1,9 +1,17 @@
 import { createStore, applyMiddleware } from 'redux';
 import createSocketIoMiddleware from 'redux-socket.io';
 import io from 'socket.io-client';
+import logger from 'redux-logger'
+
+
+function optimisticExecute(action, emit, next, dispatch) {
+    emit('action', action);
+    console.log(action);
+    next(action);
+  }
+
 let socket = io('http://localhost:3001');
-let matchmakingMiddleware = createSocketIoMiddleware(socket, "matchmaking/");
-let gameMiddleware = createSocketIoMiddleware(socket, "game/");
+let socketMiddleware = createSocketIoMiddleware(socket, ["matchmaking/", "game/"]);
 
 export const SOCKET_START_MATCHMAKING = "matchmaking/START_MATCHMAKING";
 export const SOCKET_REPLY_MATCHUP = "matchmaking/REPLY_MATCHUP";
@@ -14,7 +22,7 @@ export const CLIENT_START_GAME = "client/START_GAME";
 
 export const GAME_REQUEST_SESSION = "game/REQUEST_GAME_SESSION";
 export const GAME_PLAYER_READY = "game/PLAYER_READY";
-
+export const GAME_PLAYER_MOVE = "game/PLAYER_MOVE"
 const initialState = {
     userType: "guest",
     gameState: "default",
@@ -35,7 +43,7 @@ function reducer(state = initialState, action) {
         case SOCKET_REPLY_MATCHUP:
             return state;
 
-        // actions prefixed with CLIENT result only in a client-side stage change
+        // actions prefixed with CLIENT result only in a client-side stage change triggered by the server
         case CLIENT_REGISTER:
             return { ...state, socketId: action.payload };
         case CLIENT_PROPOSE_MATCHUP:
@@ -46,6 +54,8 @@ function reducer(state = initialState, action) {
         // actions prefixed with GAME also trigger game-related client-server actions on socket
         case GAME_PLAYER_READY:
             return { ...state, gameState: "ongoing"}
+        case GAME_PLAYER_MOVE:
+            return state;
         default:
             console.log(action);
             return state;
@@ -53,6 +63,6 @@ function reducer(state = initialState, action) {
 
 }
 
-let gameState = applyMiddleware(matchmakingMiddleware, gameMiddleware)(createStore)(reducer);
+let gameState = applyMiddleware(socketMiddleware)(createStore)(reducer);
 
 export default gameState;

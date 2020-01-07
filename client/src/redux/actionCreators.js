@@ -1,4 +1,4 @@
-import { SOCKET_START_MATCHMAKING, SOCKET_REPLY_MATCHUP, GAME_PLAYER_READY } from "./gameState";
+import { SOCKET_START_MATCHMAKING, SOCKET_REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE } from "./gameState";
 
 export const startMatchmaking = (matchup) => ({
     type: SOCKET_START_MATCHMAKING,
@@ -9,5 +9,9 @@ export const replyMatchmaking = (message) => ({
     payload: { reply: message.reply, opponentId: message.opponentId }
 })
 export const playerReady = () => ({
-    type:GAME_PLAYER_READY
+    type: GAME_PLAYER_READY
+})
+export const playerMove = (move) => ({
+    type: GAME_PLAYER_MOVE,
+    payload:move
 })
