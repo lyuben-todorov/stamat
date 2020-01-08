@@ -71,7 +71,7 @@ function createGame(gameId, p1id, p2id) {
                 white: white,
                 toMove: white,
                 position: startingPosition,
-                history: "thinking"
+                history: ""
         }
         return gameObject;
 }
@@ -92,7 +92,7 @@ io.on("connection", (socket) => {
         personalChannel.subscribe(`${clientId}`); //bad, we want the personal channel id to be issued by the server
 
         personalChannel.on("message", (channel, message) => {
-                redisLogger.info(clientId + " got message: " + message);
+                redisLogger.info(clientId + " got message: " + message.substring(0,50) + "...");
                 const messageObject = JSON.parse(message);
                 let { type, payload } = messageObject;
 
@@ -128,14 +128,13 @@ io.on("connection", (socket) => {
                                 break;
                         }
                         case "gamemove": {
-                                console.log(payload)
                                 socket.emit('action', { type: "client/UPDATE_GAME", payload: payload })
                                 break;
                         }
                 }
         })
         socket.on('action', (action) => {
-                socketLogger.info("Recieved action on socket:" + JSON.stringify(action))
+                socketLogger.info("Recieved action on socket:" + JSON.stringify(action).substring(0,50) + "...")
                 switch (action.type) {
                         case START_MATCHMAKING:
                                 // this is where matchmaking is supposed to go

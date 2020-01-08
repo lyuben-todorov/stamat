@@ -16,7 +16,7 @@ class ChessGame extends Component {
                         // custom square styles
                         squareStyles: {},
                         // square with the currently clicked piece
-                        pieceSquare: "",
+                        pieceSquare: 'none',
                         // currently clicked square
                         square: "",
                         // array of past game moves
@@ -26,6 +26,7 @@ class ChessGame extends Component {
                 }
                 this.updateGameAndServerState = this.updateGameAndServerState.bind(this);
                 this.updateGameState = this.updateGameState.bind(this);
+                this.onMoveEvent = this.onMoveEvent.bind(this);
 
         }
 
@@ -69,6 +70,7 @@ class ChessGame extends Component {
                                 position: position,
                                 history: history,
                                 squareStyles: squareStyles,
+                                pieceSquare: 'none'
                         }, () => {
                                 this.game.move(this.props.move)
                         })
@@ -117,9 +119,7 @@ class ChessGame extends Component {
                 }));
         };
 
-        onDrop = ({ sourceSquare, targetSquare }) => {
-                // is it the player's turn; this is enforced on the server-side as well
-
+        onMoveEvent = (sourceSquare, targetSquare) => {
                 if (this.props.playerId === this.state.toMove) {
 
 
@@ -141,65 +141,59 @@ class ChessGame extends Component {
                         const gameState = {
                                 position: this.game.fen(),
                                 history: this.game.history({ verbose: true }),
-                                squareStyles: squareStyling({ pieceSquare, history })
+                                squareStyles: squareStyling({ pieceSquare, history }),
+                                pieceSquare: ""
                         }
                         this.updateGameAndServerState(gameState, moveObject);
                 } else {
                         console.log("not your turn");
                         return;
                 }
-
-        };
-
+        }
+        
         onMouseOverSquare = square => {
                 // get list of possible moves for this square
                 let moves = this.game.moves({
                         square: square,
                         verbose: true
                 });
-
+                
                 // exit if there are no moves available for this square
                 if (moves.length === 0) return;
-
+                
                 let squaresToHighlight = [];
                 for (var i = 0; i < moves.length; i++) {
                         squaresToHighlight.push(moves[i].to);
                 }
-
+                
                 this.highlightSquare(square, squaresToHighlight);
         };
-
+        
         onMouseOutSquare = square => this.removeHighlightSquare(square);
-
+        
         // central squares get diff dropSquareStyles
         onDragOverSquare = square => {
                 this.setState({
                         dropSquareStyle: { boxShadow: "inset 0 0 1px 4px rgb(255, 255, 0)" }
                 });
         };
-
+        
+        onDrop = ({ sourceSquare, targetSquare }) => {
+                // is it the player's turn; this is enforced on the server-side as well
+                this.onMoveEvent(sourceSquare, targetSquare);
+        };
         onSquareClick = square => {
-                this.setState(({ history }) => ({
-                        squareStyles: squareStyling({ pieceSquare: square, history }),
-                        pieceSquare: square
-                }));
+                if (this.state.pieceSquare === 'none') {
 
-                let move = this.game.move({
-                        from: this.state.pieceSquare,
-                        to: square,
-                        promotion: "q" // always promote to a queen for example simplicity
-                });
-
-                // illegal move
-                if (move === null) return;
-
-
-                let gameState = {
-                        fen: this.game.fen(),
-                        history: this.game.history({ verbose: true }),
-                        pieceSquare: ""
+                        this.setState(({ history }) => ({
+                                squareStyles: squareStyling({ pieceSquare: square, history }),
+                                pieceSquare: square
+                        }));
+                        return;
+                } else if (this.state.pieceSquare !== square) {
+                        let source = this.state.pieceSquare;
+                        this.onMoveEvent(source, square);
                 }
-                this.updateGameStates(gameState);
         };
 
         onSquareRightClick = square =>
