@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Grid, Header, Form, Segment, Button, Message } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
 
 const root = "http://localhost:3001/auth";
 
@@ -82,4 +83,18 @@ class Login extends Component {
                 );
         }
 }
-export default withRouter(Login);
+const mapStateToProps = (state) => {
+        return {
+                userType: state.userType,
+                gameState: state.gameState,
+                socketId: state.socketId,
+                oponent: state.oponent
+        }
+}
+
+const mapDispatchToProps = { }
+
+export default connect(
+        mapStateToProps,
+        mapDispatchToProps
+)(withRouter(Login))

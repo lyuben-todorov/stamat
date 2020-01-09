@@ -12,7 +12,7 @@ import indexRouter from './routes/index';
 import userRouter from './routes/auth';
 import env from './env';
 import redis from 'redis';
-import { START_MATCHMAKING, REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, CLIENT_REGISTER_USER } from './clientActions';
+import { SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, CLIENT_REGISTER_USER } from './clientActions';
 import redisClient from './redis/redisClient'
 
 const app = express();
@@ -55,6 +55,13 @@ redisClient.del("matchmaking_queue");
 //app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 const server = http.createServer(app);
 const io = socketio(server)
+
+
+
+
+
+
+
 function serializeRedisMessage(type, payload) {
         return JSON.stringify({ type: type, payload: payload })
 }
@@ -98,7 +105,7 @@ io.on("connection", (socket) => {
                 let { type, payload } = messageObject;
 
                 switch (type) {
-                        case "acceptmatchup":
+                        case SERVER_REPLY_MATCHUP:
                                 redisClient.get(gameId, (err, reply) => {
                                         matchmakingLogger.info("Matchup accepted:" + gameId)
                                         matchmakingLogger.info("Waiting for players: " + reply + "/2");
@@ -109,12 +116,12 @@ io.on("connection", (socket) => {
                                                 redisClient.set(gameId + "object", JSON.stringify(game));
 
 
-                                                redisClient.publish(clientId, serializeRedisMessage("gamestart", game));
-                                                redisClient.publish(opponentId, serializeRedisMessage("gamestart", game));
+                                                redisClient.publish(clientId, serializeRedisMessage(CLIENT_START_GAME, game));
+                                                redisClient.publish(opponentId, serializeRedisMessage(CLIENT_START_GAME, game));
                                         }
                                 })
                                 break;
-                        case "proposematchup":
+                        case CLIENT_PROPOSE_MATCHUP:
                                 opponentId = payload
 
                                 host ? gameId = clientId + opponentId : gameId = opponentId + clientId;
@@ -124,11 +131,11 @@ io.on("connection", (socket) => {
 
 
                                 break;
-                        case "gamestart": {
+                        case CLIENT_START_GAME: {
                                 socket.emit('action', { type: CLIENT_START_GAME, payload: payload })
                                 break;
                         }
-                        case "gamemove": {
+                        case GAME_PLAYER_MOVE: {
                                 socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload })
                                 break;
                         }
@@ -137,7 +144,7 @@ io.on("connection", (socket) => {
         socket.on('action', (action) => {
                 socketLogger.info("Recieved action on socket:" + JSON.stringify(action))
                 switch (action.type) {
-                        case START_MATCHMAKING:
+                        case SERVER_START_MATCHMAKING:
                                 // this is where matchmaking is supposed to go
                                 // maybe connect to internal socket channel 'matchmaking', post the matchup and listen for found games
                                 // mm logic should be handled by a third-party server
@@ -163,8 +170,8 @@ io.on("connection", (socket) => {
 
 
                                                                 // propose to found 
-                                                                redisClient.publish(opponentId, serializeRedisMessage("proposematchup", clientId))
-                                                                redisClient.publish(clientId, serializeRedisMessage("proposematchup", opponentId))
+                                                                redisClient.publish(opponentId, serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, clientId))
+                                                                redisClient.publish(clientId, serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, opponentId))
 
                                                         } else {
                                                                 matchmakingLogger.error("Queue is empty and this shouldn't be happening");
@@ -173,13 +180,12 @@ io.on("connection", (socket) => {
                                         }
                                 })
                                 break;
-                        case REPLY_MATCHUP:
+                        case SERVER_REPLY_MATCHUP:
 
                                 // we don't handle rejects for now;
-                                if (true) {
-
+                                if (action.payload.reply) {
                                         redisClient.incr(gameId);
-                                        redisClient.publish(opponentId, serializeRedisMessage("acceptmatchup", clientId));
+                                        redisClient.publish(opponentId, serializeRedisMessage(SERVER_REPLY_MATCHUP, clientId));
                                 }
                                 break;
                         case GAME_PLAYER_READY:
@@ -196,7 +202,7 @@ io.on("connection", (socket) => {
                                                 oldGame.toMove === oldGame.playerOne ? oldGame.toMove = oldGame.playerTwo : oldGame.toMove = oldGame.playerOne;
                                                 let newGame = Object.assign(oldGame, game);
                                                 redisClient.set(action.payload.gameId + "object", JSON.stringify(newGame))
-                                                redisClient.publish(opponentId, serializeRedisMessage("gamemove", { game: newGame, move: move }));
+                                                redisClient.publish(opponentId, serializeRedisMessage(GAME_PLAYER_MOVE, { game: newGame, move: move }));
                                         } else {
                                                 console.log("no move")
                                         }
