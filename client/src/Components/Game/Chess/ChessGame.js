@@ -52,6 +52,7 @@ class ChessGame extends Component {
                                         toMove: toMove,
                                         history: history
                                 })
+                                this.game = new Chess();
 
                                 this.props.playerReady();
 
@@ -61,9 +62,6 @@ class ChessGame extends Component {
 
                 // this should happen when opponent moves
                 if (this.props.gameState === "ongoing" && this.props.game !== prevProps.game) {
-                        console.log("game is updating");
-                        console.log(this.state.toMove)
-                        console.log(this.props.game.toMove);
                         let { position, history, squareStyles, toMove } = this.props.game
                         this.setState({
                                 toMove: toMove,
@@ -73,13 +71,16 @@ class ChessGame extends Component {
                                 pieceSquare: 'none'
                         }, () => {
                                 this.game.move(this.props.move)
+                                if(this.game.game_over()){
+                                        this.setState({toMove:"none"});
+                                }
                         })
                 }
 
         }
         updateGameAndServerState(updatedGameState, moveObject) {
                 this.updateGameState(updatedGameState);
-                this.props.playerMove({ game: updatedGameState, move: moveObject, gameId: this.state.gameId });
+                this.props.playerMove({ game: updatedGameState, move: moveObject, gameId: this.state.gameId, gameOver:false });
         }
         updateGameState(updatedGameState) {
                 this.setState(updatedGameState);
@@ -142,42 +143,43 @@ class ChessGame extends Component {
                                 position: this.game.fen(),
                                 history: this.game.history({ verbose: true }),
                                 squareStyles: squareStyling({ pieceSquare, history }),
-                                pieceSquare: ""
+                                pieceSquare: "",
+                                toMove: this.props.oponentId
                         }
-                        this.updateGameAndServerState(gameState, moveObject);
+                        this.updateGameAndServerState(gameState, moveObject, this.game.game_over());
                 } else {
                         console.log("not your turn");
                         return;
                 }
         }
-        
+
         onMouseOverSquare = square => {
                 // get list of possible moves for this square
                 let moves = this.game.moves({
                         square: square,
                         verbose: true
                 });
-                
+
                 // exit if there are no moves available for this square
                 if (moves.length === 0) return;
-                
+
                 let squaresToHighlight = [];
                 for (var i = 0; i < moves.length; i++) {
                         squaresToHighlight.push(moves[i].to);
                 }
-                
+
                 this.highlightSquare(square, squaresToHighlight);
         };
-        
+
         onMouseOutSquare = square => this.removeHighlightSquare(square);
-        
+
         // central squares get diff dropSquareStyles
         onDragOverSquare = square => {
                 this.setState({
                         dropSquareStyle: { boxShadow: "inset 0 0 1px 4px rgb(255, 255, 0)" }
                 });
         };
-        
+
         onDrop = ({ sourceSquare, targetSquare }) => {
                 // is it the player's turn; this is enforced on the server-side as well
                 this.onMoveEvent(sourceSquare, targetSquare);
@@ -207,6 +209,8 @@ class ChessGame extends Component {
                 return (
                         <Chessboard
                                 id="mainChessboard"
+                                width={500}
+                                boardStyle={boardStyle}
                                 position={position}
                                 orientation={orientation}
                                 onDrop={this.onDrop}
@@ -228,7 +232,8 @@ const mapStateToProps = (state /*, ownProps*/) => {
                 playerId: state.socketId,
                 gameState: state.gameState,
                 game: state.game,
-                move: state.move
+                move: state.move,
+                oponentId: state.oponentId
         }
 }
 const mapDispatchToProps = { playerReady, playerMove }
@@ -256,3 +261,6 @@ const squareStyling = ({ pieceSquare, history }) => {
                 })
         };
 };
+const boardStyle = {
+        margin: "auto"
+}

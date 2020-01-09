@@ -33,8 +33,7 @@ class Login extends Component {
                         email: this.state.email,
                         password: this.state.password
                 }, { withCredentials: true }).then((res) => {
-                        this.props.sessionStore.login(res.statusText)
-                        this.props.history.push('/dashboard')
+                        this.props.history.push('/profile')
                 }).catch(err => {
                         console.log(err)
                         this.setState({ authenticationError: true })

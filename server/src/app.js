@@ -12,7 +12,7 @@ import indexRouter from './routes/index';
 import userRouter from './routes/auth';
 import env from './env';
 import redis from 'redis';
-import { START_MATCHMAKING, REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE } from './clientActions';
+import { START_MATCHMAKING, REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, CLIENT_REGISTER_USER } from './clientActions';
 import redisClient from './redis/redisClient'
 
 const app = express();
@@ -81,18 +81,19 @@ io.on("connection", (socket) => {
         const socketLogger = createLogger(clientId);
         let host = false;
         let opponentId;
+        let opponentName;
         let gameId;
 
         socketLogger.info("Socket connected");
 
-        socket.emit('action', { type: "client/REGISTER", payload: clientId })
+        socket.emit('action', { type: CLIENT_REGISTER_USER, payload: clientId })
 
         //listen on personal channel for opponent
         const personalChannel = redis.createClient()
         personalChannel.subscribe(`${clientId}`); //bad, we want the personal channel id to be issued by the server
 
         personalChannel.on("message", (channel, message) => {
-                redisLogger.info(clientId + " got message: " + message.substring(0,50) + "...");
+                redisLogger.info(clientId + " got message: " + message);
                 const messageObject = JSON.parse(message);
                 let { type, payload } = messageObject;
 
@@ -119,22 +120,22 @@ io.on("connection", (socket) => {
                                 host ? gameId = clientId + opponentId : gameId = opponentId + clientId;
                                 matchmakingLogger.info("Proposing Matchup to " + clientId + " ; against " + opponentId)
 
-                                socket.emit('action', { type: "client/PROPOSE_MATCHUP", payload: opponentId })
+                                socket.emit('action', { type: CLIENT_PROPOSE_MATCHUP, payload: opponentId })
 
 
                                 break;
-                        case "gamestart":{
-                                socket.emit('action', { type: "client/START_GAME", payload: payload })
+                        case "gamestart": {
+                                socket.emit('action', { type: CLIENT_START_GAME, payload: payload })
                                 break;
                         }
                         case "gamemove": {
-                                socket.emit('action', { type: "client/UPDATE_GAME", payload: payload })
+                                socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload })
                                 break;
                         }
                 }
         })
         socket.on('action', (action) => {
-                socketLogger.info("Recieved action on socket:" + JSON.stringify(action).substring(0,50) + "...")
+                socketLogger.info("Recieved action on socket:" + JSON.stringify(action))
                 switch (action.type) {
                         case START_MATCHMAKING:
                                 // this is where matchmaking is supposed to go
@@ -195,7 +196,7 @@ io.on("connection", (socket) => {
                                                 oldGame.toMove === oldGame.playerOne ? oldGame.toMove = oldGame.playerTwo : oldGame.toMove = oldGame.playerOne;
                                                 let newGame = Object.assign(oldGame, game);
                                                 redisClient.set(action.payload.gameId + "object", JSON.stringify(newGame))
-                                                redisClient.publish(opponentId, serializeRedisMessage("gamemove", {game:newGame,move:move}));
+                                                redisClient.publish(opponentId, serializeRedisMessage("gamemove", { game: newGame, move: move }));
                                         } else {
                                                 console.log("no move")
                                         }

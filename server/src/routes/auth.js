@@ -58,7 +58,7 @@ router.post('/login',  (req, res) => {
                                         const token = jwt.sign(payload, secret, {
                                                 expiresIn: '1h'
                                         });
-                                        res.cookie('token', token, { httpOnly: true })
+                                        res.cookie('token', token, { httpOnly: true,maxAge:360000 }).cookie('kur',"kur")
                                                 .sendStatus(200);
                                 }
                         });

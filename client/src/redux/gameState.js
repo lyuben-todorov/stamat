@@ -2,6 +2,7 @@ import { createStore, applyMiddleware } from 'redux';
 import createSocketIoMiddleware from 'redux-socket.io';
 import io from 'socket.io-client';
 import logger from 'redux-logger'
+import { act } from 'react-dom/test-utils';
 
 
 function optimisticExecute(action, emit, next, dispatch) {
@@ -11,12 +12,13 @@ function optimisticExecute(action, emit, next, dispatch) {
 }
 
 let socket = io('http://localhost:3001');
-let socketMiddleware = createSocketIoMiddleware(socket, ["matchmaking/", "game/"]);
+let socketMiddleware = createSocketIoMiddleware(socket, ["server/", "game/"]);
 
-export const SOCKET_START_MATCHMAKING = "matchmaking/START_MATCHMAKING";
-export const SOCKET_REPLY_MATCHUP = "matchmaking/REPLY_MATCHUP";
+export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
+export const SERVER_REPLY_MATCHUP = "server/REPLY_MATCHUP";
+export const SERVER_REGISTER_USER = "server/REGISTER_USER"
 
-export const CLIENT_REGISTER = "client/REGISTER";
+export const CLIENT_REGISTER_USER = "client/REGISTER_USER";
 export const CLIENT_PROPOSE_MATCHUP = "client/PROPOSE_MATCHUP";
 export const CLIENT_START_GAME = "client/START_GAME";
 export const CLIENT_UPDATE_GAME = "client/UPDATE_GAME";
@@ -28,39 +30,46 @@ const initialState = {
     userType: "guest",
     gameState: "default",
     socketId: "none",
+    username: "none",
     gameId: "none",
-    opponent: "none",
+    opponentId: "none",
     game: {
 
-    }
+    },
+    history: []
 }
 
 function reducer(state = initialState, action) {
     switch (action.type) {
 
-        // actions prefixed with SOCKET are used to trigger gerneral client-server actions on socket
-        case SOCKET_START_MATCHMAKING:
-            return { ...state, gameState: "matchmaking", game: action.payload };
-        case SOCKET_REPLY_MATCHUP:
+        // actions prefixed with SERVER are used to trigger gerneral client-server actions on socket
+        case SERVER_REGISTER_USER:
+            break;
+        case SERVER_START_MATCHMAKING:
+            return { ...state, gameState: "matchmaking", game: action.payload, username: action.username };
+        case SERVER_REPLY_MATCHUP:
             return state;
+        
 
         // actions prefixed with CLIENT result only in a client-side stage change that's triggered by the server
-        case CLIENT_REGISTER:
+
+        // client register is issued by the server after socket connects
+        // socketId is unique per user for both guests and registered clients
+        // used to identify user session
+        case CLIENT_REGISTER_USER:
             return { ...state, socketId: action.payload };
         case CLIENT_PROPOSE_MATCHUP:
-            return { ...state, gameState: "proposal", opponent: action.payload }
+            return { ...state, gameState: "proposal", opponentId: action.payload }
         case CLIENT_START_GAME:
             return { ...state, gameState: "initiateGame", game: action.payload }
         case CLIENT_UPDATE_GAME:
-            console.log(action.payload.game)
-            console.log(action.payload.move)
-            return { ...state, game: action.payload.game, move:action.payload.move }
+            return { ...state, game: action.payload.game, move: action.payload.move, history: action.payload.game.history }
 
         // actions prefixed with GAME are used to trigger game-related client-server actions on socket
         case GAME_PLAYER_READY:
             return { ...state, gameState: "ongoing" }
         case GAME_PLAYER_MOVE:
-            return state;
+            return { ...state, history: action.payload.game.history };
 
 
         // for actions with no server side-effects use mobx;

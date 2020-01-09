@@ -1,4 +1,4 @@
-import redis from 'redis';
+  import redis from 'redis';
 import createLgger from '../logger';
 
 const logger = createLgger('Redis | Server');

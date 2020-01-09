@@ -5,12 +5,13 @@ import Register from './Auth/Register';
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import axios from 'axios';
 import sessionStore from '../Mobx/SessionStore';
-import { Segment, Header } from 'semantic-ui-react';
+import { Segment, Header, Menu, Container, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import { Cookies, withCookies } from 'react-cookie';
 import { instanceOf } from 'prop-types'
 import Game from './Game/Game';
 import SessionStore from '../Mobx/SessionStore';
+import Dashboard from './Auth/Dashboard';
 
 const root = "http://localhost:3001/auth";
 
@@ -25,7 +26,7 @@ class App extends Component {
                 const { cookies } = props;
 
                 this.state = {
-                        sessionToken: cookies.get('token',{doNotParse:true})
+                        sessionToken: cookies.get('token', { doNotParse: true })
                 };
                 this.handleLogout = this.handleLogout.bind(this);
         }
@@ -53,15 +54,23 @@ class App extends Component {
                 return (
                         <div className="App">
                                 <BrowserRouter>
-                                        <Segment>
-
-                                                <Header size="huge">Ebre-debre</Header>
-
-                                        </Segment>
+                                        <Menu size='large'>
+                                                <Container>
+                                                        <Menu.Item header >Ebre-debre</Menu.Item>
+                                                        <Menu.Item as='a' active>Home</Menu.Item>
+                                                        <Menu.Item as='a'href="/game" >Game</Menu.Item>
+                                                        <Menu.Item position='right'>
+                                                                <Button as='a' href="/login" >Log in</Button>
+                                                                <Button as='a' href ="/register" primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
+                                                        </Menu.Item>
+                                                </Container>
+                                        </Menu>
                                         <Switch>
                                                 <Route path="/login" render={() => <Login sessionStore={sessionStore} />} />
                                                 <Route path="/register" render={() => <Register sessionStore={sessionStore} />} />
-                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore}  />} />
+                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
+                                                <Route path="/profile*" render={() => <Dashboard sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
+
                                         </Switch>
                                 </BrowserRouter>
                         </div>

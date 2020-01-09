@@ -1,21 +1,32 @@
 import React, { Component } from 'react'
 import { Segment } from 'semantic-ui-react'
 import Message from './MessageWindow/Message'
+import { connect } from 'react-redux'
 
-export default class MoveWindow extends Component {
-    constructor(props){
-        super(props)
-
-        this.state = { messages:[] }
-    }
+class MoveWindow extends Component {
     render() {
         return (
 
-                <Segment className="MessageWindow">
-                    {this.state.messages.map((message, index) => (
-                        <Message onMessageAction={this.onMessageAction} type={message.type} key={index} message={message.message}></Message>
+            <Segment className="MessageWindow">
+                <Segment className="MessageBox">
+                    {this.props.history.map((message, index) => (
+                        <Message onMessageAction={this.onMessageAction} type={"history"} key={index} message={message}></Message>
                     ))}
                 </Segment>
+            </Segment>
         )
     }
+
 }
+const mapStateToProps = (state /*, ownProps*/) => {
+    return {
+        history: state.history
+    }
+}
+const mapDispatchToProps = {}
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(MoveWindow)
+

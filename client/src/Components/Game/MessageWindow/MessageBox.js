@@ -5,7 +5,7 @@ import Message from './Message';
 
 import { startMatchmaking, replyMatchmaking } from '../../../redux/actionCreators'
 import { connect } from 'react-redux';
-import { SOCKET_START_MATCHMAKING, CLIENT_REGISTER, CLIENT_PROPOSE_MATCHUP, SOCKET_REPLY_MATCHUP } from '../../../redux/gameState';
+import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP } from '../../../redux/gameState';
 
 
 @observer
@@ -26,7 +26,7 @@ class MessageBox extends Component {
         componentDidMount() {
                 if (this.props.userType === "guest") {
                         this.setState(state => {
-                                const messages = [...state.messages, { type: CLIENT_REGISTER, message: "" }]
+                                const messages = [...state.messages, { type: CLIENT_REGISTER_USER, message: "" }]
 
                                 return { messages }
                         })
@@ -56,7 +56,7 @@ class MessageBox extends Component {
                 if (!this.state.startedMatchmaking) {
 
                         this.setState(state => {
-                                const messages = [...state.messages, { type: SOCKET_START_MATCHMAKING, message: "" }]
+                                const messages = [...state.messages, { type: SERVER_START_MATCHMAKING, message: "" }]
 
                                 return { messages }
                         })
@@ -74,14 +74,14 @@ class MessageBox extends Component {
         }
         onMessageAction = (message) => {
                 switch (message.type) {
-                        case SOCKET_START_MATCHMAKING:
+                        case SERVER_START_MATCHMAKING:
                                 this.startMatchmaking();
                                 break;
-                        case CLIENT_REGISTER:
+                        case CLIENT_REGISTER_USER:
                                 this.setState({ username: message.payload })
                                 this.addMatchmakingButton();
                                 break;
-                        case SOCKET_REPLY_MATCHUP:
+                        case SERVER_REPLY_MATCHUP:
                                 this.props.replyMatchmaking(message.payload);
                                 break;
                         default:
