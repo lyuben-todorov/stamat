@@ -12,9 +12,8 @@ import indexRouter from './routes/index';
 import userRouter from './routes/auth';
 import env from './env';
 import redis from 'redis';
-import { SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, CLIENT_REGISTER_USER } from './clientActions';
+import { SERVER_REGISTER_USER, SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, CLIENT_REGISTER_USER } from './clientActions';
 import redisClient from './redis/redisClient'
-
 const app = express();
 const MongoStore = connectMongo(session)
 const PORT = env.PORT || 5000;
@@ -207,6 +206,8 @@ io.on("connection", (socket) => {
                                                 console.log("no move")
                                         }
                                 })
+                                break;
+                        case SERVER_REGISTER_USER:
                                 break;
                         default:
                                 console.log(action);

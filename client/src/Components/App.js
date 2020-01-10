@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import './_sass/App.scss';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 import axios from 'axios';
 import sessionStore from '../Mobx/SessionStore';
-import { Segment, Header, Menu, Container, Button } from 'semantic-ui-react';
+import { Menu, Container, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import { Cookies, withCookies } from 'react-cookie';
 import { instanceOf } from 'prop-types'
@@ -60,15 +60,15 @@ class App extends Component {
                                                         <Menu.Item as='a' active>Home</Menu.Item>
                                                         <Menu.Item as='a'href="/game" >Game</Menu.Item>
                                                         <Menu.Item position='right'>
-                                                                <Button as='a' href="/login" >Log in</Button>
-                                                                <Button as='a' href ="/register" primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
+                                                                <Button as={Link} to={"/login"} >Log in</Button>
+                                                                <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
                                                         </Menu.Item>
                                                 </Container>
                                         </Menu>
                                         <Switch>
                                                 <Route path="/login" render={() => <Login sessionStore={sessionStore} />} />
                                                 <Route path="/register" render={() => <Register sessionStore={sessionStore} />} />
-                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
+                                                <Route path="/game" render={() => <Game sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
                                                 <Route path="/profile*" render={() => <Dashboard sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
 
                                         </Switch>

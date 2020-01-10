@@ -4,7 +4,6 @@ import env from '../env';
 const secret = env.APP_SECRET;
 const logger = createLogger("Auth middleware")
 const withAuth = function (req, res, next) {
-        logger.info(JSON.stringify(req.cookies));
         const token = req.cookies.token;
         if (!token) {
                 res.status(401).send('Unauthorized: No token provided');

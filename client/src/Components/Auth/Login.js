@@ -4,7 +4,8 @@ import { Grid, Header, Form, Segment, Button, Message } from 'semantic-ui-react'
 import { observer } from 'mobx-react';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
-
+import { registerUser } from '../../redux/actionCreators';
+import { Link } from 'react-router-dom';
 const root = "http://localhost:3001/auth";
 
 @observer
@@ -34,6 +35,8 @@ class Login extends Component {
                         email: this.state.email,
                         password: this.state.password
                 }, { withCredentials: true }).then((res) => {
+                        console.log(res);
+                        this.props.registerUser(res.data)
                         this.props.history.push('/profile')
                 }).catch(err => {
                         console.log(err)
@@ -75,7 +78,7 @@ class Login extends Component {
                                                         </Segment>
                                                 </Form>
                                                 <Message>
-                                                        New to us? <a href='/register'>Sign Up</a>
+                                                        New to us? <Link to={"/register"}>Sign Up</Link>
                                                 </Message>
                                         </Grid.Column>
                                 </Grid>
@@ -84,15 +87,10 @@ class Login extends Component {
         }
 }
 const mapStateToProps = (state) => {
-        return {
-                userType: state.userType,
-                gameState: state.gameState,
-                socketId: state.socketId,
-                oponent: state.oponent
-        }
+        return {        }
 }
 
-const mapDispatchToProps = { }
+const mapDispatchToProps = { registerUser }
 
 export default connect(
         mapStateToProps,

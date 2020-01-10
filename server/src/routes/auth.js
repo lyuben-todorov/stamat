@@ -11,14 +11,15 @@ var router = express.Router();
 
 
 router.post('/register', (req, res) => {
-        const { email, password } = req.body;
+        const { email, password,username } = req.body;
 
-        const user = new User({ email, password });
+        const user = new User({ email, password,username });
         user.save(function (err) {
                 if (err) {
+
                         logger.error(err)
-                        res.status(500)
-                                .send("Error registering new user please try again.");
+                        res.status(409)
+                                .send({emailError:true});
                 } else {
                         logger.info("Registered user: " + email);
                         res.status(200).send("Welcome to the club!");
@@ -58,8 +59,9 @@ router.post('/login',  (req, res) => {
                                         const token = jwt.sign(payload, secret, {
                                                 expiresIn: '1h'
                                         });
-                                        res.cookie('token', token, { httpOnly: true,maxAge:360000 }).cookie('kur',"kur")
-                                                .sendStatus(200);
+                                        res
+                                        .cookie('token', token, { httpOnly: true,maxAge:360000 }).send( )
+                                        console.log(user)
                                 }
                         });
                 }

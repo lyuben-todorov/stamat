@@ -3,9 +3,9 @@ import bcrypt from 'bcrypt';
 
 const SALT_WORK_FACTOR = 10;
 const UserSchema = new Schema({
-        userName: String,
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
+        username: { type: String, required: true, unique: true },
         id: String
 })
 
@@ -36,4 +36,4 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
                 cb(null, isMatch);
         });
 };
-export default model('Product', UserSchema)
+export default model('User', UserSchema)

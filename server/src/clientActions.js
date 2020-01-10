@@ -1,5 +1,6 @@
 export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
 export const SERVER_REPLY_MATCHUP = "server/REPLY_MATCHUP";
+export const SERVER_REGISTER_USER = "server/REGISTER_USER"
 
 
 export const GAME_REQUEST_SESSION = "game/REQUEST_GAME_SESSION";
