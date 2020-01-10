@@ -1,4 +1,4 @@
-import { SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE, SERVER_REGISTER_USER } from "./gameState";
+import { SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE, SERVER_REGISTER_USER } from "../actions";
 
 export const startMatchmaking = (payload) => ({
     type: SERVER_START_MATCHMAKING,
@@ -8,6 +8,8 @@ export const replyMatchmaking = (payload) => ({
     type: SERVER_REPLY_MATCHUP,
     payload: payload
 });
+
+
 export const registerUser = (payload) => ({
     type: SERVER_REGISTER_USER,
     payload: payload

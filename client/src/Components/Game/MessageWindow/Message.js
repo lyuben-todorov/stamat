@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Grid, Input } from 'semantic-ui-react'
-import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP } from '../../../redux/gameState';
+import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP } from '../../../actions';
 
 
 export default class Message extends Component {

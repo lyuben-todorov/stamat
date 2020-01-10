@@ -5,7 +5,7 @@ import Message from './Message';
 
 import { startMatchmaking, replyMatchmaking } from '../../../redux/actionCreators'
 import { connect } from 'react-redux';
-import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP } from '../../../redux/gameState';
+import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP } from '../../../actions';
 
 
 @observer

@@ -82,8 +82,15 @@ function createGame(gameId, p1id, p2id) {
         return gameObject;
 }
 
+io.use((socket,next)=>{
+        if(socket.handshake.query.token){
+
+        }
+})
 io.on("connection", (socket) => {
-        const clientId = socket.id // TODO: Issue token here
+        const clientId = socket.handshake.query.token;
+
+         // TODO: Issue token here
         const socketLogger = createLogger(clientId);
         let host = false;
         let opponentId;
@@ -208,6 +215,11 @@ io.on("connection", (socket) => {
                                 })
                                 break;
                         case SERVER_REGISTER_USER:
+                                let {sessionId} = action.payload;
+                                
+                                redisClient.get(sessionId, (err,reply)=>{
+                                        
+                                });
                                 break;
                         default:
                                 console.log(action);

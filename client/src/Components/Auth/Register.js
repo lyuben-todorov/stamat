@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import { Grid, Form, Header, Segment, Message, Button } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 const root = "http://localhost:3001/auth";
 
-export default class Register extends Component {
+class Register extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -42,13 +42,19 @@ export default class Register extends Component {
         }
         axios.post(root + "/register", {
             email: this.state.email,
-            password: this.state.password
+            password: this.state.password,
+            username: this.state.username
         }).then((res) => {
+            //redirect user to login after successful register
+            this.props.history.push('/login')
 
         }).catch(err => {
-            let { emailError, usernameError } = err.response.data;
-            this.setState({ emailError: emailError, usernameError: usernameError })
             console.log(err);
+            if (err.response) {
+
+                let { emailError, usernameError } = err.response.data;
+                this.setState({ emailError: emailError, usernameError: usernameError })
+            }
         })
     }
 
@@ -116,3 +122,5 @@ export default class Register extends Component {
         );
     }
 }
+
+export default withRouter(Register)

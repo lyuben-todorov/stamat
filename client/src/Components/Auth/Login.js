@@ -35,7 +35,7 @@ class Login extends Component {
                         email: this.state.email,
                         password: this.state.password
                 }, { withCredentials: true }).then((res) => {
-                        console.log(res);
+                        // set session token
                         this.props.registerUser(res.data)
                         this.props.history.push('/profile')
                 }).catch(err => {

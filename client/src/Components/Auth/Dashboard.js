@@ -9,7 +9,6 @@ export default class Dashboard extends Component {
 
     componentDidMount(){
         axios.get("http://localhost:3001/checkToken", {withCredentials:true}).then((value)=>{
-            console.log(value);
         })
     }
     render() {

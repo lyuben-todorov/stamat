@@ -1,19 +1,36 @@
 import React, { Component } from 'react'
-import { Segment } from 'semantic-ui-react'
-import Message from './MessageWindow/Message'
+import { Segment, Grid, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
+import Move from './MessageWindow/Move'
 
 class MoveWindow extends Component {
     render() {
         return (
 
-            <Segment className="MessageWindow">
-                <Segment className="MessageBox">
-                    {this.props.history.map((message, index) => (
-                        <Message onMessageAction={this.onMessageAction} type={"history"} key={index} message={message}></Message>
-                    ))}
+            <Grid className="MoveWindow">
+
+
+
+                <Segment className="PlayerBox">
+                    <Icon name={"circle"} color={"green"}></Icon>
+                    Gosho
                 </Segment>
-            </Segment>
+
+                <Segment className="MoveBox">
+                    <Grid className="MoveGrid" columns={2}>
+                        <Grid.Row>
+                            {this.props.history.map((message, index) => (
+                                <Move className="Move" onMessageAction={this.onMessageAction} type={"history"} key={index} message={message}></Move>
+                            ))}
+                        </Grid.Row>
+                    </Grid>
+                </Segment>
+
+                <Segment className="PlayerBox">
+                    <Icon name={"circle"} color={"green"}></Icon>
+                    Tosho
+                </Segment>
+            </Grid>
         )
     }
 
