@@ -1,6 +1,4 @@
-import { createStore, applyMiddleware } from 'redux';
-import createSocketIoMiddleware from 'redux-socket.io';
-import io from 'socket.io-client';
+
 import { SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, GAME_PLAYER_READY, GAME_PLAYER_MOVE } from '../actions';
 
 
@@ -29,7 +27,7 @@ function reducer(state = initialState, action) {
         case SERVER_REGISTER_USER:
             return { ...state, sessionId: action.payload.sessionId, username: action.payload.username };
         case SERVER_START_MATCHMAKING:
-            return { ...state, gameState: "matchmaking", game: action.payload, username: action.username };
+            return { ...state, gameState: "matchmaking" };
         case SERVER_REPLY_MATCHUP:
             return state;
 
@@ -44,6 +42,8 @@ function reducer(state = initialState, action) {
         case CLIENT_PROPOSE_MATCHUP:
             return { ...state, gameState: "proposal", opponentId: action.payload }
         case CLIENT_START_GAME:
+            console.log("KUUUUUUUR");
+
             return { ...state, gameState: "initiateGame", game: action.payload }
         case CLIENT_UPDATE_GAME:
             return { ...state, game: action.payload.game, move: action.payload.move, history: action.payload.game.history }

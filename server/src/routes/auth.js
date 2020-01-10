@@ -63,7 +63,7 @@ router.post('/login', (req, res) => {
                                         const token = jwt.sign(payload, secret, {
                                                 expiresIn: '1h'
                                         });
-                                        const sessionId = jwt.sign(user.username, secret);
+                                        const sessionId = jwt.sign({username}, secret);
                                         redisClient.set(sessionId.toString(), user._id);
                                         let { email, username } = user;
                                         res.cookie('token', token, { httpOnly: true, maxAge: 360000 })

@@ -69,7 +69,6 @@ function createGame(gameId, p1id, p2id) {
         const startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         let white = Math.floor(Math.random() * 2) ? p1id : p2id;
 
-
         const gameObject = {
                 gameId: gameId,
                 playerOne: p1id,
@@ -82,15 +81,9 @@ function createGame(gameId, p1id, p2id) {
         return gameObject;
 }
 
-io.use((socket,next)=>{
-        if(socket.handshake.query.token){
-
-        }
-})
 io.on("connection", (socket) => {
-        const clientId = socket.handshake.query.token;
-
-         // TODO: Issue token here
+        // TODO: Issue token here
+        const clientId = socket.handshake.query.session;
         const socketLogger = createLogger(clientId);
         let host = false;
         let opponentId;

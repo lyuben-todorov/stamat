@@ -4,7 +4,9 @@ import Chess from "chess.js"; // import Chess from  "chess.js"(default) if recie
 import Chessboard from "chessboardjsx";
 import { connect } from "react-redux";
 import { playerReady, playerMove } from "../../../redux/actionCreators";
+import { observer } from "mobx-react";
 
+@observer
 class ChessGame extends Component {
         constructor(props) {
                 super(props)
@@ -24,6 +26,7 @@ class ChessGame extends Component {
                         // orientation from player prespective
                         orientation: 'white'
                 }
+                console.log(this.props.sessionStore.sessionId)
                 this.updateGameAndServerState = this.updateGameAndServerState.bind(this);
                 this.updateGameState = this.updateGameState.bind(this);
                 this.onMoveEvent = this.onMoveEvent.bind(this);
@@ -39,11 +42,12 @@ class ChessGame extends Component {
                 if (this.props.gameState !== prevProps.gameState) {
                         // called when state receives new game object and sets gamestate to initiategame
                         if (this.props.gameState === "initiateGame") {
+                                console.log("ANUS ")
                                 let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game
                                 console.log(this.props.game);
                                 this.setState({
-                                        orientation: white === this.props.playerId ? 'white' : 'black',
-                                        playerColor: white === this.props.playerId ? 'white' : 'black',
+                                        orientation: white === this.props.sessionStore.sessionId ? 'white' : 'black',
+                                        playerColor: white === this.props.sessionStore.sessionId ? 'white' : 'black',
                                         gameId: gameId,
                                         playerOne: playerOne,
                                         playerTwo: playerTwo,
@@ -121,7 +125,7 @@ class ChessGame extends Component {
         };
 
         onMoveEvent = (sourceSquare, targetSquare) => {
-                if (this.props.playerId === this.state.toMove) {
+                if (this.props.sessionStore.sessionId === this.state.toMove) {
 
 
                         let moveObject = {
@@ -229,7 +233,6 @@ class ChessGame extends Component {
 
 const mapStateToProps = (state /*, ownProps*/) => {
         return {
-                playerId: state.socketId,
                 gameState: state.gameState,
                 game: state.game,
                 move: state.move,

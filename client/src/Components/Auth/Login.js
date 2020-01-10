@@ -3,8 +3,6 @@ import axios from 'axios';
 import { Grid, Header, Form, Segment, Button, Message } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import { withRouter } from 'react-router';
-import { connect } from 'react-redux';
-import { registerUser } from '../../redux/actionCreators';
 import { Link } from 'react-router-dom';
 const root = "http://localhost:3001/auth";
 
@@ -36,7 +34,9 @@ class Login extends Component {
                         password: this.state.password
                 }, { withCredentials: true }).then((res) => {
                         // set session token
-                        this.props.registerUser(res.data)
+                        this.props.sessionStore.setSessionId(res.data.sessionId);
+                        console.log(res.data.sessionId)
+                        localStorage.setItem('sessionId', res.data.sessionId);
                         this.props.history.push('/profile')
                 }).catch(err => {
                         console.log(err)
@@ -86,13 +86,5 @@ class Login extends Component {
                 );
         }
 }
-const mapStateToProps = (state) => {
-        return {        }
-}
 
-const mapDispatchToProps = { registerUser }
-
-export default connect(
-        mapStateToProps,
-        mapDispatchToProps
-)(withRouter(Login))
+export default withRouter(Login)

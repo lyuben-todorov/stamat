@@ -47,7 +47,7 @@ class MessageBox extends Component {
         }
         addMatchupProposalButton() {
                 this.setState(state => {
-                        const messages = [...state.messages, { type: CLIENT_PROPOSE_MATCHUP, message: this.props.socketId }]
+                        const messages = [...state.messages, { type: CLIENT_PROPOSE_MATCHUP, message: this.props.sessionId }]
 
                         return { messages }
                 })
@@ -93,7 +93,7 @@ class MessageBox extends Component {
                 var { username } = this.state;
                 var matchup = {
                         username: username,
-                        socketId: this.props.socketId
+                        sessionId: this.props.sessionId
                 }
                 this.props.startMatchmaking(matchup);
 
@@ -113,7 +113,7 @@ const mapStateToProps = (state) => {
         return {
                 userType: state.userType,
                 gameState: state.gameState,
-                socketId: state.socketId,
+                sessionId: state.sessionId,
                 oponent: state.oponent
         }
 }
