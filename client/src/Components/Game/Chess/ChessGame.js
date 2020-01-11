@@ -26,7 +26,6 @@ class ChessGame extends Component {
                         // orientation from player prespective
                         orientation: 'white'
                 }
-                console.log(this.props.sessionStore.sessionId)
                 this.updateGameAndServerState = this.updateGameAndServerState.bind(this);
                 this.updateGameState = this.updateGameState.bind(this);
                 this.onMoveEvent = this.onMoveEvent.bind(this);
@@ -40,6 +39,7 @@ class ChessGame extends Component {
         componentDidUpdate(prevProps) {
 
                 if (this.props.gameState !== prevProps.gameState) {
+
                         // called when state receives new game object and sets gamestate to initiategame
                         if (this.props.gameState === "initiateGame") {
                                 let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game

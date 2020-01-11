@@ -77,25 +77,24 @@ function createGame(gameId, p1id, p2id) {
 }
 
 io.on("connection", (socket) => {
-        const clientId = socket.handshake.query.session;
+        const sessionId = socket.handshake.query.session;
 
-        const socketLogger = createLogger(clientId);
-
-        let host = false;
-        let opponentId;
-        let opponentName;
-        let gameId;
+        const socketLogger = createLogger(sessionId.slice(-5));
+        var host = false;
+        var opponentId;
+        var opponentName;
+        var gameId;
 
         socketLogger.info("Socket connected");
 
-        socket.emit('action', { type: CLIENT_REGISTER_USER, payload: clientId })
+        socket.emit('action', { type: CLIENT_REGISTER_USER, payload: sessionId })
 
         //listen on personal channel for opponent
         const personalChannel = redis.createClient()
-        personalChannel.subscribe(`${clientId}`);
+        personalChannel.subscribe(`${sessionId}`);
 
         personalChannel.on("message", (channel, message) => {
-                redisLogger.info(clientId + " got message: " + message);
+                // redisLogger.info(sessionId.trim + " got message: " + message);
                 const messageObject = JSON.parse(message);
                 let { type, payload } = messageObject;
 
@@ -105,28 +104,30 @@ io.on("connection", (socket) => {
                                         matchmakingLogger.info("Matchup accepted:" + gameId)
                                         matchmakingLogger.info("Waiting for players: " + reply + "/2");
                                         if (reply === "2") {
-                                                matchmakingLogger.info("STARTED GAME:" + gameId)
+                                                matchmakingLogger.info("STARTED GAME:" + gameId.trim(-5))
 
-                                                let game = createGame(gameId, clientId, opponentId);
-                                                redisClient.set(gameId + "object", JSON.stringify(game));
+                                                let game = createGame(gameId, sessionId, opponentId);
+                                                //redisClient.set(gameId + "object", JSON.stringify(game));
 
 
-                                                redisClient.publish(clientId, serializeRedisMessage(CLIENT_START_GAME, game));
-                                                redisClient.publish(opponentId, serializeRedisMessage(CLIENT_START_GAME, game));
+                                                //redisClient.publish(sessionId, serializeRedisMessage(CLIENT_START_GAME, game));
+                                                //redisClient.publish(opponentId, serializeRedisMessage(CLIENT_START_GAME, game));
                                         }
                                 })
                                 break;
                         case CLIENT_PROPOSE_MATCHUP:
-                                opponentId = payload
 
-                                host ? gameId = clientId + opponentId : gameId = opponentId + clientId;
-                                matchmakingLogger.info("Proposing Matchup to " + clientId + " ; against " + opponentId)
+                                if(opponentId) opponentId = payload.opponentId
+                                host ? gameId = sessionId + payload.opponentId : gameId = payload.opponentId + sessionId;
+                                
+                                matchmakingLogger.info("Proposing Matchup to " + sessionId + " ; against " + payload.opponentId)
 
-                                socket.emit('action', { type: CLIENT_PROPOSE_MATCHUP, payload: opponentId })
+                                socket.emit('action', { type: CLIENT_PROPOSE_MATCHUP, payload: payload.opponentId })
 
 
                                 break;
                         case CLIENT_START_GAME: {
+                                redisLogger.info("game emiited" + sessionId.trim(-5));
                                 socket.emit('action', { type: CLIENT_START_GAME, payload: payload })
                                 break;
                         }
@@ -148,52 +149,49 @@ io.on("connection", (socket) => {
 
                                 //get size of queue
                                 redisClient.get("mmqueue", (err, queueSize) => {
-                                        if (queueSize <= 0) {
+                                        redisClient.sismember('matchmaking_queue', sessionId, (err, reply) => {
+                                                if (reply) {
+                                                        socket.emit('action', { type: CLIENT_ALREADY_IN_QUEUE });
+                                                } else {
 
-                                                redisClient.sismember('matchmaking_queue', clientId, (err, reply) => {
-                                                        if (reply) {
-                                                                socket.emit('action', { type: CLIENT_ALREADY_IN_QUEUE });
-                                                        } else {
-
-                                                                redisClient.sadd('matchmaking_queue', clientId, (number) => {
-                                                                        if(number) redisClient.incr("mmqueue")
+                                                        if (queueSize <= 0) {
+                                                                redisClient.sadd('matchmaking_queue', sessionId, (number) => {
+                                                                        redisClient.incr("mmqueue")
+                                                                        matchmakingLogger.info("Pushed client to MM queue:" + sessionId.trim(-5))
                                                                 })
-                                                        }
-                                                });
-                                                matchmakingLogger.info("Pushed client to MM queue:" + clientId)
-                                        } else {
-
-                                                // is already in queue
-                                                redisClient.sismember('matchmaking_queue', clientId, (err, reply) => {
-                                                        if (reply) {
-                                                                socket.emit('action', { type: CLIENT_ALREADY_IN_QUEUE });
                                                         } else {
-                                                                redisClient.spop('matchmaking_queue', (err, foundOpponentId) => {
+                                                                redisClient.spop('matchmaking_queue', (err, foundOpponent) => {
 
-                                                                        if (foundOpponentId) {
+                                                                        if (foundOpponent) {
+
                                                                                 redisClient.decr("mmqueue");
-                                                                                matchmakingLogger.info("Popped client from MM queue:" + foundOpponentId)
+                                                                                matchmakingLogger.info("Popped client from MM queue:" + foundOpponent.trim(-5))
+
 
                                                                                 host = true;
-                                                                                opponentId = foundOpponentId;
-                                                                                gameId = clientId + opponentId;
+                                                                                opponentId = foundOpponent;
+                                                                                gameId = sessionId + opponentId;
                                                                                 redisClient.set(gameId, 0);
 
 
+                                                                                console.log(sessionId)
+                                                                                console.log(opponentId);
+
                                                                                 // propose to found 
-                                                                                redisClient.publish(opponentId, serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, clientId))
-                                                                                redisClient.publish(clientId, serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, opponentId))
+                                                                                redisClient.publish(opponentId,
+                                                                                        serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, {
+                                                                                                opponentId: opponentId, gameId: gameId
+                                                                                        }))
+                                                                                redisClient.publish(sessionId,
+                                                                                        serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, { opponentId: sessionId, gameId: gameId }))
 
                                                                         } else {
                                                                                 matchmakingLogger.error("Queue is empty and this shouldn't be happening");
                                                                         }
-
-
                                                                 })
                                                         }
-                                                })
-
-                                        }
+                                                }
+                                        })
                                 })
                                 break;
                         case SERVER_REPLY_MATCHUP:
@@ -201,7 +199,7 @@ io.on("connection", (socket) => {
                                 // we don't handle rejects for now;
                                 if (action.payload.reply) {
                                         redisClient.incr(gameId);
-                                        redisClient.publish(opponentId, serializeRedisMessage(SERVER_REPLY_MATCHUP, clientId));
+                                        redisClient.publish(opponentId, serializeRedisMessage(SERVER_REPLY_MATCHUP, sessionId));
                                 }
                                 break;
                         case GAME_PLAYER_READY:
@@ -214,7 +212,7 @@ io.on("connection", (socket) => {
                                         let oldGame = JSON.parse(reply);
 
                                         // player is on move
-                                        if (oldGame.toMove === clientId) {
+                                        if (oldGame.toMove === sessionId) {
                                                 oldGame.toMove === oldGame.playerOne ? oldGame.toMove = oldGame.playerTwo : oldGame.toMove = oldGame.playerOne;
                                                 let newGame = Object.assign(oldGame, game);
                                                 redisClient.set(action.payload.gameId + "object", JSON.stringify(newGame))
@@ -225,8 +223,6 @@ io.on("connection", (socket) => {
                                 })
                                 break;
                         case SERVER_REGISTER_USER:
-                                let { sessionId } = action.payload;
-
                                 break;
                         default:
                                 console.log(action);

@@ -1,11 +1,15 @@
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 
 class SessionStore {
     @observable gameState = null;
     @observable userType = "guest";
+
     @observable sessionId = null;
+
     @observable username = null;
     @observable email = null;
+    @observable userId = null;
+
     @observable loggedIn = false;
     @observable opponentName = null;
     @action setGameState = (gameState) => {
@@ -20,6 +24,7 @@ class SessionStore {
         this.sessionId = null;
         this.username = null;
         this.email = null;
+        this.userId = null;
     }
     @action loginUser = (user) => {
         this.userType = "user";
@@ -27,6 +32,10 @@ class SessionStore {
         this.sessionId = user.sessionId;
         this.username = user.username;
         this.email = user.email;
+        this.userId = user.id;
+    }
+    @computed get getUserType(){
+        return this.userType;
     }
 }
 

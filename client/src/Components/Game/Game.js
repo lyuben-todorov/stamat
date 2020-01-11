@@ -21,7 +21,6 @@ class Game extends Component {
         constructor(props) {
                 super(props)
 
-
                 let socket = io(`http://localhost:3001?session=${this.props.sessionStore.sessionId}`);
                 let socketMiddleware = createSocketIoMiddleware(socket, ["server/", "game/"]);
                 let gameStore = applyMiddleware(socketMiddleware)(createStore)(reducer);

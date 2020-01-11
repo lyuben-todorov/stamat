@@ -16,7 +16,6 @@ class App extends Component {
         constructor(props) {
                 super(props);
 
-                console.log(this.props.sessionStore)
                 const sessionId = localStorage.getItem('sessionId');
                 if (sessionId) {
                         this.props.sessionStore.setSessionId(sessionId);

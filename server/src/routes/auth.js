@@ -56,19 +56,19 @@ router.get('/restore', (req, res) => {
                                 let { email } = decoded;
 
                                 User.findOne({ email }, (err, user) => {
-                                        let { email, username } = user;
-
-                                        redisClient.get(user._id.toString(), (err, reply) => {
+                                        let { email, username, _id } = user;
+                                        let id = _id.toString();
+                                        redisClient.get(id, (err, reply) => {
                                                 let sessionId = reply;
 
                                                 //no session for user found
                                                 if (!reply) {
                                                         // make new session id
                                                         sessionId = jwt.sign({ username }, secret);
-                                                        redisClient.set(user._id.toString(), sessionId);
+                                                        redisClient.set(id, sessionId);
                                                 }
                                                 res.cookie('sessionId', sessionId)
-                                                        .send({ email, username, sessionId });
+                                                        .send({ email, username, id, sessionId });
                                         })
                                 });
                         }
@@ -105,9 +105,9 @@ router.post('/login', (req, res) => {
                                                 email:user.email
                                         }, secret);
 
-                                        let { email, username } = user;
-
-                                        redisClient.get(user._id.toString(), (err, reply) => {
+                                        let { email, username, _id } = user;
+                                        let id = _id.toString()
+                                        redisClient.get(id, (err, reply) => {
                                                 let sessionId
 
                                                 if (reply) {
@@ -118,7 +118,7 @@ router.post('/login', (req, res) => {
                                                 }
                                                 res.cookie('token', token, { httpOnly: true })
                                                         .cookie('sessionId', sessionId)
-                                                        .send({ email, username, sessionId });
+                                                        .send({ email, username, id, sessionId });
                                                 // we send the sessionid as it is useless without the securely-issued token cookie anyway
                                         });
                                 }

@@ -15,24 +15,28 @@ class MessageBox extends Component {
                 this.state = {
                         messages: [],
                         startedMatchmaking: false,
-                        startedGame:false,
-                        username: "none"
+                        startedGame: false,
                 }
+
+
                 this.addMatchmakingButton = this.addMatchmakingButton.bind(this);
                 this.addMatchupProposalButton = this.addMatchupProposalButton.bind(this);
                 this.addStartGameMessage = this.addStartGameMessage.bind(this);
                 this.addTextMessage = this.addTextMessage.bind(this);
         }
-        componentDidMount() {
+        componentDidMount(){
                 if (this.props.userType === "guest") {
                         this.setState(state => {
                                 const messages = [...state.messages, { type: CLIENT_REGISTER_USER, message: "" }]
 
                                 return { messages }
                         })
+                
+                }else{
+                        this.addMatchmakingButton();
                 }
-
         }
+
         componentDidUpdate(prevProps) {
                 if (this.props.gameState !== prevProps.gameState) {
                         if (this.props.gameState === "proposal") {
@@ -40,14 +44,14 @@ class MessageBox extends Component {
                         }
                         if (this.props.gameState === "ongoing" && !this.state.startedGame) {
                                 this.addStartGameMessage();
-                                this.setState({startedGame:true});
+                                this.setState({ startedGame: true });
                         }
 
                 }
         }
         addMatchupProposalButton() {
                 this.setState(state => {
-                        const messages = [...state.messages, { type: CLIENT_PROPOSE_MATCHUP, message: this.props.sessionId }]
+                        const messages = [...state.messages, { type: CLIENT_PROPOSE_MATCHUP, message: this.props.opponentId }]
 
                         return { messages }
                 })
@@ -90,11 +94,11 @@ class MessageBox extends Component {
                 }
         }
         startMatchmaking() {
-                var { username } = this.state;
                 var matchup = {
-                        username: username,
-                        sessionId: this.props.sessionId
+                        username: this.props.sessionStore.username,
+                        sessionId: this.props.sessionStore.sessionId
                 }
+                console.log(matchup);
                 this.props.startMatchmaking(matchup);
 
         }
@@ -114,7 +118,7 @@ const mapStateToProps = (state) => {
                 userType: state.userType,
                 gameState: state.gameState,
                 sessionId: state.sessionId,
-                oponent: state.oponent
+                opponentId: state.opponentId
         }
 }
 

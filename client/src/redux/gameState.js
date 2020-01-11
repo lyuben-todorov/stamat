@@ -3,7 +3,7 @@ import { SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, C
 
 
 const initialState = {
-    userType: "guest",
+    userType: "user",
     gameState: "default",
     sessionId: "none",
     username: "none",
@@ -40,7 +40,7 @@ function reducer(state = initialState, action) {
         case CLIENT_REGISTER_USER:
             return { ...state };
         case CLIENT_PROPOSE_MATCHUP:
-            return { ...state, gameState: "proposal", opponentId: action.payload }
+            return { ...state, gameState: "proposal", opponentId: action.payload.opponentId }
         case CLIENT_START_GAME:
 
             return { ...state, gameState: "initiateGame", game: action.payload }
@@ -56,7 +56,6 @@ function reducer(state = initialState, action) {
 
         // for actions with no server side-effects use mobx;
         default:
-            console.log(action);
             return state;
     }
 
