@@ -12,3 +12,4 @@ export const CLIENT_REGISTER_USER = "client/REGISTER_USER";
 export const CLIENT_PROPOSE_MATCHUP = "client/PROPOSE_MATCHUP";
 export const CLIENT_START_GAME = "client/START_GAME";
 export const CLIENT_UPDATE_GAME = "client/UPDATE_GAME";
+export const CLIENT_ALREADY_IN_QUEUE = "client/ALREADY_IN_QUEUE"

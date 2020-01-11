@@ -42,7 +42,6 @@ class ChessGame extends Component {
                 if (this.props.gameState !== prevProps.gameState) {
                         // called when state receives new game object and sets gamestate to initiategame
                         if (this.props.gameState === "initiateGame") {
-                                console.log("ANUS ")
                                 let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game
                                 console.log(this.props.game);
                                 this.setState({

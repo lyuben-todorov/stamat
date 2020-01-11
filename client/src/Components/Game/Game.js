@@ -34,13 +34,13 @@ class Game extends Component {
                                 <Grid stackable divided="vertically">
                                         <Grid.Row columns={3}>
                                                 <Grid.Column className="flexbox" width={4}>
-                                                        <MessageWindow />
+                                                        <MessageWindow sessionStore={SessionStore} />
                                                 </Grid.Column>
                                                 <Grid.Column width={8}>
                                                         <ChessGame sessionStore={SessionStore} className="MainChessboard" />
                                                 </Grid.Column>
                                                 <Grid.Column className="flexbox" width={4}>
-                                                        <MoveWindow />
+                                                        <MoveWindow sessionStore={SessionStore} />
                                                 </Grid.Column>
                                         </Grid.Row>
                                 </Grid>

@@ -42,7 +42,6 @@ function reducer(state = initialState, action) {
         case CLIENT_PROPOSE_MATCHUP:
             return { ...state, gameState: "proposal", opponentId: action.payload }
         case CLIENT_START_GAME:
-            console.log("KUUUUUUUR");
 
             return { ...state, gameState: "initiateGame", game: action.payload }
         case CLIENT_UPDATE_GAME:

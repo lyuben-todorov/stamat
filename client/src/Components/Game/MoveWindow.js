@@ -2,8 +2,10 @@ import React, { Component } from 'react'
 import { Segment, Grid, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import Move from './MessageWindow/Move'
-
+import { observer } from 'mobx-react'
+@observer
 class MoveWindow extends Component {
+
     render() {
         return (
 
@@ -13,7 +15,7 @@ class MoveWindow extends Component {
 
                 <Segment className="PlayerBox">
                     <Icon name={"circle"} color={"green"}></Icon>
-                    Gosho
+                    {this.props.sessionStore.opponentName ? this.props.sessionStore.opponentName : "None"}
                 </Segment>
 
                 <Segment className="MoveBox">
@@ -28,7 +30,8 @@ class MoveWindow extends Component {
 
                 <Segment className="PlayerBox">
                     <Icon name={"circle"} color={"green"}></Icon>
-                    Tosho
+                    {this.props.sessionStore.username}
+
                 </Segment>
             </Grid>
         )
@@ -37,6 +40,7 @@ class MoveWindow extends Component {
 }
 const mapStateToProps = (state /*, ownProps*/) => {
     return {
+        game: state.game,
         history: state.history
     }
 }

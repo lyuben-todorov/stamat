@@ -8,16 +8,30 @@ import { observer } from 'mobx-react';
 import Game from './Game/Game';
 import SessionStore from '../Mobx/SessionStore';
 import Dashboard from './Auth/Dashboard';
-
+import axios from 'axios';
+import { serverURI } from '../processVariables'
 
 @observer
 class App extends Component {
-        constructor(props){
+        constructor(props) {
                 super(props);
+
+                console.log(this.props.sessionStore)
                 const sessionId = localStorage.getItem('sessionId');
-                this.props.sessionStore.setSessionId(sessionId);
+                if (sessionId) {
+                        this.props.sessionStore.setSessionId(sessionId);
+                }
+                axios.get(`http://${serverURI}/auth/restore`, { withCredentials: true }).then((res) => {
+                        this.props.sessionStore.loginUser(res.data)
+                })
+                this.handleLogout = this.handleLogout.bind(this);
         }
 
+        handleLogout() {
+                axios.get(`http://${serverURI}/auth/logout`, { withCredentials: true }).then((res)=>{
+                        this.props.sessionStore.logout();
+                })
+        }
         render() {
                 return (
                         <div className="App">
@@ -26,10 +40,20 @@ class App extends Component {
                                                 <Container>
                                                         <Menu.Item header >Ebre-debre</Menu.Item>
                                                         <Menu.Item as='a' active>Home</Menu.Item>
-                                                        <Menu.Item as='a'href="/game" >Game</Menu.Item>
+                                                        <Menu.Item as='a' href="/game" >Game</Menu.Item>
                                                         <Menu.Item position='right'>
-                                                                <Button as={Link} to={"/login"} >Log in</Button>
-                                                                <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
+                                                                {this.props.sessionStore.loggedIn ?
+                                                                        <div>
+                                                                                <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
+
+                                                                        </div>
+                                                                        :
+                                                                        <div>
+                                                                                <Button as={Link} to={"/login"} >Log in</Button>
+                                                                                <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
+                                                                        </div>
+                                                                }
+
                                                         </Menu.Item>
                                                 </Container>
                                         </Menu>
