@@ -27,7 +27,7 @@ export default class Move extends Component {
                 } else if (this.props.message.flags === "q") {
                     this.state = { icon: "chess king", flags: "O-O-O" }
                 } else {
-                    this.state = { icon: "chess king" }
+                    this.state = { icon: "chess king", to:this.props.message.to }
                 }
                 break;
             default:
@@ -40,8 +40,8 @@ export default class Move extends Component {
 
             <Segment className={this.props.index % 2 === 0 ? "Move" : "Move Black"}>
                 <Grid >
-                    {this.props.index % 2 === 0 ? <Grid.Column className="MoveNumber" width={2}>{this.props.index/2 + 1}</Grid.Column> : <div/>}
-                    <Grid.Column width={this.props.index % 2 === 0 ? 14 : 16}>
+                    {this.props.index % 2 === 0 ? <Grid.Column className="MoveNumber" width={4}>{this.props.index/2 + 1}</Grid.Column> : <div/>}
+                    <Grid.Column width={this.props.index % 2 === 0 ? 12 : 16}>
                         <div><Icon name={this.state.icon} />
                             {this.state.flags}{this.state.to}</div>
                     </Grid.Column>

@@ -13,6 +13,7 @@ export const CLIENT_PROPOSE_MATCHUP = "client/PROPOSE_MATCHUP";
 export const CLIENT_START_GAME = "client/START_GAME";
 export const CLIENT_UPDATE_GAME = "client/UPDATE_GAME";
 export const CLIENT_ALREADY_IN_QUEUE = "client/ALREADY_IN_QUEUE"
-export const CLIENT_CONTINUE_GAME = "client/CONTINUE_GAME";
+export const CLIENT_RESUME_GAME = "client/RESUME_GAME";
+export const CLIENT_RESUME_SESSION = "client/RESUME_SESSION"
 
 export const MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"

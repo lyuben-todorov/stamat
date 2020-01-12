@@ -1,8 +1,8 @@
-  import redis from 'redis';
+import redis from 'ioredis';
 import createLgger from '../logger';
 
 const logger = createLgger('Server Redis');
-const redisClient = redis.createClient();
+const redisClient = new redis();
 
 redisClient.on("error", function (err) {
         logger.error("Redis error: " + err);

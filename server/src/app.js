@@ -11,16 +11,17 @@ import mongoConnection from './mongo/mongoClient';
 import indexRouter from './routes/index';
 import userRouter from './routes/auth';
 import env from './env';
-import redis from 'redis';
-import { CLIENT_CONTINUE_GAME, SERVER_REGISTER_USER, SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, CLIENT_REGISTER_USER, CLIENT_ALREADY_IN_QUEUE, MATCHMAKER_ADD_TO_QUEUE } from './clientActions';
+import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME as CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, CLIENT_REGISTER_USER, CLIENT_ALREADY_IN_QUEUE, MATCHMAKER_ADD_TO_QUEUE } from './clientActions';
 import redisClient from './redis/redisClient'
 import mongoose from 'mongoose'
 import Chess from 'chess.js';
+import redis from 'ioredis'
+
 const app = express();
 const MongoStore = connectMongo(session)
 const PORT = env.PORT || 5000;
 
-const gameLogger = createGame("Game");
+const gameLogger = createLogger("Game");
 const serverLogger = createLogger("Server");
 const socketLogger = createLogger("Socket");
 const redisLogger = createLogger("Redis");
@@ -70,7 +71,7 @@ function createGame(gameId, p1id, p2id) {
                 playerOne: p1id,
                 playerTwo: p2id,
                 white: white,
-                toMove: white,
+                toMove: 'w',
                 position: startingPosition,
                 history: []
         }
@@ -79,140 +80,208 @@ function createGame(gameId, p1id, p2id) {
 
 io.on("connection", (socket) => {
         const sessionId = socket.handshake.query.session;
-        var chess = new Chess.Chess();
-        var clientUsername;
+
+
         const socketLogger = createLogger(sessionId.slice(-5));
-        var opponentId;
-        var gameId;
-        var opponentName
         socketLogger.info("Socket connected");
 
-        socket.emit('action', { type: CLIENT_REGISTER_USER, payload: sessionId })
+        redisClient.hgetall(sessionId, (err, res) => {
+                var chess;
+                var clientUsername;
+                var opponentId;
+                var gameId;
+                var opponentName;
+                if (!err && err !== null) {
+                        socketLogger.info("No session found" + err);
 
-        //listen on personal channel for opponent
-        const personalChannel = redis.createClient()
-        personalChannel.subscribe(sessionId);
+                } else {
+                        socketLogger.info("Socket session retrieved successfully");
 
-        personalChannel.on("message", (channel, message) => {
-                redisLogger.info(" Got message: " + message);
-                const messageObject = JSON.parse(message);
-                let { type, payload } = messageObject;
-
-                switch (type) {
-                        case SERVER_REPLY_MATCHUP:
-                                redisClient.get(gameId, (err, reply) => {
-                                        if (err) {
-                                                redisClient.set(gameId, 1);
-                                        } else {
-
-                                                redisClient.get(gameId, (err, reply) => {
-                                                        matchmakingLogger.info("Matchup accepted:" + gameId)
-                                                        matchmakingLogger.info("Waiting for players: " + reply + "/2");
-                                                        if (reply === "2") {
-                                                                matchmakingLogger.info("STARTED GAME:" + gameId.trim(-5))
-
-                                                                let game = createGame(gameId, sessionId, opponentId);
-                                                                redisClient.set(gameId + "object", JSON.stringify(game));
-
-                                                                redisClient.publish(sessionId, serializeRedisMessage(CLIENT_START_GAME, { game }));
-                                                                redisClient.publish(opponentId, serializeRedisMessage(CLIENT_START_GAME, { game }));
-                                                        }
-                                                })
-                                        }
-                                })
-                                break;
-                        case CLIENT_PROPOSE_MATCHUP:
-
-                                gameId = payload.gameId;
-                                opponentId = payload.sessionId;
-                                opponentName = payload.username;
-                                matchmakingLogger.info("Proposing Matchup to " + clientUsername + " ; against " + payload.username);
-
-                                socket.emit('action', { type: CLIENT_PROPOSE_MATCHUP, payload: payload })
-
-
-                                break;
-                        case CLIENT_START_GAME: {
-                                socket.emit('action', { type: CLIENT_START_GAME, payload: payload })
-                                break;
-                        }
-                        case CLIENT_CONTINUE_GAME: {
-                                socket.emit('action', { type: CLIENT_CONTINUE_GAME, payload: payload })
-                        }
-                        case CLIENT_UPDATE_GAME: {
-                                // update socket chess instance;
-                                chess.move(payload.move)
-                                socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload })
-                                break;
-                        }
-                }
-        })
-        socket.on("disconnect", () => {
-
-                // if we don't quit explicitly we run into a fun bug
-                personalChannel.quit()
-        });
-        socket.on('action', (action) => {
-                socketLogger.info("Recieved action on socket:" + JSON.stringify(action))
-                switch (action.type) {
-                        case SERVER_START_MATCHMAKING:
-                                clientUsername = action.payload.username;
-                                redisClient.publish('matchmaking', serializeRedisMessage(MATCHMAKER_ADD_TO_QUEUE, {
-                                        "username": action.payload.username,
-                                        "sessionId": action.payload.sessionId
-                                }))
-
-
-                                break;
-                        case SERVER_REPLY_MATCHUP:
-
-                                // we don't handle rejects for now;
-                                if (action.payload.reply) {
-                                        redisClient.incr(gameId);
-                                        redisClient.publish(opponentId, serializeRedisMessage(SERVER_REPLY_MATCHUP, sessionId));
+                        clientUsername = res.clientUsername;
+                        opponentId = res.opponentId;
+                        gameId = res.gameId;
+                        opponentName = res.opponentName;
+                        
+                        socket.emit('action', {
+                                type: CLIENT_RESUME_SESSION,
+                                payload: {
+                                        userType: "user",
+                                        sessionId: sessionId,
+                                        username: clientUsername,
+                                        opponentName: opponentName,
+                                        gameId: gameId ? gameId : "none",
+                                        opponentId: opponentId,
                                 }
-                                break;
-                        case GAME_PLAYER_READY:
-                                // player has received game state 
-                                break;
-                        case GAME_PLAYER_MOVE:
-                                redisClient.get(action.payload.gameId + "object", (err, reply) => {
-                                        let oldGame = JSON.parse(reply);
-                                        console.log(oldGame);
+                        });
 
-                                        // player is on move
-                                        if (oldGame.toMove === sessionId) {
-                                                var newMove = chess.move(action.payload.move);
-                                                // is move legal;
-                                                if (newMove === null) {
-                                                        gameLogger.info("Client sending illegal move")
-                                                        return;
-                                                }
+                        if (res.gameId) {
+                                redisClient.get(res.gameId + "object", (err, reply) => {
+                                        let gameObject = JSON.parse(reply);
+                                        if (!gameObject.finished) {
+                                                chess = new Chess.Chess(gameObject.position);
+                                                socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: gameObject } });
 
-                                                // copy game object
-                                                let newGame = oldGame;
-
-                                                newGame.history.push(newMove);
-                                                newGame.position= chess.fen();
-                                                newGame.toMove === oldGame.playerOne ? oldGame.toMove = oldGame.playerTwo : oldGame.toMove = oldGame.playerOne;
-
-                                                //set new game object
-                                                redisClient.set(action.payload.gameId + "object", JSON.stringify(newGame))
-                                                redisClient.publish(opponentId, serializeRedisMessage(CLIENT_UPDATE_GAME, { gameId: action.payload.gameId, move: action.payload.move }));
-                                        } else {
-                                                console.log("no move")
                                         }
                                 })
-                                break;
-                        case SERVER_REGISTER_USER:
-                                break;
-                        default:
-                                console.log(action);
-
+                        }
 
                 }
 
+                //listen on personal channel for opponent
+                const personalChannel = new redis()
+
+                personalChannel.subscribe(sessionId);
+
+                personalChannel.on("message", (channel, message) => {
+                        redisLogger.info(" Got message: " + message);
+                        const messageObject = JSON.parse(message);
+                        let { type, payload } = messageObject;
+
+                        switch (type) {
+                                case SERVER_REPLY_MATCHUP:
+                                        redisClient.get(gameId, (err, reply) => {
+                                                if (err) {
+                                                        redisClient.set(gameId, 1);
+                                                } else {
+
+                                                        redisClient.get(gameId, (err, reply) => {
+                                                                matchmakingLogger.info("Matchup accepted:" + gameId)
+                                                                matchmakingLogger.info("Waiting for players: " + reply + "/2");
+                                                                if (reply === "2") {
+                                                                        matchmakingLogger.info("STARTED GAME:" + gameId.trim(-5))
+
+                                                                        let game = createGame(gameId, sessionId, opponentId);
+                                                                        redisClient.set(gameId + "object", JSON.stringify(game));
+
+                                                                        redisClient.publish(sessionId, serializeRedisMessage(CLIENT_START_GAME, { game }));
+                                                                        redisClient.publish(opponentId, serializeRedisMessage(CLIENT_START_GAME, { game }));
+                                                                }
+                                                        })
+                                                }
+                                        })
+                                        break;
+                                case CLIENT_PROPOSE_MATCHUP:
+
+                                        gameId = payload.gameId;
+                                        opponentId = payload.sessionId;
+                                        opponentName = payload.username;
+                                        matchmakingLogger.info("Proposing Matchup to " + clientUsername + " ; against " + opponentName);
+
+                                        socket.emit('action', { type: CLIENT_PROPOSE_MATCHUP, payload: payload })
+
+
+                                        break;
+                                case CLIENT_START_GAME: {
+                                        chess = new Chess.Chess();
+                                        socket.emit('action', { type: CLIENT_START_GAME, payload: { game: payload.game } })
+                                        break;
+                                }
+                                case CLIENT_RESUME_GAME: {
+                                        socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: payload.game } })
+                                        break;
+
+                                }
+                                case CLIENT_UPDATE_GAME: {
+                                        // update socket chess instance;
+                                        chess.move(payload.move)
+                                        socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload })
+                                        break;
+                                }
+                        }
+                })
+                socket.on("disconnect", () => {
+                        // persist session here
+                        socketLogger.info("Socket disconnected");
+                        let sessionObject = {
+                                sessionId: sessionId,
+                                clientUsername: clientUsername,
+                                gameId: gameId,
+                                opponentId: opponentId,
+                                opponentName: opponentName
+                        }
+                        redisClient.hmset(sessionId, sessionObject, (err, res) => {
+                                if (!err) {
+                                        redisLogger.info(`Session persisted successfully: ${sessionId.slice(-5)}`);
+
+                                } else {
+                                        redisLogger.error(`Error persisting session ${sessionId.slice(-5)}: ${err}`)
+                                }
+                        })
+                        // if we don't quit explicitly we run into a fun bug
+                        personalChannel.quit()
+                });
+                socket.on('action', (action) => {
+                        socketLogger.info("Recieved action on socket:" + JSON.stringify(action))
+                        switch (action.type) {
+                                case SERVER_START_MATCHMAKING:
+                                        clientUsername = action.payload.username;
+                                        redisClient.publish('matchmaking', serializeRedisMessage(MATCHMAKER_ADD_TO_QUEUE, {
+                                                "username": action.payload.username,
+                                                "sessionId": action.payload.sessionId
+                                        }))
+
+
+                                        break;
+                                case SERVER_REPLY_MATCHUP:
+
+                                        // we don't handle rejects for now;
+                                        if (action.payload.reply) {
+                                                redisClient.incr(gameId);
+                                                redisClient.publish(opponentId, serializeRedisMessage(SERVER_REPLY_MATCHUP, sessionId));
+                                        }
+                                        break;
+                                case GAME_PLAYER_READY:
+                                        // player has received game state 
+                                        break;
+                                case GAME_PLAYER_MOVE:
+                                        redisClient.get(action.payload.gameId + "object", (err, reply) => {
+                                                let oldGame = JSON.parse(reply);
+
+                                                // player is on move
+                                                //      XNOR
+                                                if ((oldGame.white === sessionId) == (oldGame.toMove === 'w')) {
+                                                        var newMove = chess.move(action.payload.move);
+                                                        // is move legal;
+                                                        if (newMove === null) {
+                                                                gameLogger.info("Client sending illegal move")
+                                                                return;
+                                                        }
+
+                                                        // copy game object
+                                                        let newGame = oldGame;
+
+                                                        newGame.history.push(newMove);
+                                                        newGame.position = chess.fen();
+                                                        if (chess.game_over()) {
+                                                                //checkmate
+                                                                newGame.finished = true;
+                                                        }
+                                                        newGame.toMove = newGame.toMove === 'w' ? 'b' : 'w';
+
+                                                        //set new game object
+                                                        redisClient.set(action.payload.gameId + "object", JSON.stringify(newGame))
+                                                        redisClient.publish(opponentId, serializeRedisMessage(CLIENT_UPDATE_GAME, { gameId: action.payload.gameId, move: action.payload.move }));
+                                                } else {
+                                                        console.log("no move")
+                                                }
+                                        })
+                                        break;
+                                case SERVER_REGISTER_USER:
+                                        break;
+                                default:
+                                        console.log(action);
+
+
+                        }
+
+                })
+
+
+
+
         })
+
+
 })
 
 io.on("disconnect", () => {

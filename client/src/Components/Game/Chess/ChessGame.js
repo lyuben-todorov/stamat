@@ -62,6 +62,28 @@ class ChessGame extends Component {
 
                                 return
                         }
+                        if (this.props.gameState === "resumeGame") {
+                                let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game
+                                console.log(this.props.game)
+                                this.setState({
+                                
+                                        orientation: white === this.props.sessionId ? 'white' : 'black',
+                                        playerColor: white === this.props.sessionId ? 'white' : 'black',
+                                        gameId: gameId,
+                                        playerOne: playerOne,
+                                        playerTwo: playerTwo,
+                                        // changing props
+                                        position: position,
+                                        toMove: toMove,
+                                        history: history
+                                })
+                                this.game = new Chess(position);
+
+                                // changes game state from resume to ongoing
+                                this.props.playerReady();
+
+                                return
+                        }
                 }
 
                 // this should happen when opponent moves
@@ -83,7 +105,7 @@ class ChessGame extends Component {
         }
         onMoveEvent = (sourceSquare, targetSquare, clientMove = true) => {
 
-                if (clientMove && this.props.sessionStore.sessionId === this.state.toMove) {
+                if (clientMove && this.state.orientation.charAt(0) === this.state.toMove) {
                         let moveObject = {
                                 from: sourceSquare,
                                 to: targetSquare,
@@ -105,11 +127,11 @@ class ChessGame extends Component {
                                 history: this.game.history({ verbose: true }),
                                 squareStyles: squareStyling({ pieceSquare, history }),
                                 pieceSquare: "",
-                                toMove: clientMove ? this.props.opponentId : this.props.sessionStore.sessionId
+                                toMove: this.state.toMove === 'w' ? 'b' : 'w'
                         }
                         this.updateGameAndServerState(gameState, move);
 
-                } else if(!clientMove && this.props.opponentId === this.state.toMove) {
+                } else if(!clientMove && this.state.orientation.charAt(0) !== this.game.toMove) {
                         let moveObject = {
                                 from: sourceSquare,
                                 to: targetSquare,
@@ -132,10 +154,12 @@ class ChessGame extends Component {
                                 history: this.game.history({ verbose: true }),
                                 squareStyles: squareStyling({ pieceSquare, history }),
                                 pieceSquare: "",
-                                toMove: clientMove ? this.props.opponentId : this.props.sessionStore.sessionId
+                                toMove: this.state.toMove === 'w' ? 'b' : 'w'
                         }
                         this.updateGameState(gameState);
                 }else{
+                        console.log(this.state.orientation.charAt(0))
+                        console.log(this.props.game.toMove)
                         console.log("not your turn");
                 }
 
