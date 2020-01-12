@@ -40,7 +40,7 @@ function reducer(state = initialState, action) {
         case CLIENT_REGISTER_USER:
             return { ...state };
         case CLIENT_PROPOSE_MATCHUP:
-            return { ...state, gameState: "proposal", opponentId: action.payload.opponentId }
+            return { ...state, gameState: "proposal", opponentId: action.payload.sessionId, opponentName:action.payload.username }
         case CLIENT_START_GAME:
 
             return { ...state, gameState: "initiateGame", game: action.payload }

@@ -1,0 +1,5 @@
+{
+    "exec": "NODE_ENV=development npm run server",
+    "watch": ["src/*", "public/*"],
+    "ext": "js, html, css, json"
+  }
