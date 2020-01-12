@@ -40,8 +40,7 @@ export default class Move extends Component {
 
             <Segment className={this.props.index % 2 === 0 ? "Move" : "Move Black"}>
                 <Grid >
-                    
-                    {this.props.index % 2 === 0 ? <Grid.Column className="MoveNumber" width={2}>{this.props.index/2 + 1}</Grid.Column> : true}
+                    {this.props.index % 2 === 0 ? <Grid.Column className="MoveNumber" width={2}>{this.props.index/2 + 1}</Grid.Column> : <div/>}
                     <Grid.Column width={this.props.index % 2 === 0 ? 14 : 16}>
                         <div><Icon name={this.state.icon} />
                             {this.state.flags}{this.state.to}</div>
