@@ -5,7 +5,7 @@ import Message from './Message';
 
 import { startMatchmaking, replyMatchmaking } from '../../../redux/actionCreators'
 import { connect } from 'react-redux';
-import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP } from '../../../actions';
+import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP, CLIENT_GAME_OVER } from '../../../actions';
 
 
 @observer
@@ -24,15 +24,15 @@ class MessageBox extends Component {
                 this.addStartGameMessage = this.addStartGameMessage.bind(this);
                 this.addTextMessage = this.addTextMessage.bind(this);
         }
-        componentDidMount(){
+        componentDidMount() {
                 if (this.props.userType === "guest") {
                         this.setState(state => {
                                 const messages = [...state.messages, { type: CLIENT_REGISTER_USER, message: "" }]
 
                                 return { messages }
                         })
-                
-                }else{
+
+                } else {
                         this.addMatchmakingButton();
                 }
         }
@@ -46,8 +46,21 @@ class MessageBox extends Component {
                                 this.addStartGameMessage();
                                 this.setState({ startedGame: true });
                         }
+                        if (this.props.gameState === "gameOver") {
+                                this.addGameOverMessage();
+                                this.setState({ gameOver: true });
+                        }
 
                 }
+        }
+        addGameOverMessage() {
+                this.setState({
+                        messages: [...this.state.messages,
+                        {
+                                type: CLIENT_GAME_OVER, 
+                                message: this.props.winner === this.props.sessionId ? this.props.username : this.props.opponentName
+                        }]
+                })
         }
         addMatchupProposalButton() {
                 this.setState(state => {
@@ -117,7 +130,9 @@ const mapStateToProps = (state) => {
                 userType: state.userType,
                 gameState: state.gameState,
                 sessionId: state.sessionId,
-                opponentName: state.opponentName
+                opponentName: state.opponentName,
+                winner: state.winner,
+                username: state.username
         }
 }
 

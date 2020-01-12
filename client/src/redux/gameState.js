@@ -1,5 +1,5 @@
 
-import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, GAME_PLAYER_READY, GAME_PLAYER_MOVE } from '../actions';
+import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_GAME_OVER } from '../actions';
 
 
 const initialState = {
@@ -46,7 +46,6 @@ function reducer(state = initialState, action) {
         case CLIENT_RESUME_GAME:
             return { ...state, gameState: "resumeGame", game: action.payload.game, history: action.payload.game.history }
         case CLIENT_RESUME_SESSION:
-            console.log(action.payload)
             return {
                 ...state, userType: "user",
                 sessionId: action.payload.sessionId,
@@ -55,7 +54,9 @@ function reducer(state = initialState, action) {
                 gameId: action.payload.gameId,
                 opponentId: action.payload.opponentId
             }
-
+        case CLIENT_GAME_OVER:
+            console.log(action.payload);
+            return { ...state, gameState: "gameOver", winner: action.payload.winner }
         case CLIENT_UPDATE_GAME:
             return { ...state, move: action.payload.move, history: [...state.history, action.payload.move] }
 

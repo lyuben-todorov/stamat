@@ -11,7 +11,7 @@ import mongoConnection from './mongo/mongoClient';
 import indexRouter from './routes/index';
 import userRouter from './routes/auth';
 import env from './env';
-import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME as CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, CLIENT_REGISTER_USER, CLIENT_ALREADY_IN_QUEUE, MATCHMAKER_ADD_TO_QUEUE } from './clientActions';
+import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME as CLIENT_RESUME_GAME, GAME_OVER, SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, MATCHMAKER_ADD_TO_QUEUE, GAME_CONCEDE, GAME_OFFER_DRAW, CLIENT_GAME_OVER } from './clientActions';
 import redisClient from './redis/redisClient'
 import mongoose from 'mongoose'
 import Chess from 'chess.js';
@@ -73,6 +73,8 @@ function createGame(gameId, p1id, p2id) {
                 white: white,
                 toMove: 'w',
                 position: startingPosition,
+                finished: false,
+                winner:"none",
                 history: []
         }
         return gameObject;
@@ -101,7 +103,7 @@ io.on("connection", (socket) => {
                         opponentId = res.opponentId;
                         gameId = res.gameId;
                         opponentName = res.opponentName;
-                        
+
                         socket.emit('action', {
                                 type: CLIENT_RESUME_SESSION,
                                 payload: {
@@ -119,6 +121,9 @@ io.on("connection", (socket) => {
                                         let gameObject = JSON.parse(reply);
                                         if (!gameObject.finished) {
                                                 chess = new Chess.Chess(gameObject.position);
+
+                                                // write socket action payloads in a verbose way for code readability
+                                                // not payload: { ... , ... , .. } or payload: payload
                                                 socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: gameObject } });
 
                                         }
@@ -171,22 +176,29 @@ io.on("connection", (socket) => {
 
 
                                         break;
-                                case CLIENT_START_GAME: {
+                                case CLIENT_START_GAME:
                                         chess = new Chess.Chess();
                                         socket.emit('action', { type: CLIENT_START_GAME, payload: { game: payload.game } })
                                         break;
-                                }
-                                case CLIENT_RESUME_GAME: {
+
+                                case CLIENT_RESUME_GAME:
                                         socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: payload.game } })
                                         break;
 
-                                }
-                                case CLIENT_UPDATE_GAME: {
+
+                                case CLIENT_UPDATE_GAME:
                                         // update socket chess instance;
                                         chess.move(payload.move)
-                                        socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload })
+                                        socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload });
+                                        if (payload.finished && chess.game_over()) {
+                                                socket.emit('action', { type: CLIENT_GAME_OVER, payload: { winner: payload.winner } })
+                                        }
                                         break;
-                                }
+
+                                // in case game isn't ended by a move
+                                case CLIENT_GAME_OVER:
+                                        socket.emit('action', { type: CLIENT_GAME_OVER, payload: { winner: payload.winner } });
+                                        break;
                         }
                 })
                 socket.on("disconnect", () => {
@@ -220,7 +232,6 @@ io.on("connection", (socket) => {
                                                 "sessionId": action.payload.sessionId
                                         }))
 
-
                                         break;
                                 case SERVER_REPLY_MATCHUP:
 
@@ -252,43 +263,49 @@ io.on("connection", (socket) => {
 
                                                         newGame.history.push(newMove);
                                                         newGame.position = chess.fen();
+                                                        newGame.toMove = newGame.toMove === 'w' ? 'b' : 'w';
                                                         if (chess.game_over()) {
                                                                 //checkmate
                                                                 newGame.finished = true;
+                                                                newGame.winner = sessionId;
+                                                                socket.emit('action', { type: CLIENT_GAME_OVER, payload: { winner: sessionId } })
+
                                                         }
-                                                        newGame.toMove = newGame.toMove === 'w' ? 'b' : 'w';
 
                                                         //set new game object
                                                         redisClient.set(action.payload.gameId + "object", JSON.stringify(newGame))
-                                                        redisClient.publish(opponentId, serializeRedisMessage(CLIENT_UPDATE_GAME, { gameId: action.payload.gameId, move: action.payload.move }));
+                                                        redisClient.publish(opponentId, serializeRedisMessage(CLIENT_UPDATE_GAME,
+                                                                {
+                                                                        gameId: action.payload.gameId,
+                                                                        move: action.payload.move,
+                                                                        finished: newGame.finished,
+                                                                        winner: newGame.finished ? sessionId : "none"
+                                                                }));
                                                 } else {
                                                         console.log("no move")
                                                 }
                                         })
                                         break;
-                                case SERVER_REGISTER_USER:
+                                case GAME_CONCEDE:
+                                        redisClient.get(action.payload.gameId + "object", (err, reply) => {
+                                                let finishedGame = JSON.parse(reply);
+                                                finishedGame.finished = true;
+                                                // save game to static storage here;
+                                                redisClient.publish(finishedGame.playerOne, serializeRedisMessage(GAME_OVER, { winner: opponentId }));
+                                        })
+                                        break;
+                                case GAME_OFFER_DRAW:
                                         break;
                                 default:
                                         console.log(action);
-
-
                         }
-
                 })
-
-
-
-
         })
-
-
 })
 
 io.on("disconnect", () => {
         socketLogger.info("Disconnected");
 })
-
-
 
 server.on("close", () => {
 

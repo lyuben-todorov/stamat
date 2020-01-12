@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Button, Grid, Input } from 'semantic-ui-react'
-import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP } from '../../../actions';
+import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP, CLIENT_GAME_OVER } from '../../../actions';
 
 
 export default class Message extends Component {
@@ -55,6 +55,14 @@ export default class Message extends Component {
                                     this.props.onMessageAction({ type: SERVER_REPLY_MATCHUP, payload: { reply: false, opponentId: this.props.message } })}>Refuse</Button>
                             </Grid.Column>
                         </Grid.Row>
+                    </Grid>
+                break;
+            case CLIENT_GAME_OVER:
+                messageBody =
+                    <Grid>
+                        <Grid.Column width={16}>
+                            {this.props.message} has won!
+                        </Grid.Column>
                     </Grid>
                 break;
             case "message":
