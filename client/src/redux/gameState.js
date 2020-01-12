@@ -42,16 +42,16 @@ function reducer(state = initialState, action) {
         case CLIENT_PROPOSE_MATCHUP:
             return { ...state, gameState: "proposal", opponentId: action.payload.sessionId, opponentName:action.payload.username }
         case CLIENT_START_GAME:
-
             return { ...state, gameState: "initiateGame", game: action.payload }
         case CLIENT_UPDATE_GAME:
-            return { ...state, game: action.payload.game, move: action.payload.move, history: action.payload.game.history }
+            return { ...state, move: action.payload.move }
+
 
         // actions prefixed with GAME are triggered by the SERVER for game-related actions on socket
         case GAME_PLAYER_READY:
             return { ...state, gameState: "ongoing" }
         case GAME_PLAYER_MOVE:
-            return { ...state, history: action.payload.game.history };
+            return { ...state};
 
 
         // for actions with no server side-effects use mobx;

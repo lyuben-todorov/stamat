@@ -138,7 +138,7 @@ io.on("connection", (socket) => {
                                 socket.emit('action', { type: CLIENT_START_GAME, payload: payload })
                                 break;
                         }
-                        case GAME_PLAYER_MOVE: {
+                        case CLIENT_UPDATE_GAME: {
                                 socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload })
                                 break;
                         }
@@ -173,17 +173,18 @@ io.on("connection", (socket) => {
                                 // player has received game state 
                                 break;
                         case GAME_PLAYER_MOVE:
-                                let { move, game } = action.payload;
-
+                                //const { move, gameId } = action.payload;
                                 redisClient.get(action.payload.gameId + "object", (err, reply) => {
                                         let oldGame = JSON.parse(reply);
-
+                                        
                                         // player is on move
                                         if (oldGame.toMove === sessionId) {
+
+                                                // here we should check if move is legal regardless;
                                                 oldGame.toMove === oldGame.playerOne ? oldGame.toMove = oldGame.playerTwo : oldGame.toMove = oldGame.playerOne;
-                                                let newGame = Object.assign(oldGame, game);
-                                                redisClient.set(action.payload.gameId + "object", JSON.stringify(newGame))
-                                                redisClient.publish(opponentId, serializeRedisMessage(GAME_PLAYER_MOVE, { game: newGame, move: move }));
+                                                //let newGame = Object.assign(oldGame, game); here we need to genereate a new gameobject to get saved to redis
+                                                redisClient.set(action.payload.gameId + "object", JSON.stringify(oldGame))
+                                                redisClient.publish(opponentId, serializeRedisMessage(CLIENT_UPDATE_GAME, { gameId: action.payload.gameId, move: action.payload.move }));
                                         } else {
                                                 console.log("no move")
                                         }
