@@ -5,17 +5,14 @@ import Move from './MessageWindow/Move'
 import { observer } from 'mobx-react'
 @observer
 class MoveWindow extends Component {
-
     render() {
         return (
 
             <Grid className="MoveWindow">
 
-
-
                 <Segment className="PlayerBox">
                     <Icon name={"circle"} color={"green"}></Icon>
-                    {this.props.sessionStore.opponentName ? this.props.sessionStore.opponentName : "None"}
+                    {this.props.opponentName ? this.props.opponentName: "None"}
                 </Segment>
 
                 <Segment className="MoveBox">
@@ -40,6 +37,7 @@ class MoveWindow extends Component {
 }
 const mapStateToProps = (state /*, ownProps*/) => {
     return {
+        opponentName: state.opponentName,
         game: state.game,
         history: state.history
     }
