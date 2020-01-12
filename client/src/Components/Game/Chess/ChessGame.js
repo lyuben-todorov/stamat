@@ -73,9 +73,9 @@ class ChessGame extends Component {
                 }
 
         }
-        updateGameAndServerState(updatedGameState, moveObject) {
+        updateGameAndServerState(updatedGameState, move) {
                 this.updateGameState(updatedGameState);
-                this.props.playerMove({ move: moveObject, gameId: this.state.gameId });
+                this.props.playerMove({ move: move, gameId: this.state.gameId });
         }
         updateGameState(updatedGameState) {
                 this.setState(updatedGameState);
@@ -83,34 +83,57 @@ class ChessGame extends Component {
         }
         onMoveEvent = (sourceSquare, targetSquare, clientMove = true) => {
 
-                let moveObject = {
-                        from: sourceSquare,
-                        to: targetSquare,
-                        promotion: "q" // always promote to a queen for simplicity
-                };
-                // see if the move is legal
-                let move = this.game.move(moveObject);
-
-                // illegal move
-                if (move === null) {
-                        console.log("illegal");
-                        return;
-                }
-                let { history, pieceSquare } = this.state;
-
-                const gameState = {
-                        position: this.game.fen(),
-                        history: this.game.history({ verbose: true }),
-                        squareStyles: squareStyling({ pieceSquare, history }),
-                        pieceSquare: "",
-                        toMove: clientMove ? this.props.opponentId : this.props.sessionStore.sessionId
-                }
-
                 if (clientMove && this.props.sessionStore.sessionId === this.state.toMove) {
-                        this.updateGameAndServerState(gameState, moveObject);
+                        let moveObject = {
+                                from: sourceSquare,
+                                to: targetSquare,
+                                promotion: "q" // always promote to a queen for simplicity
+                        };
+                        // see if the move is legal
+                        let move = this.game.move(moveObject);
+        
+                        // illegal move
+                        if (move === null) {
+                                console.log("illegal");
+                                return;
+                        }
+
+                        let { history, pieceSquare } = this.state;
+        
+                        const gameState = {
+                                position: this.game.fen(),
+                                history: this.game.history({ verbose: true }),
+                                squareStyles: squareStyling({ pieceSquare, history }),
+                                pieceSquare: "",
+                                toMove: clientMove ? this.props.opponentId : this.props.sessionStore.sessionId
+                        }
+                        this.updateGameAndServerState(gameState, move);
 
                 } else if(!clientMove && this.props.opponentId === this.state.toMove) {
-                        console.log("recieved update")
+                        let moveObject = {
+                                from: sourceSquare,
+                                to: targetSquare,
+                                promotion: "q" // always promote to a queen for simplicity
+                        };
+                        // see if the move is legal
+                        let move = this.game.move(moveObject);
+        
+                        // move really shouldn't be illegal here
+                        // remove when server enforces move legality
+                        if (move === null) {
+                                console.log("illegal what????");
+                                return;
+                        }
+
+                        let { history, pieceSquare } = this.state;
+        
+                        const gameState = {
+                                position: this.game.fen(),
+                                history: this.game.history({ verbose: true }),
+                                squareStyles: squareStyling({ pieceSquare, history }),
+                                pieceSquare: "",
+                                toMove: clientMove ? this.props.opponentId : this.props.sessionStore.sessionId
+                        }
                         this.updateGameState(gameState);
                 }else{
                         console.log("not your turn");

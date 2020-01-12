@@ -17,11 +17,9 @@ class MoveWindow extends Component {
 
                 <Segment className="MoveBox">
                     <Grid className="MoveGrid" columns={2}>
-                        <Grid.Row>
                             {this.props.history.map((message, index) => (
-                                <Move className="Move" onMessageAction={this.onMessageAction} type={"history"} key={index} message={message}></Move>
+                                <Move className="Move" onMessageAction={this.onMessageAction} type={"history"} index={index} key={index} message={message}></Move>
                             ))}
-                        </Grid.Row>
                     </Grid>
                 </Segment>
 

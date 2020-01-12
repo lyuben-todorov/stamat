@@ -7,7 +7,7 @@ const initialState = {
     gameState: "default",
     sessionId: "none",
     username: "none",
-    opponentName: "none",
+    opponentName: "None",
     gameId: "none",
     opponentId: "none",
     game: {
@@ -44,14 +44,14 @@ function reducer(state = initialState, action) {
         case CLIENT_START_GAME:
             return { ...state, gameState: "initiateGame", game: action.payload }
         case CLIENT_UPDATE_GAME:
-            return { ...state, move: action.payload.move }
+            return { ...state, move: action.payload.move, history:[...state.history, action.payload.move] }
 
 
-        // actions prefixed with GAME are triggered by the SERVER for game-related actions on socket
+        // actions prefixed with GAME are triggered by the CLIENT for game-related actions on socket
         case GAME_PLAYER_READY:
             return { ...state, gameState: "ongoing" }
         case GAME_PLAYER_MOVE:
-            return { ...state};
+            return { ...state, history:[...state.history, action.payload.move]};
 
 
         // for actions with no server side-effects use mobx;
