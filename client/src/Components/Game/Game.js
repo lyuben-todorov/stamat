@@ -25,7 +25,7 @@ class Game extends Component {
                 if(mode==="development"){
                         socket = io(connectionString);
                 }else{
-                        socket = io(connectionString,{path:endpoint})
+                        socket = io(connectionString)
                 }
                 let socketMiddleware = createSocketIoMiddleware(socket, ["server/", "game/"]);
                 let gameStore = applyMiddleware(socketMiddleware)(createStore)(reducer);
