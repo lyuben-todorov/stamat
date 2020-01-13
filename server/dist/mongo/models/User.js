@@ -13,7 +13,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 var SALT_WORK_FACTOR = 10;
 var UserSchema = new _mongoose.Schema({
-  userName: String,
   email: {
     type: String,
     required: true,
@@ -23,7 +22,12 @@ var UserSchema = new _mongoose.Schema({
     type: String,
     required: true
   },
-  id: String
+  username: {
+    type: String
+  },
+  id: {
+    type: String
+  }
 });
 UserSchema.pre('save', function (next) {
   var user = this; // only hash the password if it has been modified (or is new)
@@ -49,6 +53,6 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
   });
 };
 
-var _default = (0, _mongoose.model)('Product', UserSchema);
+var _default = (0, _mongoose.model)('User', UserSchema);
 
 exports["default"] = _default;

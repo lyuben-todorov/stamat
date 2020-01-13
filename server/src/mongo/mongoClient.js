@@ -1,8 +1,10 @@
 import mongoose, { mongo } from 'mongoose';
 import createLgger from '../logger';
+import env from '../env'
 
 const logger = createLgger('MongoDB');
-const uri =`mongodb://localhost:27017/ebredebre`;
+const uri =`mongodb://${env.MONGO_USERNAME ? env.MONGO_USERNAME : ""}${env.MONGO_USERNAME ? ":" : ""}${env.MONGO_PASSWORD ? env.MONGO_PASSWORD :""}${env.MONGO_USERNAME ? "@" : ""}localhost:27017/ebredebre`;
+console.log(uri);
 const db = mongoose.connection;
 
 
