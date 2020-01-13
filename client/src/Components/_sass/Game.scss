@@ -43,36 +43,57 @@
     padding: 0;
     margin: auto !important;
     margin-right: 20px !important;
-    overflow-y: scroll;
+    max-height: 100%;
 
-    .Move {
-        width: 50%;
-        background-color: white !important;
-        margin: 0 !important;
-        font-size: 2em;
-        font-weight: bold;
-        max-height: 2em;
-        padding: 0.5em;
+    .Timer{
+        color:white;
+        font-size: 3em;
+        height: 30px;
+        line-height: 1;
         text-align: center;
-        border-radius: 0em;
-        border: none;
-        border-top: 2px solid rgba(200, 200, 200, 0.5) !important;
-
-        
+        margin:auto;
+        margin-bottom: 5px;
+        margin-top: 5px;
+        .TimerNumber{
+            padding: 0px 10px;
+            float:left;
+            width:50px;
+        }
+        .TimerNumber.Seconds{
+            float: right;
+        }
     }
-    .MoveNumber {
-        padding: 1rem 0em 1rem 0em !important;
-        border-right: 2px solid rgba(200, 200, 200, 0.658) !important;
-    }
-    .Move.Black {
-        background-color: black !important;
-        color: white;
-    }
-
     .MoveBox {
 
+        .Move {
+            width: 50%;
+            background-color: white !important;
+            margin: 0 !important;
+            font-size: 2em;
+            font-weight: bold;
+            max-height: 2em;
+            padding: 0.5em;
+            text-align: center;
+            border-radius: 0em;
+            border: none;
+            border-top: 2px solid rgba(200, 200, 200, 0.5) !important;
+
+
+        }
+
+        .MoveNumber {
+            padding: 1rem 0em 1rem 0em !important;
+            border-right: 2px solid rgba(200, 200, 200, 0.658) !important;
+        }
+
+        .Move.Black {
+            background-color: black !important;
+            color: white;
+        }
+
+
         overflow-y: scroll;
-        height: 200px;
+        height: 16em;
         margin: auto;
         width: 100%;
         max-height: 100%;
@@ -85,6 +106,14 @@
     .PlayerBox {
         text-align: left;
         width: 100%;
+        .User{
+            .Username{
+                padding-left: 5px;
+            }
+        }
+        .icon{
+            margin:auto !important;
+        }
     }
 
 }

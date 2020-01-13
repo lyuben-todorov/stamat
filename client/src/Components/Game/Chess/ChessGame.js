@@ -158,8 +158,6 @@ class ChessGame extends Component {
                         }
                         this.updateGameState(gameState);
                 }else{
-                        console.log(this.state.orientation.charAt(0))
-                        console.log(this.props.game.toMove)
                         console.log("not your turn");
                 }
 

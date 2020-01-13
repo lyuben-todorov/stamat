@@ -14,6 +14,7 @@
     "node-sass": "^4.13.0",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
+    "react-compound-timer": "^1.1.15",
     "react-cookie": "^4.0.3",
     "react-dom": "^16.12.0",
     "react-redux": "^7.1.3",
