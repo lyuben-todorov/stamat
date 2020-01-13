@@ -2,8 +2,8 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import { Grid, Form, Header, Segment, Message, Button } from 'semantic-ui-react';
 import { Link, withRouter } from 'react-router-dom';
+import {serverUrl} from '../../processVariables'
 
-const root = "http://localhost:3001/auth";
 
 class Register extends Component {
     constructor(props) {
@@ -40,7 +40,7 @@ class Register extends Component {
             this.setState({ passwordError: true });
             return;
         }
-        axios.post(root + "/register", {
+        axios.post(`${serverUrl}/auth/register`, {
             email: this.state.email,
             password: this.state.password,
             username: this.state.username

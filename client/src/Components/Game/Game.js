@@ -12,8 +12,7 @@ import createSocketIoMiddleware from 'redux-socket.io';
 import io from 'socket.io-client';
 import reducer from '../../redux/gameState'
 import SessionStore from '../../Mobx/SessionStore';
-
-
+import {serverUrl} from '../../processVariables';
 
 @observer
 class Game extends Component {
@@ -21,7 +20,7 @@ class Game extends Component {
         constructor(props) {
                 super(props)
 
-                let socket = io(`http://localhost:3001?session=${this.props.sessionStore.sessionId}`);
+                let socket = io(`${serverUrl}?session=${this.props.sessionStore.sessionId}`);
                 let socketMiddleware = createSocketIoMiddleware(socket, ["server/", "game/"]);
                 let gameStore = applyMiddleware(socketMiddleware)(createStore)(reducer);
                 this.state = { gameStore: gameStore };

@@ -4,7 +4,7 @@ import { Grid, Header, Form, Segment, Button, Message } from 'semantic-ui-react'
 import { observer } from 'mobx-react';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
-const root = "http://localhost:3001/auth";
+import {serverUrl} from '../../processVariables'
 
 @observer
 class Login extends Component {
@@ -29,7 +29,7 @@ class Login extends Component {
 
         handleSubmit(event) {
                 event.preventDefault()
-                axios.post(root + "/login", {
+                axios.post(`${serverUrl}/auth/login`, {
                         email: this.state.email,
                         password: this.state.password
                 }, { withCredentials: true }).then((res) => {

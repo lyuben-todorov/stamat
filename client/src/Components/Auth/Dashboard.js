@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios';
+import {serverUrl} from '../../processVariables'
 
 export default class Dashboard extends Component {
     constructor(props){
@@ -8,7 +9,7 @@ export default class Dashboard extends Component {
     }
 
     componentDidMount(){
-        axios.get("http://localhost:3001/checkToken", {withCredentials:true}).then((value)=>{
+        axios.get(`${serverUrl}/checkToken`, {withCredentials:true}).then((value)=>{
         })
     }
     render() {

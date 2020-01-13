@@ -9,7 +9,7 @@ import Game from './Game/Game';
 import SessionStore from '../Mobx/SessionStore';
 import Dashboard from './Auth/Dashboard';
 import axios from 'axios';
-import { serverURI } from '../processVariables'
+import { serverUrl } from '../processVariables'
 
 @observer
 class App extends Component {
@@ -20,14 +20,14 @@ class App extends Component {
                 if (sessionId) {
                         this.props.sessionStore.setSessionId(sessionId);
                 }
-                axios.get(`http://${serverURI}/auth/restore`, { withCredentials: true }).then((res) => {
+                axios.get(`${serverUrl}/auth/restore`, { withCredentials: true }).then((res) => {
                         this.props.sessionStore.loginUser(res.data)
                 })
                 this.handleLogout = this.handleLogout.bind(this);
         }
 
         handleLogout() {
-                axios.get(`http://${serverURI}/auth/logout`, { withCredentials: true }).then((res)=>{
+                axios.get(`${serverUrl}/auth/logout`, { withCredentials: true }).then((res)=>{
                         this.props.sessionStore.logout();
                 })
         }
