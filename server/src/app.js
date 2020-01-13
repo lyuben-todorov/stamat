@@ -287,11 +287,14 @@ io.on("connection", (socket) => {
                                         })
                                         break;
                                 case GAME_CONCEDE:
-                                        redisClient.get(action.payload.gameId + "object", (err, reply) => {
+                                        redisClient.get(gameId + "object", (err, reply) => {
                                                 let finishedGame = JSON.parse(reply);
                                                 finishedGame.finished = true;
                                                 // save game to static storage here;
-                                                redisClient.publish(finishedGame.playerOne, serializeRedisMessage(GAME_OVER, { winner: opponentId }));
+                                                redisClient.set(gameId + "object", JSON.stringify(finishedGame));
+                                                redisClient.publish(finishedGame.playerOne, serializeRedisMessage(CLIENT_GAME_OVER, { winner: opponentId }));
+                                                redisClient.publish(finishedGame.playerTwo, serializeRedisMessage(CLIENT_GAME_OVER, { winner: opponentId }));
+
                                         })
                                         break;
                                 case GAME_OFFER_DRAW:

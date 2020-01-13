@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import Move from './MessageWindow/Move'
 import { observer } from 'mobx-react'
 import Timer from 'react-compound-timer';
+import { concedeGame } from '../../redux/actionCreators'
 @observer
 class MoveWindow extends Component {
     render() {
@@ -51,11 +52,11 @@ class MoveWindow extends Component {
                         <Menu.Item className="User">
                             <Icon name={"circle"} color={"green"}></Icon>
                             <div className="Username">
-                            {this.props.sessionStore.username}
+                                {this.props.sessionStore.username}
                             </div>
                         </Menu.Item>
                         <Menu.Item>
-                            <Button color={"red"} onClick={() => { console.log("asd") }}>
+                            <Button color={"red"} onClick={() => this.props.concedeGame()}>
                                 <Icon size={"large"} name={"flag outline"}></Icon>
                             </Button>
                         </Menu.Item>
@@ -91,7 +92,7 @@ const mapStateToProps = (state /*, ownProps*/) => {
         history: state.history
     }
 }
-const mapDispatchToProps = {}
+const mapDispatchToProps = {concedeGame}
 
 export default connect(
     mapStateToProps,
