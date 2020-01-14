@@ -44,7 +44,6 @@ router.get('/restore', (req, res) => {
 
         const token = req.cookies.token;
         if (!token) {
-                logger.error("No token");
                 res.status(401).send('Unauthorized: No token provided');
         } else {
                 jwt.verify(token, secret, function (err, decoded) {

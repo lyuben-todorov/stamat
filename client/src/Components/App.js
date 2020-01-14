@@ -2,69 +2,106 @@ import React, { Component } from 'react'
 import './_sass/App.scss';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
-import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Link, Redirect, NavLink } from 'react-router-dom'
 import { Menu, Container, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
+import { Provider } from 'react-redux'
 import Game from './Game/Game';
 import SessionStore from '../Mobx/SessionStore';
 import Dashboard from './Auth/Dashboard';
 import axios from 'axios';
 import { serverUrl } from '../processVariables'
+import io from 'socket.io-client';
+import createSocketIoMiddleware from 'redux-socket.io';
+import { createStore, applyMiddleware } from 'redux';
+import reducer from '../redux/gameState'
+import { Stamat } from './Stamat';
 
+function returnStore(sessionId) {
+        console.log("asd");
+        let connectionString = `${serverUrl}/?session=${sessionId}`;
+        let socket = io(connectionString);
+
+        let socketMiddleware = createSocketIoMiddleware(socket, ["server/", "game/"]);
+        let gameStore = applyMiddleware(socketMiddleware)(createStore)(reducer);
+        return gameStore
+}
 @observer
 class App extends Component {
         constructor(props) {
                 super(props);
 
+
+
                 const sessionId = localStorage.getItem('sessionId');
+
                 if (sessionId) {
-                        this.props.sessionStore.setSessionId(sessionId);
+                        axios.get(`${serverUrl}/auth/restore`, { withCredentials: true }).then((res) => {
+                                this.props.sessionStore.loginUser(res.data)
+                        })
                 }
-                axios.get(`${serverUrl}/auth/restore`, { withCredentials: true }).then((res) => {
-                        this.props.sessionStore.loginUser(res.data)
-                })
+
                 this.handleLogout = this.handleLogout.bind(this);
+
+
+        }
+        componentDidUpdate(prevProps) {
+                if (this.props !== prevProps) {
+                        console.log("UUUUUI")
+                }
         }
 
         handleLogout() {
-                axios.get(`${serverUrl}/auth/logout`, { withCredentials: true }).then((res)=>{
+                axios.get(`${serverUrl}/auth/logout`, { withCredentials: true }).then((res) => {
+                        localStorage.removeItem('sessionId')
                         this.props.sessionStore.logout();
                 })
         }
         render() {
                 return (
-                        <div className="App">
-                                <BrowserRouter>
-                                        <Menu size='large'>
-                                                <Container>
-                                                        <Menu.Item header >Ebre-debre</Menu.Item>
-                                                        <Menu.Item as='a' active>Home</Menu.Item>
-                                                        <Menu.Item as='a' href="/game" >Game</Menu.Item>
-                                                        <Menu.Item position='right'>
-                                                                {this.props.sessionStore.loggedIn ?
-                                                                        <div>
-                                                                                <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
 
-                                                                        </div>
-                                                                        :
-                                                                        <div>
-                                                                                <Button as={Link} to={"/login"} >Log in</Button>
-                                                                                <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
-                                                                        </div>
-                                                                }
+                        <Provider store={returnStore(this.props.sessionStore.sessionId)}>
+                                <div className="App">
+                                        <BrowserRouter>
+                                                <Menu size='large'>
+                                                        <Container>
+                                                                <Menu.Item >
 
-                                                        </Menu.Item>
-                                                </Container>
-                                        </Menu>
-                                        <Switch>
-                                                <Route path="/login" render={() => <Login sessionStore={SessionStore} />} />
-                                                <Route path="/register" render={() => <Register sessionStore={SessionStore} />} />
-                                                <Route path="/game" render={() => <Game sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
-                                                <Route path="/profile*" render={() => <Dashboard sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
+                                                                        Ebre-debre
+                                                                </Menu.Item>
+                                                                <Menu.Item >
+                                                                        <NavLink to={"/"}>Home</NavLink>
+                                                                </Menu.Item>
+                                                                <Menu.Item >
 
-                                        </Switch>
-                                </BrowserRouter>
-                        </div>
+                                                                        <NavLink to={"/game"}>Game</NavLink>
+                                                                </Menu.Item>
+                                                                <Menu.Item position='right'>
+                                                                        {this.props.sessionStore.loggedIn ?
+                                                                                <div>
+                                                                                        <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
+
+                                                                                </div>
+                                                                                :
+                                                                                <div>
+                                                                                        <Button as={Link} to={"/login"} >Log in</Button>
+                                                                                        <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
+                                                                                </div>
+                                                                        }
+
+                                                                </Menu.Item>
+                                                        </Container>
+                                                </Menu>
+                                                <Switch>
+                                                        <Route path="/login" render={() => <Login sessionStore={SessionStore} />} />
+                                                        <Route path="/register" render={() => <Register sessionStore={SessionStore} />} />
+                                                        <Route path="/game" render={() => <Stamat sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
+
+                                                </Switch>
+                                        </BrowserRouter>
+                                </div>
+
+                        </Provider>
                 )
         }
 }
