@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import Chat from './Chat';
 import Matchmaking from './Matchmaking';
 
 export class MenuRouter extends Component {
+    
+    component
     render() {
         return (
             <div className="MenuRouter">
@@ -23,12 +24,3 @@ export class MenuRouter extends Component {
         )
     }
 }
-
-const mapStateToProps = (state) => ({
-
-})
-const mapDispatchToProps = {
-
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(MenuRouter)

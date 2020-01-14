@@ -1,15 +1,38 @@
 import React, { Component } from 'react'
 import { Segment, Menu } from 'semantic-ui-react'
 import { observer } from 'mobx-react'
-import SessionStore from '../../Mobx/SessionStore'
 import { MenuRouter } from './MenuWindow/MenuRouter'
+import { connect } from 'react-redux';
 
 @observer
-export default class MenuWindow extends Component {
+class MenuWindow extends Component {
     constructor(props) {
         super(props);
-        this.state = { activeItem: 'matchmaking' }
+        switch (this.props.gameState) {
+            case "ongoing" || "initiateGame":
+                this.state = { activeItem: "chat" }
+                break;
+            case "default":
+                this.state = { activeItem: "matchmaking" }
+                break;
+            default:
+                break;
+        }
         this.handleItemClick = this.handleItemClick.bind(this);
+    }
+    componentDidUpdate(prevProps) {
+        if (this.props !== prevProps) {
+            switch (this.props.gameState) {
+                case "ongoing" || "initiateGame":
+                    this.setState({ activeItem: "chat" })
+                    break;
+                case "default":
+                    this.setState({ activeItem: "matchmaking" })
+                    break;
+                default:
+                    break;
+            }
+        }
     }
     handleItemClick = (e, { name }) => this.setState({ activeItem: name })
 
@@ -18,9 +41,9 @@ export default class MenuWindow extends Component {
         return (
             <Segment className="MenuWindow">
                 <Segment className="Content">
-                    <MenuRouter active={activeItem}/>
+                    <MenuRouter active={activeItem} />
                 </Segment>
-                
+
                 <Menu className="Menu" attached='bottom' tabular>
                     <Menu.Item
                         name='matchmaking'
@@ -48,3 +71,13 @@ export default class MenuWindow extends Component {
         )
     }
 }
+
+
+const mapStateToProps = (state) => ({
+    gameState: state.gameState
+})
+const mapDispatchToProps = {
+
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MenuWindow)

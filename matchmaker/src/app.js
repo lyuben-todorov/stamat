@@ -82,22 +82,7 @@ matchmakingClient.on('message', (channel, message) => {
                                                                                 console.log(playerTwo)
                                                                                 console.log(playerOne)
 
-                                                                                //bad protocol rigght here----------------------------------------------------->//whoever is player one gets to generate game on client~
-                                                                                // IF autoaccept is true
-                                                                                // redisClient.publish(playerOne.sessionId, serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, {
-                                                                                //         gameId: gameId,
-                                                                                //         opponentName: playerTwo.username,
-                                                                                //         opponentId: playerTwo.sessionId,
-                                                                                //         playerOneUsername: playerOne.username,
-                                                                                // }));
-
-                                                                                // redisClient.publish(playerTwo.sessionId, serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, {
-                                                                                //         gameId: gameId,
-                                                                                //         opponentName: playerOne.username,
-                                                                                //         opponentId: playerOne.sessionId,
-                                                                                //         playerOneUsername: playerOne.username
-                                                                                // }));
-
+                                                                                
                                                                                 let game = createGame(gameId, playerOne.sessionId, playerTwo.sessionId);
                                                                                 redisClient.set(gameId + "object", JSON.stringify(game));
 

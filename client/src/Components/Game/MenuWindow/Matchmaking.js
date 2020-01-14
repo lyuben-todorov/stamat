@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Header, Divider, Form, Dropdown, Icon, Button, Message } from 'semantic-ui-react'
+import { Header, Divider, Dropdown, Icon, Button, Message } from 'semantic-ui-react'
 import { startMatchmaking } from '../../../redux/actionCreators';
 const chessOptions = [
     {
@@ -59,6 +59,13 @@ class Matchmaking extends Component {
         this.sendMatchmakingRequest = this.sendMatchmakingRequest.bind(this);
     }
 
+    componentDidUpdate(prevProps){
+        if(this.props !== prevProps){
+            if(this.props.gameState !== prevProps.gameState && this.props.gameState === "initiateGame"){
+                this.setState({submitted:false})
+            }
+        }
+    }
     onModeChoice = (e, { name }) => {
         if (name.key === "regular") {
             this.setState({ mode: name.key, modeText: name.text, modeIcon: name.icon })
@@ -186,7 +193,7 @@ const mapStateToProps = (state) => {
         sessionId: state.sessionId,
         opponentName: state.opponentName,
         winner: state.winner,
-        username: state.username
+        username: state.username,
     }
 }
 

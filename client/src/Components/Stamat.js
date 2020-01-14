@@ -31,7 +31,7 @@ export class Stamat extends Component {
     render() {
         return (
             <div>
-                {this.state.session ?
+                {this.state.session || this.props.loggedIn ?
                     <Game sessionStore={SessionStore}> </Game>
                     :
                     <Redirect to={"/login"}></Redirect>

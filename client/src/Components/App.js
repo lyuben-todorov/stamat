@@ -2,13 +2,12 @@ import React, { Component } from 'react'
 import './_sass/App.scss';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
-import { BrowserRouter, Switch, Route, Link, Redirect, NavLink } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Link, NavLink } from 'react-router-dom'
 import { Menu, Container, Button } from 'semantic-ui-react';
 import { observer } from 'mobx-react';
 import { Provider } from 'react-redux'
 import Game from './Game/Game';
 import SessionStore from '../Mobx/SessionStore';
-import Dashboard from './Auth/Dashboard';
 import axios from 'axios';
 import { serverUrl } from '../processVariables'
 import io from 'socket.io-client';
@@ -18,7 +17,6 @@ import reducer from '../redux/gameState'
 import { Stamat } from './Stamat';
 
 function returnStore(sessionId) {
-        console.log("asd");
         let connectionString = `${serverUrl}/?session=${sessionId}`;
         let socket = io(connectionString);
 
@@ -31,7 +29,7 @@ class App extends Component {
         constructor(props) {
                 super(props);
 
-
+                this.state = {loggedIn:false};
 
                 const sessionId = localStorage.getItem('sessionId');
 
@@ -39,7 +37,9 @@ class App extends Component {
                         axios.get(`${serverUrl}/auth/restore`, { withCredentials: true }).then((res) => {
                                 this.props.sessionStore.loginUser(res.data)
                         })
+                        this.state = {loggedIn:true}
                 }
+
 
                 this.handleLogout = this.handleLogout.bind(this);
 
@@ -95,7 +95,7 @@ class App extends Component {
                                                 <Switch>
                                                         <Route path="/login" render={() => <Login sessionStore={SessionStore} />} />
                                                         <Route path="/register" render={() => <Register sessionStore={SessionStore} />} />
-                                                        <Route path="/game" render={() => <Stamat sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
+                                                        <Route path="/game" render={() => <Stamat loggedIn={this.state.loggedIn} sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
 
                                                 </Switch>
                                         </BrowserRouter>
