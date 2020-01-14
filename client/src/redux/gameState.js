@@ -13,7 +13,10 @@ const initialState = {
     game: {
 
     },
-    history: []
+    history: [],
+    mmpreferences:{
+        
+    }
 }
 
 function reducer(state = initialState, action) {
@@ -40,13 +43,14 @@ function reducer(state = initialState, action) {
         case CLIENT_REGISTER_USER:
             return state
         case CLIENT_PROPOSE_MATCHUP:
-            return { ...state, gameState: "proposal", opponentId: action.payload.sessionId, opponentName: action.payload.username }
+            return { ...state, action: "propose", opponentId: action.payload.sessionId, opponentName: action.payload.username }
         case CLIENT_START_GAME:
-            return { ...state, gameState: "initiateGame", game: action.payload.game, history: [] }
+            return { ...state, action: "initiateGame", gameState: "ongoing", game: action.payload.game, history: [] }
         case CLIENT_RESUME_GAME:
-            return { ...state, gameState: "resumeGame", game: action.payload.game, history: action.payload.game.history }
+            return { ...state, action: "resumeGame", gameState: "ongoing", game: action.payload.game, history: action.payload.game.history }
         case CLIENT_OFFER_DRAW:
-            return state
+
+            return { ...state, action: "offerDraw" }
         case CLIENT_REPLY_DRAW:
             return state
         case CLIENT_RESUME_SESSION:
@@ -62,7 +66,7 @@ function reducer(state = initialState, action) {
             console.log(action.payload);
             return { ...state, gameState: "gameOver", winner: action.payload.winner }
         case CLIENT_UPDATE_GAME:
-            return { ...state, move: action.payload.move, history: [...state.history, action.payload.move] }
+            return { ...state, action:"playerMove", move: action.payload.move, history: [...state.history, action.payload.move] }
         // actions prefixed with GAME are triggered by the CLIENT for game-related actions on socket
         case GAME_PLAYER_READY:
             return { ...state, gameState: "ongoing" }

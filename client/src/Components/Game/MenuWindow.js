@@ -9,7 +9,7 @@ class MenuWindow extends Component {
     constructor(props) {
         super(props);
         switch (this.props.gameState) {
-            case "ongoing" || "initiateGame":
+            case "ongoing":
                 this.state = { activeItem: "chat" }
                 break;
             case "default":

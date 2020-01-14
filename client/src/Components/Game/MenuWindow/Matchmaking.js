@@ -61,7 +61,7 @@ class Matchmaking extends Component {
 
     componentDidUpdate(prevProps){
         if(this.props !== prevProps){
-            if(this.props.gameState !== prevProps.gameState && this.props.gameState === "initiateGame"){
+            if(this.props.gameState === "ongoing"){
                 this.setState({submitted:false})
             }
         }

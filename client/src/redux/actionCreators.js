@@ -1,4 +1,4 @@
-import { SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE, SERVER_REGISTER_USER, GAME_CONCEDE } from "../actions";
+import { SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, GAME_PLAYER_READY, GAME_PLAYER_MOVE, SERVER_REGISTER_USER, GAME_CONCEDE, GAME_OFFER_DRAW } from "../actions";
 
 export const startMatchmaking = (payload) => ({
     type: SERVER_START_MATCHMAKING,
@@ -17,6 +17,9 @@ export const registerUser = (payload) => ({
 
 export const concedeGame = () =>({
     type: GAME_CONCEDE
+})
+export const offerDraw = () =>({
+    type: GAME_OFFER_DRAW
 })
 export const playerReady = () => ({
     type: GAME_PLAYER_READY

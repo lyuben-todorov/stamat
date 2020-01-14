@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import Move from './MoveWindow/Move'
 import { observer } from 'mobx-react'
 import Timer from 'react-compound-timer';
-import { concedeGame } from '../../redux/actionCreators'
+import { concedeGame, offerDraw } from '../../redux/actionCreators'
 @observer
 class MoveWindow extends Component {
     render() {
@@ -61,7 +61,7 @@ class MoveWindow extends Component {
                             </Button>
                         </Menu.Item>
                         <Menu.Item>
-                            <Button onClick={() => { console.log("asd") }}>
+                            <Button onClick={() => { this.props.offerDraw(); }}>
                                 <Icon size={"large"} name={"handshake outline"}></Icon>
                             </Button>
                         </Menu.Item>
@@ -92,7 +92,7 @@ const mapStateToProps = (state /*, ownProps*/) => {
         history: state.history
     }
 }
-const mapDispatchToProps = {concedeGame}
+const mapDispatchToProps = {concedeGame, offerDraw}
 
 export default connect(
     mapStateToProps,

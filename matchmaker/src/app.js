@@ -29,6 +29,7 @@ function createGame(gameId, p1id, p2id) {
         let white = Math.floor(Math.random() * 2) ? p1id : p2id;
 
         const gameObject = {
+                startTime: Date.now(),
                 gameId: gameId,
                 playerOne: p1id,
                 playerTwo: p2id,
@@ -82,7 +83,7 @@ matchmakingClient.on('message', (channel, message) => {
                                                                                 console.log(playerTwo)
                                                                                 console.log(playerOne)
 
-                                                                                
+
                                                                                 let game = createGame(gameId, playerOne.sessionId, playerTwo.sessionId);
                                                                                 redisClient.set(gameId + "object", JSON.stringify(game));
 

@@ -162,6 +162,8 @@ io.on("connection", (socket) => {
                         personalChannel.on("message", (channel, message) => {
                                 redisLogger.info(" Got message: " + message);
                                 const messageObject = JSON.parse(message);
+                                const time = Date.now();
+
                                 let { type, payload } = messageObject;
 
                                 switch (type) {

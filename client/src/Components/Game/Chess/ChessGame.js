@@ -38,10 +38,10 @@ class ChessGame extends Component {
         }
         componentDidUpdate(prevProps) {
 
-                if (this.props.gameState !== prevProps.gameState) {
+                if (this.props.action !== prevProps.action) {
 
                         // called when state receives new game object and sets gamestate to initiategame
-                        if (this.props.gameState === "initiateGame") {
+                        if (this.props.action === "initiateGame") {
                                 let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game
                                 console.log(this.props.game);
                                 this.setState({
@@ -62,7 +62,7 @@ class ChessGame extends Component {
 
                                 return
                         }
-                        if (this.props.gameState === "resumeGame") {
+                        if (this.props.action === "resumeGame") {
                                 let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game
                                 console.log(this.props.game)
                                 this.setState({
@@ -87,7 +87,7 @@ class ChessGame extends Component {
                 }
 
                 // this should happen when opponent moves
-                if (this.props.gameState === "ongoing" && this.props.move !== prevProps.move) {
+                if (this.props.action === "playerMove" && this.props.move !== prevProps.move) {
                         console.log(this.props.move);
                         let { from, to } = this.props.move
                         this.onMoveEvent(from, to, false);
@@ -275,6 +275,7 @@ class ChessGame extends Component {
 
 const mapStateToProps = (state /*, ownProps*/) => {
         return {
+                action: state.action,
                 gameState: state.gameState,
                 game: state.game,
                 move: state.move,
