@@ -82,7 +82,7 @@ matchmakingClient.on('message', (channel, message) => {
                                                                                 console.log(playerTwo)
                                                                                 console.log(playerOne)
 
-//bad protocol rigght here----------------------------------------------------->//whoever is player one gets to generate game on client~
+                                                                                //bad protocol rigght here----------------------------------------------------->//whoever is player one gets to generate game on client~
                                                                                 // IF autoaccept is true
                                                                                 // redisClient.publish(playerOne.sessionId, serializeRedisMessage(CLIENT_PROPOSE_MATCHUP, {
                                                                                 //         gameId: gameId,
@@ -98,9 +98,9 @@ matchmakingClient.on('message', (channel, message) => {
                                                                                 //         playerOneUsername: playerOne.username
                                                                                 // }));
 
-                                                                                let game = createGame(gameId, sessionId, opponentId);
+                                                                                let game = createGame(gameId, playerOne.sessionId, playerTwo.sessionId);
                                                                                 redisClient.set(gameId + "object", JSON.stringify(game));
-        
+
                                                                                 let opponentInfoOne = {
                                                                                         opponentId: playerTwo.sessionId,
                                                                                         opponentName: playerTwo.username,
@@ -111,8 +111,8 @@ matchmakingClient.on('message', (channel, message) => {
                                                                                         opponentName: playerOne.username,
                                                                                         gameId: gameId
                                                                                 }
-                                                                                redisClient.publish(playerOne.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game, opponentInfo }));
-                                                                                redisClient.publish(playerTwo.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game, opponentInfo }));
+                                                                                redisClient.publish(playerOne.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: game, opponentInfo: opponentInfoOne }));
+                                                                                redisClient.publish(playerTwo.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: game, opponentInfo: opponentInfoTwo }));
 
                                                                         })
 

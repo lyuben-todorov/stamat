@@ -220,7 +220,7 @@ io.on("connection", (socket) => {
                                         chess = new Chess.Chess();
                                         opponentId = payload.opponentInfo.opponentId
                                         opponentName = payload.opponentInfo.opponentName
-                                        gameId = payload.gameId;
+                                        gameId = payload.opponentInfo.gameId;
                                         socket.emit('action', { type: CLIENT_START_GAME, payload: { game: payload.game } })
                                         break;
 
