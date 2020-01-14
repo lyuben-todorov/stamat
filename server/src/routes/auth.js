@@ -32,7 +32,7 @@ router.post('/register', (req, res) => {
 
 
 
-// used to restore user session
+// used to restore user session through auth token
 // client sends request with auth cookies
 // if the token is valid the server tries to retrieve session 
 // if there is a session the cookie session is sent
@@ -57,18 +57,36 @@ router.get('/restore', (req, res) => {
 
                                 User.findOne({ email }, (err, user) => {
                                         let { email, username, _id } = user;
-                                        let id = _id.toString();
-                                        redisClient.get(id, (err, reply) => {
+
+                                        redisClient.get(_id, (err, reply) => {
                                                 let sessionId = reply;
 
                                                 //no session for user found
                                                 if (!reply) {
                                                         // make new session id
                                                         sessionId = jwt.sign({ username }, secret);
-                                                        redisClient.set(id, sessionId);
+                                                        // this SET is for the auth cycle
+                                                        redisClient.set(user._id.toString(), sessionId);
+
+                                                        let sessionObject = {
+                                                                sessionId: sessionId,
+                                                                clientUsername: user.username,
+                                                                gameId: "none",
+                                                                opponentId: "none",
+                                                                opponentName: "none"
+                                                        }
+                                                        console.log(sessionObject);
+                                                        redisClient.hmset(sessionId, sessionObject, (err, res) => {
+                                                                if (!err) {
+                                                                        logger.info(`Session persisted successfully: ${sessionId.slice(-5)}`);
+
+                                                                } else {
+                                                                        logger.error(`Error persisting session ${sessionId.slice(-5)}: ${err}`)
+                                                                }
+                                                        })
                                                 }
                                                 res.cookie('sessionId', sessionId)
-                                                        .send({ email, username, id, sessionId });
+                                                        .send({ email, username, _id, sessionId });
                                         })
                                 });
                         }
@@ -102,7 +120,7 @@ router.post('/login', (req, res) => {
                                 } else {
                                         // Issue token
                                         const token = jwt.sign({
-                                                email:user.email
+                                                email: user.email
                                         }, secret);
 
                                         let { email, username, _id } = user;
@@ -114,7 +132,24 @@ router.post('/login', (req, res) => {
                                                         sessionId = reply
                                                 } else {
                                                         sessionId = jwt.sign({ username }, secret);
+                                                        // this SET is for the auth cycle
                                                         redisClient.set(user._id.toString(), sessionId);
+
+                                                        let sessionObject = {
+                                                                sessionId: sessionId,
+                                                                clientUsername: user.username,
+                                                                gameId: "none",
+                                                                opponentId: "none",
+                                                                opponentName: "none"
+                                                        }
+                                                        redisClient.hmset(sessionId, sessionObject, (err, res) => {
+                                                                if (!err) {
+                                                                        logger.info(`Session persisted successfully: ${sessionId.slice(-5)}`);
+
+                                                                } else {
+                                                                        logger.error(`Error persisting session ${sessionId.slice(-5)}: ${err}`)
+                                                                }
+                                                        })
                                                 }
                                                 res.cookie('token', token, { httpOnly: true })
                                                         .cookie('sessionId', sessionId)

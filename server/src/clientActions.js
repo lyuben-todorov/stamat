@@ -2,7 +2,6 @@ export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
 export const SERVER_REPLY_MATCHUP = "server/REPLY_MATCHUP";
 export const SERVER_REGISTER_USER = "server/REGISTER_USER"
 
-
 export const GAME_PLAYER_READY = "game/PLAYER_READY";
 export const GAME_PLAYER_MOVE = "game/PLAYER_MOVE";
 export const GAME_OFFER_DRAW = "game/OFFER_DRAW";

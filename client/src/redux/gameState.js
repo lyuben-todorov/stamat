@@ -63,8 +63,6 @@ function reducer(state = initialState, action) {
             return { ...state, gameState: "gameOver", winner: action.payload.winner }
         case CLIENT_UPDATE_GAME:
             return { ...state, move: action.payload.move, history: [...state.history, action.payload.move] }
-
-
         // actions prefixed with GAME are triggered by the CLIENT for game-related actions on socket
         case GAME_PLAYER_READY:
             return { ...state, gameState: "ongoing" }
