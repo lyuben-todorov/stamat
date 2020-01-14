@@ -1,29 +1,82 @@
-.MessageWindow {
+.MenuWindow {
     height: 100%;
     width: 100%;
     padding-bottom: 2em !important;
-    max-height: 500px;
 
-    .MessageBox {
-        height: 90%;
-        max-height: 90%;
-        overflow-y: scroll;
+    .Menu {
+        max-height: 6%;
 
-        .message {
-            padding: 0px;
-            padding-right: 20px;
-        }
     }
 
-    .ChatBox {
-        height: 30px;
-        padding: 0;
+    .Content {
+        max-height: 94%;
+        height: 94%;
 
-        .input {
-            padding: 0;
-            margin: 0;
-            width: 100%;
-            height: 100%
+        .MenuRouter {
+            height: 100%;
+        }
+
+        .MatchmakingBox {
+            height: 100%;
+
+
+            .Dropdown {
+                width: 100%;
+                line-height: 2em;
+                font-size: 16pt !important;
+                text-align: center;
+                margin: 5px;
+
+                .mainIcon {
+                    font-size: 1.5em !important;
+                    width: 20%;
+                }
+
+                .icon,
+                .item {
+                    //width:25%;
+                    text-align: right;
+                    font-size: 1em;
+                }
+            }
+
+            button.SubmitButton {
+                position: absolute !important;
+                left: 50%;
+                width: 90%;
+                margin-left: -45%;
+                height: 50px;
+                bottom: 5%;
+            }
+
+        }
+
+        .MessageBox {
+            height: 90%;
+            max-height: 90%;
+            overflow-y: scroll;
+
+            .message {
+                padding: 0px;
+                padding-right: 20px;
+            }
+        }
+
+        .ChatBox {
+            height: 100%;
+
+            .ChatHistory {
+                height: 90%;
+                background: white !important;
+            }
+
+            .input {
+
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                height: 30px;
+            }
         }
     }
 }
@@ -45,24 +98,27 @@
     margin-right: 20px !important;
     max-height: 100%;
 
-    .Timer{
-        color:white;
+    .Timer {
+        color: white;
         font-size: 3em;
         height: 30px;
         line-height: 1;
         text-align: center;
-        margin:auto;
+        margin: auto;
         margin-bottom: 5px;
         margin-top: 5px;
-        .TimerNumber{
+
+        .TimerNumber {
             padding: 0px 10px;
-            float:left;
-            width:50px;
+            float: left;
+            width: 50px;
         }
-        .TimerNumber.Seconds{
+
+        .TimerNumber.Seconds {
             float: right;
         }
     }
+
     .MoveBox {
 
         .Move {
@@ -106,13 +162,15 @@
     .PlayerBox {
         text-align: left;
         width: 100%;
-        .User{
-            .Username{
+
+        .User {
+            .Username {
                 padding-left: 5px;
             }
         }
-        .icon{
-            margin:auto !important;
+
+        .icon {
+            margin: auto !important;
         }
     }
 

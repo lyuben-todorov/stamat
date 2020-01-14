@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Segment, Grid, Icon, Menu, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import Move from './MessageWindow/Move'
+import Move from './MoveWindow/Move'
 import { observer } from 'mobx-react'
 import Timer from 'react-compound-timer';
 import { concedeGame } from '../../redux/actionCreators'

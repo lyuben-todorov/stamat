@@ -1,19 +1,18 @@
 import React, { Component } from 'react'
 import { observer } from 'mobx-react'
-import MessageWindow from './MessageWindow';
-import MoveWindow from './MoveWindow';
 import { Grid } from 'semantic-ui-react';
 import { Provider } from 'react-redux';
-import ChessGame from './Chess/ChessGame';
-import '../_sass/Game.scss'
-
 import { createStore, applyMiddleware } from 'redux';
 import createSocketIoMiddleware from 'redux-socket.io';
 import io from 'socket.io-client';
+import MoveWindow from './MoveWindow';
+import ChessGame from './Chess/ChessGame';
 import reducer from '../../redux/gameState'
 import SessionStore from '../../Mobx/SessionStore';
 import { serverUrl } from '../../processVariables';
-import { endpoint, mode } from '../../processVariables'
+import { mode } from '../../processVariables'
+import MenuWindow from './MenuWindow';
+import '../_sass/Game.scss'
 @observer
 class Game extends Component {
 
@@ -38,7 +37,7 @@ class Game extends Component {
                                 <Grid stackable divided="vertically">
                                         <Grid.Row columns={3}>
                                                 <Grid.Column className="flexbox" width={4}>
-                                                        <MessageWindow sessionStore={SessionStore} />
+                                                        <MenuWindow sessionStore={SessionStore} />
                                                 </Grid.Column>
                                                 <Grid.Column width={8}>
                                                         <ChessGame sessionStore={SessionStore} className="MainChessboard" />

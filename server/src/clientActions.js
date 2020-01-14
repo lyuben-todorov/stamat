@@ -6,12 +6,14 @@ export const SERVER_REGISTER_USER = "server/REGISTER_USER"
 export const GAME_PLAYER_READY = "game/PLAYER_READY";
 export const GAME_PLAYER_MOVE = "game/PLAYER_MOVE";
 export const GAME_OFFER_DRAW = "game/OFFER_DRAW";
+export const GAME_REPLY_DRAW = "game/REPLY_DRAW";
+
 export const GAME_CONCEDE = "game/CONCEDE";
-export const GAME_OVER = "game/OVER"
 
 export const CLIENT_GAME_OVER = "client/GAME_OVER";
 export const CLIENT_UPDATE_GAME = "client/UPDATE_GAME";
 export const CLIENT_OFFER_DRAW = "client/OFFER_DRAW";
+export const CLIENT_REPLY_DRAW = "client/REPLY_DRAW";
 
 export const CLIENT_PROPOSE_MATCHUP = "client/PROPOSE_MATCHUP";
 export const CLIENT_START_GAME = "client/START_GAME";

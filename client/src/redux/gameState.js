@@ -1,5 +1,5 @@
 
-import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_GAME_OVER } from '../actions';
+import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_GAME_OVER, GAME_OFFER_DRAW, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW } from '../actions';
 
 
 const initialState = {
@@ -27,7 +27,7 @@ function reducer(state = initialState, action) {
         case SERVER_REGISTER_USER:
             return { ...state, sessionId: action.payload.sessionId, username: action.payload.username };
         case SERVER_START_MATCHMAKING:
-            return { ...state, gameState: "matchmaking" };
+            return state;
         case SERVER_REPLY_MATCHUP:
             return state;
 
@@ -38,13 +38,17 @@ function reducer(state = initialState, action) {
         // sessionId is unique per user for both guests and registered clients
         // used to identify user session
         case CLIENT_REGISTER_USER:
-            return { ...state };
+            return state
         case CLIENT_PROPOSE_MATCHUP:
             return { ...state, gameState: "proposal", opponentId: action.payload.sessionId, opponentName: action.payload.username }
         case CLIENT_START_GAME:
             return { ...state, gameState: "initiateGame", game: action.payload.game, history: [] }
         case CLIENT_RESUME_GAME:
             return { ...state, gameState: "resumeGame", game: action.payload.game, history: action.payload.game.history }
+        case CLIENT_OFFER_DRAW:
+            return state
+        case CLIENT_REPLY_DRAW:
+            return state
         case CLIENT_RESUME_SESSION:
             return {
                 ...state, userType: "user",
@@ -66,9 +70,8 @@ function reducer(state = initialState, action) {
             return { ...state, gameState: "ongoing" }
         case GAME_PLAYER_MOVE:
             return { ...state, history: [...state.history, action.payload.move] };
-
-
-        // for actions with no server side-effects use mobx;
+        case GAME_OFFER_DRAW:
+            return state
         default:
             return state;
     }
