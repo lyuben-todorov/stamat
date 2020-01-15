@@ -52,23 +52,47 @@
 
         }
 
-        .MessageBox {
-            height: 90%;
-            max-height: 90%;
-            overflow-y: scroll;
-
-            .message {
-                padding: 0px;
-                padding-right: 20px;
-            }
-        }
-
         .ChatBox {
             height: 100%;
+            width: 100%;
+            max-height: 100%;
 
             .ChatHistory {
                 height: 90%;
-                background: white !important;
+                overflow-y: auto;
+
+                .Message {
+                    text-align: center;
+                    background-color: rgba(200, 200, 200, 0.322);
+                    box-shadow: none;
+                    height: 30px !important;
+                    padding: 5px 1.5em !important;
+
+                    text-align: center;
+                    color: rgb(99, 99, 99);
+                    font: size 10pt;;
+                    .MessageBody {
+                        float: left;
+                    }
+
+                    .MessageTime {
+                        float: right
+                    }
+                    .Sender{
+                        font-weight: bold;
+                        margin-right: 10px;
+                    }
+                }
+                
+
+                .Message.Server {
+                    background-color: transparent;
+                    text-align: center;
+                    color: rgb(99, 99, 99);
+                    font-size:20pt;
+                    font-style: italic;
+                    font-weight: bold;
+                }
             }
 
             .input {
@@ -111,9 +135,10 @@
         margin-top: 5px;
 
         .CenterContainer {
-            width:fit-content;
+            width: fit-content;
             text-align: center;
-            margin:auto;
+            margin: auto;
+
             .TimerNumber {
                 padding: 0px 10px;
                 font-size: 1.5em;

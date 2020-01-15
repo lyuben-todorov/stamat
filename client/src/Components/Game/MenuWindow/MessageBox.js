@@ -5,7 +5,8 @@ import Message from './Message';
 
 import { startMatchmaking, replyMatchmaking } from '../../../redux/actionCreators'
 import { connect } from 'react-redux';
-import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP, CLIENT_GAME_OVER } from '../../../actions';
+import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP, CLIENT_GAME_OVER, CLIENT_RESUME_SESSION, CLIENT_START_GAME, CLIENT_SEND_CHAT_MESSAGE } from '../../../actions';
+import { reaction } from 'mobx';
 
 
 @observer
@@ -14,54 +15,50 @@ class MessageBox extends Component {
                 super(props);
                 this.state = {
                         messages: [],
-                        startedMatchmaking: false,
-                        startedGame: false,
                 }
-
-
-                this.addMatchmakingButton = this.addMatchmakingButton.bind(this);
-                this.addMatchupProposalButton = this.addMatchupProposalButton.bind(this);
-                this.addStartGameMessage = this.addStartGameMessage.bind(this);
                 this.addTextMessage = this.addTextMessage.bind(this);
+                this.addMessage = this.addMessage.bind(this);
         }
+
         componentDidMount() {
-                if (this.props.userType === "guest") {
-                        this.setState(state => {
-                                const messages = [...state.messages, { type: CLIENT_REGISTER_USER, message: "" }]
+                this.addMessage("greet","hi");
+        }
+        addMessage(type, message,level="server") {
 
-                                return { messages }
-                        })
-
-                } else {
-                        this.addMatchmakingButton();
-                }
+                this.setState(state => {
+                        const messages = [...state.messages,  {
+                                type: type,
+                                message: message,
+                                level:level
+                        }]
+                        return { messages }
+                })
         }
 
         componentDidUpdate(prevProps) {
-                if (this.props.gameState !== prevProps.gameState) {
-                        if (this.props.gameState === "proposal") {
-                                this.addMatchupProposalButton();
-                        }
-                        if (this.props.gameState === "ongoing" && !this.state.startedGame) {
-                                this.addStartGameMessage();
-                                this.setState({ startedGame: true });
-                        }
-                        if (this.props.gameState === "gameOver") {
-                                this.addGameOverMessage();
-                                this.setState({ gameOver: true });
+                if (this.props.action !== prevProps.action || this.props.chatHistory !== prevProps.chatHistory) {
+                        console.log(this.props)
+                        switch (this.props.action) {
+                                case "initiateGame" || "resumeGame":
+                                        //this.addMessage(CLIENT_START_GAME)
+                                        break;
+                                case "gameOver":
+                                        this.addMessage(CLIENT_GAME_OVER,
+                                                this.props.winner === this.props.sessionId ? this.props.username : this.props.opponentName)
+                                        break;
+                                case "serverMessage":
+                                        this.addMessage("server", this.props.latestMessage, "player")
+                                        break;
+                                case "ownMessage":
+                                        this.addMessage("client", this.props.latestMessage, "player")
+                                        break
+                                default:
+                                        break;
                         }
 
                 }
         }
-        addGameOverMessage() {
-                this.setState({
-                        messages: [...this.state.messages,
-                        {
-                                type: CLIENT_GAME_OVER, 
-                                message: this.props.winner === this.props.sessionId ? this.props.username : this.props.opponentName
-                        }]
-                })
-        }
+
         addMatchupProposalButton() {
                 this.setState(state => {
                         const messages = [...state.messages, { type: CLIENT_PROPOSE_MATCHUP, message: this.props.opponentName }]
@@ -69,58 +66,22 @@ class MessageBox extends Component {
                         return { messages }
                 })
         }
-        addMatchmakingButton() {
-                if (!this.state.startedMatchmaking) {
-
-                        this.setState(state => {
-                                const messages = [...state.messages, { type: SERVER_START_MATCHMAKING, message: "" }]
-
-                                return { messages }
-                        })
-                        this.setState({ startedMatchmaking: true })
-                }
-        }
         addTextMessage(message) {
                 this.setState(state => {
-                        const messages = [...state.messages, { type: "message", message: message }]
+                        const messages = [...state.messages, { type: CLIENT_SEND_CHAT_MESSAGE, message: message }]
                         return { messages }
                 })
         }
-        addStartGameMessage() {
-                this.addTextMessage("Started Game!");
-        }
-        onMessageAction = (message) => {
-                switch (message.type) {
-                        case SERVER_START_MATCHMAKING:
-                                this.startMatchmaking();
-                                break;
-                        case CLIENT_REGISTER_USER:
-                                this.setState({ username: message.payload })
-                                this.addMatchmakingButton();
-                                break;
-                        case SERVER_REPLY_MATCHUP:
-                                this.props.replyMatchmaking(message.payload);
-                                break;
-                        default:
-                                console.log(message);
-                                break;
-                }
-        }
-        startMatchmaking() {
-                var matchup = {
-                        username: this.props.sessionStore.username,
-                        sessionId: this.props.sessionStore.sessionId
-                }
-                this.props.startMatchmaking(matchup);
 
-        }
         render() {
                 return (
-                        <Segment className="MessageBox">
+                        <div className="ChatHistory">
                                 {this.state.messages.map((message, index) => (
-                                        <Message onMessageAction={this.onMessageAction} type={message.type} key={index} message={message.message}></Message>
+                                        <Message type={message.type} level={message.level} key={index} message={message.message}></Message>
                                 ))}
-                        </Segment>
+
+                        </div>
+
                 )
         }
 }
@@ -132,7 +93,10 @@ const mapStateToProps = (state) => {
                 sessionId: state.sessionId,
                 opponentName: state.opponentName,
                 winner: state.winner,
-                username: state.username
+                username: state.username,
+                action: state.action,
+                latestMessage: state.latestMessage,
+                chatHistory:state.chatHistory
         }
 }
 

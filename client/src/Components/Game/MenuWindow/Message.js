@@ -1,14 +1,23 @@
 import React, { Component } from 'react'
-import { Button, Grid, Input } from 'semantic-ui-react'
-import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP, CLIENT_GAME_OVER } from '../../../actions';
+import { Button, Grid, Container } from 'semantic-ui-react'
+import { Message as SemanticMessage } from 'semantic-ui-react'
+import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP, CLIENT_GAME_OVER, CLIENT_SEND_CHAT_MESSAGE } from '../../../actions';
 
 
 export default class Message extends Component {
     constructor(props) {
         super(props)
         const time = new Date().toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
+        let className
+        if (this.props.level === "server") {
+            className = "Message Server"
+        } else if (this.props.level === "player") {
+            className = "Message";
+        }
+        console.log(props);
         this.state = {
             time: time.toString(),
+            className: className,
         }
     }
     handleInputChange(event) {
@@ -22,54 +31,32 @@ export default class Message extends Component {
     }
     render() {
         var messageBody;
+
         switch (this.props.type) {
-            case SERVER_START_MATCHMAKING:
-                messageBody = <Button onClick={() => this.props.onMessageAction({ type: SERVER_START_MATCHMAKING })}>Start</Button>
-                break;
-            case CLIENT_REGISTER_USER:
-                messageBody =
-                    <Grid>
-                        <Grid.Column width={10}>
-                            <Input name="username" onChange={this.handleInputChange} type="text"></Input>
-                        </Grid.Column>
-                        <Grid.Column width={6}>
-                            <Button onClick={() => this.props.onMessageAction({ type: CLIENT_REGISTER_USER, payload: this.state.username })}>Submit</Button>
-                        </Grid.Column>
-                    </Grid>
+            case "greet":
+                messageBody = "Please be nice!"
                 break;
             case CLIENT_PROPOSE_MATCHUP:
-                messageBody =
-                    <Grid>
-                        <Grid.Row columns={1}>
-                            <Grid.Column>
-                                {"Accept match against: " + this.props.message + "?"}
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row columns={2}>
-                            <Grid.Column>
-                                <Button positive onClick={() =>
-                                    this.props.onMessageAction({ type: SERVER_REPLY_MATCHUP, payload: { reply: true, opponentId: this.props.message } })}>Accept</Button>
-                            </Grid.Column>
-                            <Grid.Column>
-                                <Button positive onClick={() =>
-                                    this.props.onMessageAction({ type: SERVER_REPLY_MATCHUP, payload: { reply: false, opponentId: this.props.message } })}>Refuse</Button>
-                            </Grid.Column>
-                        </Grid.Row>
-                    </Grid>
                 break;
             case CLIENT_GAME_OVER:
                 messageBody =
-                    <Grid>
-                        <Grid.Column width={16}>
-                            {this.props.message} has won!
-                        </Grid.Column>
-                    </Grid>
+                    <div>
+                        {this.props.message + " has won!"}
+                    </div>
+
                 break;
-            case "message":
-                messageBody = <div>{this.props.message}</div>
+            case "server":
+                messageBody =
+                    <React.Fragment>
+                        <div className="Sender">Opponent:</div>
+                        {this.props.message}
+                    </React.Fragment>
                 break;
-            case "history":
-                messageBody = <div>{this.props.message.from + this.props.message.to}</div>
+            case "client":
+                messageBody = <React.Fragment>
+                    <div className="Sender">You:</div>
+                    {this.props.message}
+                </React.Fragment>
                 break;
 
             default:
@@ -77,14 +64,18 @@ export default class Message extends Component {
         }
 
         return (
-            <Grid className="message" divided="vertically">
-                <Grid.Column width={14}>
+            <SemanticMessage className={this.state.className}>
+
+
+                <div className="MessageBody flexbox">
                     {messageBody}
-                </Grid.Column>
-                <Grid.Column floated="right" width={2}>
+                </div>
+                <div className="MessageTime">
                     {this.state.time}
-                </Grid.Column>
-            </Grid>
+                </div>
+
+
+            </SemanticMessage>
         )
     }
 

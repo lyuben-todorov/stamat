@@ -3,8 +3,7 @@ import createLgger from '../logger';
 import env from '../env'
 
 const logger = createLgger('MongoDB');
-const uri =`mongodb://${env.MONGO_USERNAME ? env.MONGO_USERNAME : ""}${env.MONGO_USERNAME ? ":" : ""}${env.MONGO_PASSWORD ? env.MONGO_PASSWORD :""}${env.MONGO_USERNAME ? "@" : ""}localhost:27017/ebredebre`;
-console.log(uri);
+const uri = `mongodb://${env.MONGO_USERNAME ? env.MONGO_USERNAME : ""}${env.MONGO_USERNAME ? ":" : ""}${env.MONGO_PASSWORD ? env.MONGO_PASSWORD : ""}${env.MONGO_USERNAME ? "@" : ""}localhost:27017/ebredebre`;
 const db = mongoose.connection;
 
 
@@ -23,7 +22,7 @@ db.on('disconnected', function () {
 	logger.info('MongoDB disconnected!');
 });
 
-mongoose.connect(uri, { autoReconnect: false, useNewUrlParser: true, useUnifiedTopology:true});
+mongoose.connect(uri, { autoReconnect: false, useNewUrlParser: true, useUnifiedTopology: true });
 
 const connection = mongoose.connection
-export default  connection
+export default connection

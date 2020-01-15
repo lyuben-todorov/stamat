@@ -1,6 +1,5 @@
 
-import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_GAME_OVER, GAME_OFFER_DRAW, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW } from '../actions';
-import { act } from 'react-dom/test-utils';
+import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_GAME_OVER, GAME_OFFER_DRAW, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW, SERVER_SEND_CHAT_MESSAGE, CLIENT_SEND_CHAT_MESSAGE } from '../actions';
 
 
 const initialState = {
@@ -15,10 +14,12 @@ const initialState = {
     game: {
     },
     history: [],
-    mmpreferences:{
-        
+    latestMessage: {},
+    chatHistory: [],
+    mmpreferences: {
+
     },
-    moveCount:0 //
+    moveCount: 0 //
 }
 
 function reducer(state = initialState, action) {
@@ -35,7 +36,9 @@ function reducer(state = initialState, action) {
             return state;
         case SERVER_REPLY_MATCHUP:
             return state;
-
+        //message and channel
+        case SERVER_SEND_CHAT_MESSAGE:
+            return { ...state, action: "ownMessage", latestMessage: action.payload.message, chatHistory: [...state.chatHistory, action.payload.message] }
 
         // actions prefixed with CLIENT are triggered by the SERVER for general client state updates
 
@@ -49,10 +52,8 @@ function reducer(state = initialState, action) {
         case CLIENT_START_GAME:
             return { ...state, action: "initiateGame", gameState: "ongoing", game: action.payload.game, history: [], color: action.payload.color }
         case CLIENT_RESUME_GAME:
-            console.log(action.payload)
             return { ...state, action: "resumeGame", gameState: "ongoing", game: action.payload.game, history: action.payload.game.history, color: action.payload.color }
         case CLIENT_OFFER_DRAW:
-
             return { ...state, action: "offerDraw" }
         case CLIENT_REPLY_DRAW:
             return state
@@ -66,14 +67,16 @@ function reducer(state = initialState, action) {
                 opponentId: action.payload.opponentId
             }
         case CLIENT_GAME_OVER:
-            return { ...state, gameState: "gameOver", winner: action.payload.winner }
+            return { ...state, action: "gameOver", gameState: "gameOver", winner: action.payload.winner }
         case CLIENT_UPDATE_GAME:
-            return { ...state, action:"opponentMove", moveCount: state.moveCount+=1, move: action.payload.move, history: [...state.history, action.payload.move] }
+            return { ...state, action: "opponentMove", moveCount: state.moveCount += 1, move: action.payload.move, history: [...state.history, action.payload.move] }
+        case CLIENT_SEND_CHAT_MESSAGE:
+            return { ...state, action: "serverMessage", latestMessage: action.payload.message, chatHistory: [...state.chatHistory, action.payload] }
         // actions prefixed with GAME are triggered by the CLIENT for game-related actions on socket
         case GAME_PLAYER_READY:
-            return { ...state, action:"gameReady", gameState: "ongoing" }
+            return { ...state, action: "gameReady", gameState: "ongoing" }
         case GAME_PLAYER_MOVE:
-            return { ...state, action:"clientMove", moveCount: state.moveCount+=1, history: [...state.history, action.payload.move] };
+            return { ...state, action: "clientMove", moveCount: state.moveCount += 1, history: [...state.history, action.payload.move] };
         case GAME_OFFER_DRAW:
             return state
         default:

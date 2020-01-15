@@ -11,7 +11,7 @@ import mongoConnection from './mongo/mongoClient';
 import indexRouter from './routes/index';
 import userRouter from './routes/auth';
 import env from './env';
-import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, MATCHMAKER_ADD_TO_QUEUE, GAME_CONCEDE, GAME_OFFER_DRAW, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, GAME_REPLY_DRAW } from './clientActions';
+import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, MATCHMAKER_ADD_TO_QUEUE, GAME_CONCEDE, GAME_OFFER_DRAW, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, GAME_REPLY_DRAW, SERVER_SEND_CHAT_MESSAGE, CLIENT_SEND_CHAT_MESSAGE } from './clientActions';
 import redisClient from './redis/redisClient'
 import mongoose from 'mongoose'
 import Chess from 'chess.js';
@@ -193,10 +193,6 @@ io.on("connection", (socket) => {
                         })
                         break;
                     case CLIENT_PROPOSE_MATCHUP:
-
-
-
-
                         if (autoAccept) {
                             if (payload.playerOneUsername === clientUsername) {
 
@@ -221,8 +217,6 @@ io.on("connection", (socket) => {
 
                             socket.emit('action', { type: CLIENT_PROPOSE_MATCHUP, payload: payload })
                         }
-
-
                         break;
                     case CLIENT_START_GAME:
                         chess = new Chess.Chess();
@@ -230,11 +224,15 @@ io.on("connection", (socket) => {
                         opponentName = payload.opponentInfo.opponentName
                         gameId = payload.opponentInfo.gameId;
                         color = payload.color;
-                        socket.emit('action', { type: CLIENT_START_GAME, payload: { game: payload.game } })
+                        socket.emit('action', { type: CLIENT_START_GAME, payload: { game: payload.game } });
                         break;
 
+                    case CLIENT_SEND_CHAT_MESSAGE:
+                        console.log(payload);
+                        socket.emit('action', { type: CLIENT_SEND_CHAT_MESSAGE, payload: { message: payload.message, channel:payload.channel } });
+                        break;
                     case CLIENT_RESUME_GAME:
-                        socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: payload.game } })
+                        socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: payload.game } });
                         break;
                     case CLIENT_OFFER_DRAW:
                         socket.emit('action', { type: CLIENT_OFFER_DRAW, payload: { gameId: payload.gameId } });
@@ -275,6 +273,17 @@ io.on("connection", (socket) => {
                         if (action.payload.reply) {
                             redisClient.incr(gameId);
                             redisClient.publish(opponentId, serializeRedisMessage(SERVER_REPLY_MATCHUP, sessionId));
+                        }
+                        break;
+                    case SERVER_SEND_CHAT_MESSAGE:
+                        switch (action.payload.channel) {
+                            case "opponent":
+                                redisClient.publish(opponentId, serializeRedisMessage(CLIENT_SEND_CHAT_MESSAGE, action.payload));
+                                break;
+                            case "global":
+                                break;
+
+
                         }
                         break;
 
