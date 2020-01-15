@@ -79,6 +79,9 @@ function createGame(gameId, p1id, p2id) {
         }
         return gameObject;
 }
+function getHumanTime() {
+        return Math.floor(Date.now() / 1000);
+}
 
 io.on("connection", (socket) => {
         const sessionId = socket.handshake.query.session;
@@ -277,7 +280,11 @@ io.on("connection", (socket) => {
                                         case GAME_PLAYER_MOVE:
                                                 redisClient.get(action.payload.gameId + "object", (err, reply) => {
                                                         let oldGame = JSON.parse(reply);
-
+                                                        if (oldGame.moveCount == 0) {
+                                                                console.log("ys");
+                                                                oldGame.startTime = Date.now();
+                                                                oldGame.lastPlayerMoveTime = Date.now();
+                                                        }
                                                         // player is on move
                                                         //      XNOR
                                                         if ((oldGame.white === sessionId) == (oldGame.toMove === 'w')) {
@@ -288,16 +295,29 @@ io.on("connection", (socket) => {
                                                                         return;
                                                                 }
 
+
+
                                                                 // copy game object
                                                                 let newGame = oldGame;
+                                                                let moveTime = Date.now() - newGame.lastPlayerMoveTime;
+                                                                if (sessionId === newGame.playerOne) {
+                                                                        newGame.p1time -= moveTime
+                                                                } else {
+                                                                        newGame.p2time -= moveTime;
+                                                                }
+                                                                console.log(Math.floor(newGame.lastPlayerMoveTime / 1000))
+                                                                newGame.history.push(newMove)
 
-                                                                newGame.history.push(newMove);
+                                                                newGame.moveCount += 1;
                                                                 newGame.position = chess.fen();
                                                                 newGame.toMove = newGame.toMove === 'w' ? 'b' : 'w';
+
                                                                 if (chess.game_over()) {
                                                                         //checkmate
                                                                         newGame.finished = true;
                                                                         newGame.winner = sessionId;
+
+                                                                        newGame.lastPlayerMoveTime = Date.now()
 
                                                                         //send move to opponent
                                                                         redisClient.publish(opponentId, serializeRedisMessage(CLIENT_UPDATE_GAME,
@@ -306,7 +326,7 @@ io.on("connection", (socket) => {
                                                                                         move: action.payload.move,
                                                                                         finished: newGame.finished,
                                                                                         winner: newGame.finished ? sessionId : "none"
-                                                                                }), (err, res) => {
+                                                                                }), () => {
                                                                                         // game over shouldn't arrive before the last move 
                                                                                         redisClient.publish(newGame.playerOne, serializeRedisMessage(CLIENT_GAME_OVER, { winner: sessionId }));
                                                                                         redisClient.publish(newGame.playerTwo, serializeRedisMessage(CLIENT_GAME_OVER, { winner: sessionId }));
@@ -314,12 +334,17 @@ io.on("connection", (socket) => {
                                                                                 });
 
                                                                 } else {
+                                                                        newGame.lastPlayerMoveTime = Date.now()
+
                                                                         redisClient.publish(opponentId, serializeRedisMessage(CLIENT_UPDATE_GAME,
                                                                                 {
                                                                                         gameId: action.payload.gameId,
                                                                                         move: action.payload.move,
+                                                                                        p1time: newGame.p1time,
+                                                                                        p2time: newGame.p2time,
                                                                                         finished: newGame.finished,
-                                                                                        winner: newGame.finished ? sessionId : "none"
+                                                                                        winner: newGame.finished ? sessionId : "none",
+
                                                                                 }));
                                                                 }
                                                                 //set new game object
@@ -332,7 +357,7 @@ io.on("connection", (socket) => {
                                                 break;
                                         case GAME_CONCEDE:
                                                 redisClient.get(gameId + "object", (err, reply) => {
-                                                        let finishedGame = JSON.parse(reply);
+                                                        let finishedGame = JSON.parse(reply)
                                                         finishedGame.finished = true;
                                                         // save game to static storage here;
                                                         redisClient.set(gameId + "object", JSON.stringify(finishedGame));
@@ -345,7 +370,7 @@ io.on("connection", (socket) => {
 
                                         case GAME_OFFER_DRAW:
                                                 redisClient.get(gameId + "object", (err, reply) => {
-                                                        let currentGame = JSON.parse(reply);
+                                                        let currentGame = JSON.parse(reply)
 
                                                         redisClient.publish(opponentId, serializeRedisMessage(CLIENT_OFFER_DRAW, { gameId: gameId }));
 
@@ -361,7 +386,7 @@ io.on("connection", (socket) => {
                                 socketLogger.info("Socket disconnected: " + sessionId);
 
                                 // we don't want to persist an undefined session do we
-                                if (!_.isUndefined(sessionId) && !_.isNull(sessionId) && sessionId !=="undefined" && sessionId !=="null"  ) {
+                                if (!_.isUndefined(sessionId) && !_.isNull(sessionId) && sessionId !== "undefined" && sessionId !== "null") {
 
                                         let sessionObject = {
                                                 sessionId: sessionId,

@@ -59,10 +59,32 @@ class Matchmaking extends Component {
         this.sendMatchmakingRequest = this.sendMatchmakingRequest.bind(this);
     }
 
-    componentDidUpdate(prevProps){
-        if(this.props !== prevProps){
-            if(this.props.gameState === "ongoing"){
-                this.setState({submitted:false})
+    componentDidMount() {
+        let defaultMode = {
+            text: 'Regular Chess',
+            key: "regular",
+            icon: "chess"
+        }
+        let defaultTime = {
+            text: '10 Minutes',
+            key: "10",
+            icon: "hourglass half"
+        }
+        let defaultOpponent = {
+            text: "Player",
+            key: "player",
+            icon: "user"
+        }
+
+        let e;
+        this.onModeChoice(e, { name: defaultMode });
+        this.onTimeChoice(e, { name: defaultTime });
+        this.onPlayerChoice(e, { name: defaultOpponent });
+    }
+    componentDidUpdate(prevProps) {
+        if (this.props !== prevProps) {
+            if (this.props.gameState === "ongoing") {
+                this.setState({ submitted: false })
             }
         }
     }

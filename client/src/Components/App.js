@@ -35,7 +35,7 @@ class App extends Component {
 
                 if (sessionId) {
                         axios.get(`${serverUrl}/auth/restore`, { withCredentials: true }).then((res) => {
-                                
+
                                 this.props.sessionStore.loginUser(res.data)
                         })
                         this.state = {loggedIn:true}
@@ -68,7 +68,7 @@ class App extends Component {
                                                         <Container>
                                                                 <Menu.Item >
 
-                                                                        Ebre-debre
+                                                                        Stamat
                                                                 </Menu.Item>
                                                                 <Menu.Item >
                                                                         <NavLink to={"/"}>Home</NavLink>

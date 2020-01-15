@@ -29,10 +29,13 @@ function createGame(gameId, p1id, p2id) {
         let white = Math.floor(Math.random() * 2) ? p1id : p2id;
 
         const gameObject = {
-                startTime: Date.now(),
+                moveCount: 0,
+                issueTime: Date.now(),
                 gameId: gameId,
                 playerOne: p1id,
                 playerTwo: p2id,
+                p1time:600000,
+                p2time:600000,
                 white: white,
                 toMove: 'w',
                 position: startingPosition,
@@ -51,7 +54,6 @@ matchmakingClient.on('message', (channel, message) => {
         switch (type) {
                 case MATCHMAKER_ADD_TO_QUEUE:
                         var { sessionId, username, opponentType, mode, time } = payload;
-                        console.log(payload)
                         redisClient.incr(`${mode}Count`);
                         redisClient.hmset(sessionId, { username, opponentType, mode, type });
 
@@ -69,7 +71,6 @@ matchmakingClient.on('message', (channel, message) => {
                                                                         redisClient.decrby('totalCurrent', 2);
 
                                                                         redisClient.pipeline().hgetall(reply[0]).hgetall(reply[1]).exec((err, res) => {
-                                                                                console.log(res);
 
                                                                                 let playerOne = res[0][1];
                                                                                 let playerTwo = res[1][1];
@@ -80,10 +81,7 @@ matchmakingClient.on('message', (channel, message) => {
                                                                                         Math.random().toString(33).substring(2, 15);
                                                                                 playerOne.gameId = gameId;
                                                                                 playerTwo.gameId = gameId;
-                                                                                console.log(playerTwo)
-                                                                                console.log(playerOne)
-
-
+                                                                    
                                                                                 let game = createGame(gameId, playerOne.sessionId, playerTwo.sessionId);
                                                                                 redisClient.set(gameId + "object", JSON.stringify(game));
 
