@@ -255,7 +255,7 @@ class ChessGame extends Component {
                 return (
                         <Chessboard
                                 id="mainChessboard"
-                                width={700}
+                                width={750}
                                 boardStyle={boardStyle}
                                 position={position}
                                 orientation={orientation}
