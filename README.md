@@ -1,20 +1,24 @@
 # ebre-debre
 A chess server implementation based on express servers and redis. For a description of the project structure, see [Architecture](https://github.com/lyuben-todorov/ebre-debre/blob/master/Architecture.md)
 # TODO
-* Concede - protocol
-* Game timer - protocol
-* ~Matchmaker frontend~
-* AI Mode 
-* Play as Guest
-* Sounds
-* More uI?
-* End to all session problems
-* ~Player box - frontend~
-* ~Game Components~
-* Client timeout
-* Session integrity - session must not leave server or cookies
-* Botnet
-* Analysis
-* Matchmaker rework
-* chat
+1. ~Concede - protocol~2
+2. Concede - ui
+3. ~Game timer - protocol~
+4. ~Game timer - ui~
+5. ~Matchmaker frontend~
+6. AI Mode 
+7. Sounds
+8. Play as Guest
+9. chat
 
+------- milestone 1    
+
+10. ~End to all session problems~ ??
+11. ~Player box - frontend~
+12. ~Game Components~
+13. Client timeout
+14. Session integrity - session must not leave server or cookies
+15. Botnet
+16. Analysis
+17. Matchmaker rework
+18. more ui??
