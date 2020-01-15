@@ -99,24 +99,32 @@
     max-height: 100%;
 
     .Timer {
-        color: white;
+        color: rgb(63, 63, 63);
+        background-color: rgba(200, 200, 200, 0.658);
+        width: 100%;
         font-size: 3em;
-        height: 30px;
         line-height: 1;
         text-align: center;
         margin: auto;
         margin-bottom: 5px;
         margin-top: 5px;
 
-        .TimerNumber {
-            padding: 0px 10px;
-            float: left;
-            width: 50px;
+        .CenterContainer {
+            width:fit-content;
+            text-align: center;
+            margin:auto;
+            .TimerNumber {
+                padding: 0px 10px;
+                font-size: 1.5em;
+                float: left;
+            }
         }
+    }
 
-        .TimerNumber.Seconds {
-            float: right;
-        }
+    .Timer.active {
+        background-color: rgb(63, 63, 63);
+        color: white;
+        ;
     }
 
     .MoveBox {

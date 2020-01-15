@@ -1,22 +1,24 @@
 
 import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REGISTER_USER, SERVER_START_MATCHMAKING, SERVER_REPLY_MATCHUP, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_GAME_OVER, GAME_OFFER_DRAW, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW } from '../actions';
+import { act } from 'react-dom/test-utils';
 
 
 const initialState = {
     userType: "user",
+    color: "white",
     gameState: "default",
-    sessionId: "none",
-    username: "none",
+    sessionId: "None",
+    username: "None",
     opponentName: "None",
-    gameId: "none",
-    opponentId: "none",
+    gameId: "None",
+    opponentId: "None",
     game: {
-
     },
     history: [],
     mmpreferences:{
         
-    }
+    },
+    moveCount:0 //
 }
 
 function reducer(state = initialState, action) {
@@ -45,9 +47,10 @@ function reducer(state = initialState, action) {
         case CLIENT_PROPOSE_MATCHUP:
             return { ...state, action: "propose", opponentId: action.payload.sessionId, opponentName: action.payload.username }
         case CLIENT_START_GAME:
-            return { ...state, action: "initiateGame", gameState: "ongoing", game: action.payload.game, history: [] }
+            return { ...state, action: "initiateGame", gameState: "ongoing", game: action.payload.game, history: [], color: action.payload.color }
         case CLIENT_RESUME_GAME:
-            return { ...state, action: "resumeGame", gameState: "ongoing", game: action.payload.game, history: action.payload.game.history }
+            console.log(action.payload)
+            return { ...state, action: "resumeGame", gameState: "ongoing", game: action.payload.game, history: action.payload.game.history, color: action.payload.color }
         case CLIENT_OFFER_DRAW:
 
             return { ...state, action: "offerDraw" }
@@ -63,15 +66,14 @@ function reducer(state = initialState, action) {
                 opponentId: action.payload.opponentId
             }
         case CLIENT_GAME_OVER:
-            console.log(action.payload);
             return { ...state, gameState: "gameOver", winner: action.payload.winner }
         case CLIENT_UPDATE_GAME:
-            return { ...state, action:"playerMove", move: action.payload.move, history: [...state.history, action.payload.move] }
+            return { ...state, action:"opponentMove", moveCount: state.moveCount+=1, move: action.payload.move, history: [...state.history, action.payload.move] }
         // actions prefixed with GAME are triggered by the CLIENT for game-related actions on socket
         case GAME_PLAYER_READY:
-            return { ...state, gameState: "ongoing" }
+            return { ...state, action:"gameReady", gameState: "ongoing" }
         case GAME_PLAYER_MOVE:
-            return { ...state, history: [...state.history, action.payload.move] };
+            return { ...state, action:"clientMove", moveCount: state.moveCount+=1, history: [...state.history, action.payload.move] };
         case GAME_OFFER_DRAW:
             return state
         default:

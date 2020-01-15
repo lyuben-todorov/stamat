@@ -87,7 +87,7 @@ class ChessGame extends Component {
                 }
 
                 // this should happen when opponent moves
-                if (this.props.action === "playerMove" && this.props.move !== prevProps.move) {
+                if (this.props.action === "opponentMove" && this.props.move !== prevProps.move) {
                         console.log(this.props.move);
                         let { from, to } = this.props.move
                         this.onMoveEvent(from, to, false);
