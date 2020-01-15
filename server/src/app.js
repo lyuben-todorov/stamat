@@ -27,7 +27,7 @@ const socketLogger = createLogger("Socket");
 const redisLogger = createLogger("Redis");
 const matchmakingLogger = createLogger("Matchmaking")
 
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
+app.use(cors({ credentials: true, origin: 'http://145.94.181.200:8080' }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
