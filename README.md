@@ -6,14 +6,14 @@ A chess server implementation based on express servers and redis. For a descript
 3. ~Game timer - protocol~
 4. ~Game timer - ui~
 5. ~Matchmaker frontend~
-6. AI Mode 
+6. AI Mode
 7. Sounds
-8. Play as Guest
+8. ~Stats screen~
 9. ~Chat~
 
 ------- milestone 1    
 
-10. ~End to all session problems~ ??
+10. ~End to all session problems~ ?? none so far
 11. ~Player box - frontend~
 12. ~Game Components~
 13. Client timeout
@@ -22,3 +22,4 @@ A chess server implementation based on express servers and redis. For a descript
 16. Analysis
 17. Matchmaker rework
 18. more ui??
+19. play as guest 
