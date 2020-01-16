@@ -2,14 +2,14 @@
 A chess server implementation based on express servers and redis. For a description of the project structure, see [Architecture](https://github.com/lyuben-todorov/ebre-debre/blob/master/Architecture.md)
 # TODO
 1. ~Concede - protocol~2
-2. Concede - ui
+2. ~Concede - ui~
 3. ~Game timer - protocol~
 4. ~Game timer - ui~
 5. ~Matchmaker frontend~
 6. AI Mode 
 7. Sounds
 8. Play as Guest
-9. chat
+9. ~Chat~
 
 ------- milestone 1    
 
