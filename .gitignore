@@ -4,3 +4,4 @@ node_modules
 ./matchmaker/dist/
 ./client/build/
 .env
+package-lock.json
