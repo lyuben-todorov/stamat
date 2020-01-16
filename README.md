@@ -1,5 +1,10 @@
-# ebre-debre
-A chess server implementation based on express servers and redis. For a description of the project structure, see [Architecture](https://github.com/lyuben-todorov/ebre-debre/blob/master/Architecture.md)
+# Stamat
+A chess server implementation based on express servers and redis. For a description of the project structure, see [Architecture](https://github.com/lyuben-todorov/ebre-debre/blob/master/Architecture.md).    
+t.
+
+Lesson 1 is that javascript code started losing it's maintainability right around 2.5k lines mostly due to having no type definitions and no idea what any object does or has or where it should be. This led to a loop of a lot of time debugging, writing bad code, then fixing that bad code with more bad code, etc. This would also mean writing any sort of documentation would be really annoying. Socket/redis communication could've been better thought out. 
+
+Lesson 2 is that redis is really really good.
 # TODO
 1. ~Concede - protocol~2
 2. ~Concede - ui~
