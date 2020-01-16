@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Grid, Container } from 'semantic-ui-react'
 import { Message as SemanticMessage } from 'semantic-ui-react'
-import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP, CLIENT_GAME_OVER, CLIENT_SEND_CHAT_MESSAGE } from '../../../actions';
+import { CLIENT_PROPOSE_MATCHUP, CLIENT_GAME_OVER } from '../../../actions';
 
 
 export default class Message extends Component {
@@ -14,7 +13,6 @@ export default class Message extends Component {
         } else if (this.props.level === "player") {
             className = "Message";
         }
-        console.log(props);
         this.state = {
             time: time.toString(),
             className: className,
@@ -34,7 +32,7 @@ export default class Message extends Component {
 
         switch (this.props.type) {
             case "greet":
-                messageBody = "Please be nice!"
+                messageBody = " be nice"
                 break;
             case CLIENT_PROPOSE_MATCHUP:
                 break;
@@ -46,19 +44,36 @@ export default class Message extends Component {
 
                 break;
             case "server":
+                if (this.props.level === "server") {
+
+                    messageBody =
+                        <React.Fragment>
+                            <div className="Server"></div>
+                            {this.props.message}
+                        </React.Fragment>
+                } else {
+                    messageBody =
+                        <React.Fragment>
+                            <div className="Sender">Opponent:</div>
+                            {this.props.message}
+                        </React.Fragment>
+                }
+                break;
+
+            case "client":
                 messageBody =
                     <React.Fragment>
-                        <div className="Sender">Opponent:</div>
+                        <div className="Sender">You:</div>
                         {this.props.message}
                     </React.Fragment>
                 break;
-            case "client":
-                messageBody = <React.Fragment>
-                    <div className="Sender">You:</div>
-                    {this.props.message}
-                </React.Fragment>
+            case "draw":
+                messageBody =
+                    <React.Fragment>
+                        <div className="Server"></div>
+                        Players have agreed to a draw!
+                        </React.Fragment>
                 break;
-
             default:
                 break;
         }

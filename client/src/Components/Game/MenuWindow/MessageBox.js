@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-import { Segment } from 'semantic-ui-react'
 import { observer } from 'mobx-react';
 import Message from './Message';
 
 import { startMatchmaking, replyMatchmaking } from '../../../redux/actionCreators'
 import { connect } from 'react-redux';
-import { SERVER_START_MATCHMAKING, CLIENT_REGISTER_USER, CLIENT_PROPOSE_MATCHUP, SERVER_REPLY_MATCHUP, CLIENT_GAME_OVER, CLIENT_RESUME_SESSION, CLIENT_START_GAME, CLIENT_SEND_CHAT_MESSAGE } from '../../../actions';
-import { reaction } from 'mobx';
+import { CLIENT_PROPOSE_MATCHUP, CLIENT_GAME_OVER, CLIENT_SEND_CHAT_MESSAGE } from '../../../actions';
 
 
 @observer
@@ -21,15 +19,15 @@ class MessageBox extends Component {
         }
 
         componentDidMount() {
-                this.addMessage("greet","hi");
+                this.addMessage("greet", "hi");
         }
-        addMessage(type, message,level="server") {
+        addMessage(type, message, level = "server") {
 
                 this.setState(state => {
-                        const messages = [...state.messages,  {
+                        const messages = [...state.messages, {
                                 type: type,
                                 message: message,
-                                level:level
+                                level: level
                         }]
                         return { messages }
                 })
@@ -37,20 +35,24 @@ class MessageBox extends Component {
 
         componentDidUpdate(prevProps) {
                 if (this.props.action !== prevProps.action || this.props.chatHistory !== prevProps.chatHistory) {
-                        console.log(this.props)
                         switch (this.props.action) {
                                 case "initiateGame" || "resumeGame":
                                         //this.addMessage(CLIENT_START_GAME)
                                         break;
                                 case "gameOver":
-                                        this.addMessage(CLIENT_GAME_OVER,
-                                                this.props.winner === this.props.sessionId ? this.props.username : this.props.opponentName)
+
+                                        if (this.props.winner === "draw") {
+                                                this.addMessage("draw")
+
+                                        } else {
+
+                                                this.addMessage(CLIENT_GAME_OVER, this.props.winner === this.props.sessionId ? this.props.username : this.props.opponentName)
+                                        }
                                         break;
                                 case "serverMessage":
-                                        this.addMessage("server", this.props.latestMessage, "player")
+                                        this.addMessage("server", this.props.latestMessage.message, this.props.latestMessage.sender)
                                         break;
                                 case "ownMessage":
-                                        this.addMessage("client", this.props.latestMessage, "player")
                                         break
                                 default:
                                         break;
@@ -96,7 +98,7 @@ const mapStateToProps = (state) => {
                 username: state.username,
                 action: state.action,
                 latestMessage: state.latestMessage,
-                chatHistory:state.chatHistory
+                chatHistory: state.chatHistory
         }
 }
 

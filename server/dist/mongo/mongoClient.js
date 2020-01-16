@@ -20,8 +20,7 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 var logger = (0, _logger["default"])('MongoDB');
-var uri = "mongodb://".concat(_env["default"].MONGO_USERNAME, ":").concat(_env["default"].MONGO_PASSWORD).concat(_env["default"].MONGO_USERNAME ? "@" : "", "localhost:27017/ebredebre");
-console.log(uri);
+var uri = "mongodb://".concat(_env["default"].MONGO_USERNAME ? _env["default"].MONGO_USERNAME : "").concat(_env["default"].MONGO_USERNAME ? ":" : "").concat(_env["default"].MONGO_PASSWORD ? _env["default"].MONGO_PASSWORD : "").concat(_env["default"].MONGO_USERNAME ? "@" : "", "localhost:27017/ebredebre");
 var db = _mongoose["default"].connection;
 db.on('error', function (error) {
   logger.error('Error in MongoDb connection: ' + error);

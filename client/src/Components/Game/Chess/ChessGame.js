@@ -43,7 +43,6 @@ class ChessGame extends Component {
                         // called when state receives new game object and sets gamestate to initiategame
                         if (this.props.action === "initiateGame") {
                                 let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game
-                                console.log(this.props.game);
                                 this.setState({
                                         orientation: white === this.props.sessionStore.sessionId ? 'white' : 'black',
                                         playerColor: white === this.props.sessionStore.sessionId ? 'white' : 'black',
@@ -64,9 +63,8 @@ class ChessGame extends Component {
                         }
                         if (this.props.action === "resumeGame") {
                                 let { gameId, playerOne, playerTwo, white, toMove, position, history } = this.props.game
-                                console.log(this.props.game)
                                 this.setState({
-                                
+
                                         orientation: white === this.props.sessionId ? 'white' : 'black',
                                         playerColor: white === this.props.sessionId ? 'white' : 'black',
                                         gameId: gameId,
@@ -88,7 +86,6 @@ class ChessGame extends Component {
 
                 // this should happen when opponent moves
                 if (this.props.action === "opponentMove" && this.props.move !== prevProps.move) {
-                        console.log(this.props.move);
                         let { from, to } = this.props.move
                         this.onMoveEvent(from, to, false);
 
@@ -113,15 +110,14 @@ class ChessGame extends Component {
                         };
                         // see if the move is legal
                         let move = this.game.move(moveObject);
-        
+
                         // illegal move
                         if (move === null) {
-                                console.log("illegal");
                                 return;
                         }
 
                         let { history, pieceSquare } = this.state;
-        
+
                         const gameState = {
                                 position: this.game.fen(),
                                 history: this.game.history({ verbose: true }),
@@ -131,7 +127,7 @@ class ChessGame extends Component {
                         }
                         this.updateGameAndServerState(gameState, move);
 
-                } else if(!clientMove && this.state.orientation.charAt(0) !== this.game.toMove) {
+                } else if (!clientMove && this.state.orientation.charAt(0) !== this.game.toMove) {
                         let moveObject = {
                                 from: sourceSquare,
                                 to: targetSquare,
@@ -139,16 +135,15 @@ class ChessGame extends Component {
                         };
                         // see if the move is legal
                         let move = this.game.move(moveObject);
-        
+
                         // move really shouldn't be illegal here
                         // remove when server enforces move legality
                         if (move === null) {
-                                console.log("illegal what????");
                                 return;
                         }
 
                         let { history, pieceSquare } = this.state;
-        
+
                         const gameState = {
                                 position: this.game.fen(),
                                 history: this.game.history({ verbose: true }),
@@ -157,8 +152,8 @@ class ChessGame extends Component {
                                 toMove: this.state.toMove === 'w' ? 'b' : 'w'
                         }
                         this.updateGameState(gameState);
-                }else{
-                        console.log("not your turn");
+                } else {
+                        // not your turn
                 }
 
 
@@ -280,7 +275,7 @@ const mapStateToProps = (state /*, ownProps*/) => {
                 game: state.game,
                 move: state.move,
                 opponentId: state.opponentId,
-                sessionId:state.sessionId
+                sessionId: state.sessionId
         }
 }
 const mapDispatchToProps = { playerReady, playerMove }

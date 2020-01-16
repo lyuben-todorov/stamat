@@ -55,7 +55,7 @@ router.post('/register', function (req, res) {
       res.status(200).send("Welcome to the club!");
     }
   });
-}); // used to restore user session
+}); // used to restore user session through auth token
 // client sends request with auth cookies
 // if the token is valid the server tries to retrieve session 
 // if there is a session the cookie session is sent
@@ -67,7 +67,6 @@ router.get('/restore', function (req, res) {
   var token = req.cookies.token;
 
   if (!token) {
-    logger.error("No token");
     res.status(401).send('Unauthorized: No token provided');
   } else {
     _jsonwebtoken["default"].verify(token, secret, function (err, decoded) {
@@ -84,24 +83,39 @@ router.get('/restore', function (req, res) {
               username = user.username,
               _id = user._id;
 
-          var id = _id.toString();
-
-          _redisClient["default"].get(id, function (err, reply) {
+          _redisClient["default"].get(_id, function (err, reply) {
             var sessionId = reply; //no session for user found
 
             if (!reply) {
               // make new session id
               sessionId = _jsonwebtoken["default"].sign({
                 username: username
-              }, secret);
+              }, secret); // this SET is for the auth cycle
 
-              _redisClient["default"].set(id, sessionId);
+              _redisClient["default"].set(user._id.toString(), sessionId);
+
+              var sessionObject = {
+                sessionId: sessionId,
+                clientUsername: user.username,
+                gameId: "none",
+                opponentId: "none",
+                opponentName: "none"
+              };
+              console.log(sessionObject);
+
+              _redisClient["default"].hmset(sessionId, sessionObject, function (err, res) {
+                if (!err) {
+                  logger.info("Session persisted successfully: ".concat(sessionId.slice(-5)));
+                } else {
+                  logger.error("Error persisting session ".concat(sessionId.slice(-5), ": ").concat(err));
+                }
+              });
             }
 
             res.cookie('sessionId', sessionId).send({
               email: email,
               username: username,
-              id: id,
+              _id: _id,
               sessionId: sessionId
             });
           });
@@ -155,9 +169,25 @@ router.post('/login', function (req, res) {
             } else {
               sessionId = _jsonwebtoken["default"].sign({
                 username: username
-              }, secret);
+              }, secret); // this SET is for the auth cycle
 
               _redisClient["default"].set(user._id.toString(), sessionId);
+
+              var sessionObject = {
+                sessionId: sessionId,
+                clientUsername: user.username,
+                gameId: "none",
+                opponentId: "none",
+                opponentName: "none"
+              };
+
+              _redisClient["default"].hmset(sessionId, sessionObject, function (err, res) {
+                if (!err) {
+                  logger.info("Session persisted successfully: ".concat(sessionId.slice(-5)));
+                } else {
+                  logger.error("Error persisting session ".concat(sessionId.slice(-5), ": ").concat(err));
+                }
+              });
             }
 
             res.cookie('token', token, {
