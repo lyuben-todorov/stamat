@@ -31,7 +31,6 @@ export default class Move extends Component {
                 }
                 break;
             default:
-                console.log(this.props.message);
                 break;
         }
     }

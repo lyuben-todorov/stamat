@@ -36,7 +36,6 @@ class Register extends Component {
     handleSubmit(event) {
         event.preventDefault()
         if (this.state.password !== this.state.confirmPassword) {
-            console.log("asd")
             this.setState({ passwordError: true });
             return;
         }

@@ -15,6 +15,7 @@ import createSocketIoMiddleware from 'redux-socket.io';
 import { createStore, applyMiddleware } from 'redux';
 import reducer from '../redux/gameState'
 import { Stamat } from './Stamat';
+import Home from './Home';
 
 function returnStore(sessionId) {
         let connectionString = `${serverUrl}/?session=${sessionId}`;
@@ -48,7 +49,6 @@ class App extends Component {
         }
         componentDidUpdate(prevProps) {
                 if (this.props !== prevProps) {
-                        console.log("UUUUUI")
                 }
         }
 
@@ -94,9 +94,10 @@ class App extends Component {
                                                         </Container>
                                                 </Menu>
                                                 <Switch>
-                                                        <Route path="/login" render={() => <Login sessionStore={SessionStore} />} />
-                                                        <Route path="/register" render={() => <Register sessionStore={SessionStore} />} />
-                                                        <Route path="/game" render={() => <Stamat loggedIn={this.state.loggedIn} sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
+                                                <Route path="/login" render={() => <Login sessionStore={SessionStore} />} />
+                                                <Route path="/register" render={() => <Register sessionStore={SessionStore} />} />
+                                                <Route path="/game" render={() => <Stamat loggedIn={this.state.loggedIn} sessionStore={SessionStore} />} />                                                <Route path="/game*" render={() => <Game sessionStore={SessionStore} />} />
+                                                <Route path="/" render={() => <Home sessionStore={SessionStore} />} />
 
                                                 </Switch>
                                         </BrowserRouter>

@@ -23,7 +23,7 @@ const matchmakingClient = new redis();
 function serializeRedisMessage(type, payload) {
         return JSON.stringify({ type: type, payload: payload })
 }
-function createGame(gameId, p1id, p2id) {
+function createGame(gameId, playerOne, playerTwo) {
 
         const startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         let white = Math.floor(Math.random() * 2);
@@ -31,16 +31,20 @@ function createGame(gameId, p1id, p2id) {
                 moveCount: 0,
                 issueTime: Date.now(),
                 gameId: gameId,
-                playerOne: p1id,
-                playerTwo: p2id,
+                playerOneName: playerOne.username,
+                playerTwoName: playerTwo.username,
+                whiteName: white ? playerOne.username : playerTwo.username,
+                blackName: white ? playerTwo.username : playerOne.username,
+                playerOne: playerOne.sessionId,
+                playerTwo: playerTwo.sessionId,
                 playerOneColor: white ? 'w' : 'b',
                 playerTwoColor: white ? 'b' : 'w',
                 blackTime: 600000,
                 whiteTime: 600000,
                 gameTime: 600000,
                 toMove: 'w',
-                white: white ? p1id : p2id,
-                black: white ? p2id : p1id,
+                white: white ? playerOne.sessionId : playerTwo.sessionId,
+                black: white ? playerTwo.sessionId : playerOne.sessionId,
                 position: startingPosition,
                 finished: false,
                 winner: "none",
@@ -86,7 +90,7 @@ matchmakingClient.on('message', (channel, message) => {
                                                                                         playerOne.gameId = gameId;
                                                                                         playerTwo.gameId = gameId;
 
-                                                                                        let game = createGame(gameId, playerOne.sessionId, playerTwo.sessionId);
+                                                                                        let game = createGame(gameId, playerOne, playerTwo);
                                                                                         redisClient.set(gameId + "object", JSON.stringify(game));
 
                                                                                         let opponentInfoOne = {

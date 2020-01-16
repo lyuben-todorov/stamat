@@ -50,7 +50,6 @@ class MoveWindow extends Component {
             } else if (this.props.action === "playerOfferDraw") {
                 this.setState({ playerOfferingDraw: true })
             }
-            console.log(this.props.action)
             if (this.props.game !== prevProps.game) {
                 if (this.props.action === "clientMove" || this.props === "opponentMove") {
                     let { blackTime, whiteTime } = this.props.game;

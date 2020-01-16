@@ -10,6 +10,7 @@ import http from 'http'
 import mongoConnection from './mongo/mongoClient';
 import indexRouter from './routes/index';
 import userRouter from './routes/auth';
+import statsticsRouter from './routes/statsistics'
 import env from './env';
 import { CLIENT_RESUME_SESSION, CLIENT_RESUME_GAME, SERVER_REPLY_MATCHUP, SERVER_START_MATCHMAKING, GAME_PLAYER_READY, GAME_PLAYER_MOVE, CLIENT_PROPOSE_MATCHUP, CLIENT_START_GAME, CLIENT_UPDATE_GAME, MATCHMAKER_ADD_TO_QUEUE, GAME_CONCEDE, GAME_OFFER_DRAW, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, GAME_REPLY_DRAW, SERVER_SEND_CHAT_MESSAGE, CLIENT_SEND_CHAT_MESSAGE, CLIENT_REPLY_DRAW } from './clientActions';
 import redisClient from './redis/redisClient'
@@ -48,7 +49,8 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Routes
 app.use('/', indexRouter);
-app.use('/auth', userRouter)
+app.use('/auth', userRouter);
+app.use('/statistics', statsticsRouter);
 
 redisClient.set("mmqueue", 0);
 redisClient.del("matchmaking_queue");
@@ -388,6 +390,7 @@ io.on("connection", (socket) => {
                     case GAME_CONCEDE:
                         redisClient.get(gameId + "object", (err, reply) => {
                             let finishedGame = JSON.parse(reply)
+                            finishedGame.winner = opponentId;
                             finishedGame.finished = true;
                             // save game to static storage here;
                             redisClient.set(gameId + "object", JSON.stringify(finishedGame));
@@ -401,6 +404,7 @@ io.on("connection", (socket) => {
                             if (action.payload.reply) {
                                 let finishedGame = JSON.parse(reply)
                                 finishedGame.finished = true;
+                                finishedGame.winner = "draw";
                                 // save game to static storage here;
                                 redisClient.set(gameId + "object", JSON.stringify(finishedGame));
                                 redisClient.publish(finishedGame.playerOne, serializeRedisMessage(CLIENT_GAME_OVER, { winner: "draw" }));
