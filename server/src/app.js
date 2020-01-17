@@ -57,7 +57,7 @@ redisClient.del("matchmaking_queue");
 
 /** SOCKETS */
 const server = http.createServer(app);
-const io = socketio(server)
+const io = socketio(server,{path:"/socket"})
 
 
 function serializeRedisMessage(type, payload) {

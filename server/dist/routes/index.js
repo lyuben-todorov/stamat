@@ -9,6 +9,8 @@ var _express = _interopRequireDefault(require("express"));
 
 var _withAuth = _interopRequireDefault(require("../middleware/withAuth"));
 
+var _redisClient = _interopRequireDefault(require("../redis/redisClient"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var router = _express["default"].Router();

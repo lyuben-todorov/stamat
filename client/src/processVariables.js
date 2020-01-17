@@ -1,3 +1,3 @@
-export const serverUrl = "http://localhost:3001"
-export const mode = "development";
+export const serverUrl = "http://stamat.me/api"
+export const mode = "production";
 export const endpoint ="/api"

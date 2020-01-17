@@ -18,8 +18,9 @@ import { Stamat } from './Stamat';
 import Home from './Home';
 
 function returnStore(sessionId) {
-        let connectionString = `${serverUrl}/?session=${sessionId}`;
-        let socket = io(connectionString);
+        let connectionString = `http://stamat.me/?session=${sessionId}`;
+        let socket = io(connectionString, {path:"/api/socket"});
+
 
         let socketMiddleware = createSocketIoMiddleware(socket, ["server/", "game/"]);
         let gameStore = applyMiddleware(socketMiddleware)(createStore)(reducer);

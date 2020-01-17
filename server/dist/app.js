@@ -24,6 +24,8 @@ var _index = _interopRequireDefault(require("./routes/index"));
 
 var _auth = _interopRequireDefault(require("./routes/auth"));
 
+var _statsistics = _interopRequireDefault(require("./routes/statsistics"));
+
 var _env = _interopRequireDefault(require("./env"));
 
 var _clientActions = require("./clientActions");
@@ -76,6 +78,7 @@ app.use(_express["default"]["static"](_path["default"].join(__dirname, '../publi
 
 app.use('/', _index["default"]);
 app.use('/auth', _auth["default"]);
+app.use('/statistics', _statsistics["default"]);
 
 _redisClient["default"].set("mmqueue", 0);
 
@@ -85,7 +88,9 @@ _redisClient["default"].del("matchmaking_queue");
 
 var server = _http["default"].createServer(app);
 
-var io = (0, _socket["default"])(server);
+var io = (0, _socket["default"])(server, {
+  path: "/socket"
+});
 
 function serializeRedisMessage(type, payload) {
   return JSON.stringify({
@@ -278,12 +283,14 @@ io.on("connection", function (socket) {
             break;
 
           case _clientActions.CLIENT_SEND_CHAT_MESSAGE:
-            console.log(payload);
+            console.log(payload); // message text; channel could be 'opponent', 'global', etc.; sender is either 'player' or 'server'
+
             socket.emit('action', {
               type: _clientActions.CLIENT_SEND_CHAT_MESSAGE,
               payload: {
                 message: payload.message,
-                channel: payload.channel
+                channel: payload.channel,
+                sender: "player"
               }
             });
             break;
@@ -299,6 +306,14 @@ io.on("connection", function (socket) {
 
           case _clientActions.CLIENT_OFFER_DRAW:
             socket.emit('action', {
+              type: _clientActions.CLIENT_SEND_CHAT_MESSAGE,
+              payload: {
+                message: "Opponent is offering a draw.",
+                channel: "opponent",
+                sender: "server"
+              }
+            });
+            socket.emit('action', {
               type: _clientActions.CLIENT_OFFER_DRAW,
               payload: {
                 gameId: payload.gameId
@@ -313,6 +328,23 @@ io.on("connection", function (socket) {
             socket.emit('action', {
               type: _clientActions.CLIENT_UPDATE_GAME,
               payload: payload
+            });
+            break;
+
+          case _clientActions.GAME_REPLY_DRAW:
+            socket.emit('action', {
+              type: _clientActions.CLIENT_SEND_CHAT_MESSAGE,
+              payload: {
+                message: "Opponent denied draw",
+                channel: "opponent",
+                sender: "server"
+              }
+            });
+            socket.emit('action', {
+              type: _clientActions.CLIENT_REPLY_DRAW,
+              payload: {
+                reply: payload.reply
+              }
             });
             break;
           // in case game isn't ended by a move
@@ -461,6 +493,7 @@ io.on("connection", function (socket) {
           case _clientActions.GAME_CONCEDE:
             _redisClient["default"].get(gameId + "object", function (err, reply) {
               var finishedGame = JSON.parse(reply);
+              finishedGame.winner = opponentId;
               finishedGame.finished = true; // save game to static storage here;
 
               _redisClient["default"].set(gameId + "object", JSON.stringify(finishedGame));
@@ -477,6 +510,30 @@ io.on("connection", function (socket) {
             break;
 
           case _clientActions.GAME_REPLY_DRAW:
+            _redisClient["default"].get(gameId + "object", function (err, reply) {
+              if (action.payload.reply) {
+                var finishedGame = JSON.parse(reply);
+                finishedGame.finished = true;
+                finishedGame.winner = "draw"; // save game to static storage here;
+
+                _redisClient["default"].set(gameId + "object", JSON.stringify(finishedGame));
+
+                _redisClient["default"].publish(finishedGame.playerOne, serializeRedisMessage(_clientActions.CLIENT_GAME_OVER, {
+                  winner: "draw"
+                }));
+
+                _redisClient["default"].publish(finishedGame.playerTwo, serializeRedisMessage(_clientActions.CLIENT_GAME_OVER, {
+                  winner: "draw"
+                }));
+              } else {
+                _redisClient["default"].publish(opponentId, serializeRedisMessage(_clientActions.GAME_REPLY_DRAW, {
+                  reply: false
+                }));
+              }
+            });
+
+            break;
+
           case _clientActions.GAME_OFFER_DRAW:
             _redisClient["default"].get(gameId + "object", function (err, reply) {
               var currentGame = JSON.parse(reply);
