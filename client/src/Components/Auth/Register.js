@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import { Grid, Form, Header, Segment, Message, Button } from 'semantic-ui-react';
 import { Link, withRouter } from 'react-router-dom';
-import {serverUrl} from '../../processVariables'
+import {serverUrl, endpoint} from '../../processVariables'
 
 
 class Register extends Component {
@@ -39,7 +39,7 @@ class Register extends Component {
             this.setState({ passwordError: true });
             return;
         }
-        axios.post(`${serverUrl}/auth/register`, {
+        axios.post(`${serverUrl}${endpoint}/auth/register`, {
             email: this.state.email,
             password: this.state.password,
             username: this.state.username

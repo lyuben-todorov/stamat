@@ -4,7 +4,7 @@ import { Grid, Header, Form, Segment, Button, Message } from 'semantic-ui-react'
 import { observer } from 'mobx-react';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
-import {serverUrl} from '../../processVariables'
+import {serverUrl, endpoint} from '../../processVariables'
 
 @observer
 class Login extends Component {
@@ -29,7 +29,7 @@ class Login extends Component {
 
         handleSubmit(event) {
                 event.preventDefault()
-                axios.post(`${serverUrl}/auth/login`, {
+                axios.post(`${serverUrl}${endpoint}/auth/login`, {
                         email: this.state.email,
                         password: this.state.password
                 }, { withCredentials: true }).then((res) => {
@@ -37,6 +37,7 @@ class Login extends Component {
                         this.props.sessionStore.loginUser(res.data);
                         localStorage.setItem('sessionId', res.data.sessionId);
                         this.props.history.push('/profile')
+                        window.location.reload();
                 }).catch(err => {
                         console.log(err)
                         this.setState({ authenticationError: true })

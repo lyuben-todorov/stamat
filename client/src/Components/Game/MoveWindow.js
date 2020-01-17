@@ -12,6 +12,7 @@ class MoveWindow extends Component {
         this.userTimer = React.createRef();
         this.opponentTimer = React.createRef();
 
+
         this.state = {
             gameTime: 600000,
             opponentTime: 600000,
@@ -19,11 +20,13 @@ class MoveWindow extends Component {
             active: "none",
             offeringDraw: false,
             playerOfferingDraw: false,
+            opponent: "None"
         }
     }
 
+
     componentDidUpdate(prevProps) {
-        if (this.props.action !== prevProps.action) {
+        if (this.props.action !== prevProps.action || this.props.game !== prevProps.game) {
 
             if (this.props.moveCount !== prevProps.moveCount) {
                 if (this.props.action === "clientMove") {
@@ -53,8 +56,7 @@ class MoveWindow extends Component {
             if (this.props.game !== prevProps.game) {
                 if (this.props.action === "clientMove" || this.props === "opponentMove") {
                     let { blackTime, whiteTime } = this.props.game;
-
-                    if (this.props.color === "white") {
+                    if (this.props.color.charAt(0) === 'w') {
                         this.userTimer.current.setTime(whiteTime);
                         this.opponentTimer.current.setTime(blackTime);
                     } else {
@@ -64,17 +66,21 @@ class MoveWindow extends Component {
                     }
 
                 }
-                if (this.props.action === "startGame" || this.props.action === "resumeGame" || this.props.action === "gameReady") {
-                    let { blackTime, whiteTime, toMove, lastPlayerMoveTime, gameTime } = this.props.game;
+                if (this.props.action === "startGame" || this.props.action === "resumeGame" || this.props.action === "gameReady" || this.props.action === "initiateGame") {
+                    let { blackTime, whiteTime, toMove, lastPlayerMoveTime, gameTime, blackName, whiteName } = this.props.game;
 
+                    console.log(whiteTime)
 
-                    if (toMove === 'w') {
-                        whiteTime = gameTime + lastPlayerMoveTime - Date.now()
-                    } else {
-                        blackTime = gameTime + lastPlayerMoveTime - Date.now()
+                    let opponent = this.props.color.charAt(0) === 'w' ? this.props.game.blackName : this.props.game.whiteName;
+                    if (lastPlayerMoveTime) {
+
+                        if (toMove === 'w') {
+                            whiteTime = gameTime + lastPlayerMoveTime - Date.now()
+                        } else {
+                            blackTime = gameTime + lastPlayerMoveTime - Date.now()
+                        }
                     }
-
-                    if (this.props.color === "white") {
+                    if (this.props.color.charAt(0) === 'w') {
                         this.userTimer.current.setTime(whiteTime);
                         this.opponentTimer.current.setTime(blackTime);
                     } else {
@@ -83,12 +89,13 @@ class MoveWindow extends Component {
                         this.opponentTimer.current.setTime(whiteTime);
                     }
 
-                    if ((this.props.color === "white") === (toMove === 'w')) {
+                    if ((this.props.color.charAt(0) === 'w') === (toMove === 'w')) {
                         this.userTimer.current.start();
-                        this.setState({ active: "user" })
+
+                        this.setState({ active: "user", opponent: opponent })
                     } else {
                         this.opponentTimer.current.start();
-                        this.setState({ active: "opponent" })
+                        this.setState({ active: "opponent", opponent: opponent })
                     }
                 }
 
@@ -124,7 +131,7 @@ class MoveWindow extends Component {
                     <Menu>
                         <Menu.Item className="UserName">
                             <Icon name={"circle"} color={"green"}></Icon>
-                            {this.props.opponentName ? this.props.opponentName : "None"}
+                            {this.state.opponent}
                         </Menu.Item>
                         <Menu.Item>
                             <Button onClick={() => { }}>
@@ -202,7 +209,6 @@ class MoveWindow extends Component {
 }
 const mapStateToProps = (state /*, ownProps*/) => {
     return {
-        opponentName: state.opponentName,
         game: state.game,
         moveCount: state.moveCount,
         history: state.history,

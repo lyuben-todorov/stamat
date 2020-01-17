@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import { serverUrl } from '../../processVariables'
+import { serverUrl, endpoint } from '../../processVariables'
 
 export default class Dashboard extends Component {
     componentDidMount() {
-        axios.get(`${serverUrl}/checkToken`, { withCredentials: true }).then((value) => {
+        axios.get(`${serverUrl}${endpoint}/checkToken`, { withCredentials: true }).then((value) => {
         })
     }
     render() {

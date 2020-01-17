@@ -57,8 +57,8 @@ redisClient.del("matchmaking_queue");
 
 /** SOCKETS */
 const server = http.createServer(app);
-const io = socketio(server,{path:"/socket"})
-
+// const io = socketio(server,{path:"/socket"})
+const io = socketio(server)
 
 function serializeRedisMessage(type, payload) {
     return JSON.stringify({ type: type, payload: payload })
@@ -89,7 +89,7 @@ io.on("connection", (socket) => {
     const sessionId = socket.handshake.query.session;
 
     // send register as guest and boot socket
-    if (_.isUndefined(sessionId)) {
+    if (_.isUndefined(sessionId) || sessionId == "null") {
         socket.disconnect();
         return;
     } else {
@@ -99,6 +99,13 @@ io.on("connection", (socket) => {
         socketLogger.info("Socket connected");
 
         redisClient.hgetall(sessionId, (err, res) => {
+            // var sessionObject ={
+            //     chess: new Chess.Chess(),
+            //     sessionId:"",
+            //     clientUsername:"",
+            //     gameId:"",
+            //     gameObject:{},
+            // }
             var chess;
             var clientUsername;
             var opponentId;
@@ -132,12 +139,12 @@ io.on("connection", (socket) => {
                             if (!gameObject.finished) {
                                 chess = new Chess.Chess(gameObject.position);
 
-
                                 socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: gameObject, color: color === 'w' ? 'white' : 'black' } });
 
+
                             } else {
-                                opponentName = "none";
-                                opponentId = "none";
+                                opponentName = "None";
+                                opponentId = "None";
                                 gameId = "none";
                             }
                         } else {
@@ -145,6 +152,7 @@ io.on("connection", (socket) => {
                         }
                     })
                 }
+
                 socket.emit('action', {
                     type: CLIENT_RESUME_SESSION,
                     payload: {
@@ -155,7 +163,7 @@ io.on("connection", (socket) => {
                         gameId: gameId ? gameId : "none",
                         opponentId: opponentId,
                     }
-                });
+                })
 
             }
 
@@ -226,7 +234,7 @@ io.on("connection", (socket) => {
                         opponentName = payload.opponentInfo.opponentName
                         gameId = payload.opponentInfo.gameId;
                         color = payload.color;
-                        socket.emit('action', { type: CLIENT_START_GAME, payload: { game: payload.game } });
+                        socket.emit('action', { type: CLIENT_START_GAME, payload: { game: payload.game, opponentInfo: payload.opponentInfo, color: payload.color } });
                         break;
 
                     case CLIENT_SEND_CHAT_MESSAGE:
@@ -388,16 +396,19 @@ io.on("connection", (socket) => {
                         })
                         break;
                     case GAME_CONCEDE:
-                        redisClient.get(gameId + "object", (err, reply) => {
-                            let finishedGame = JSON.parse(reply)
-                            finishedGame.winner = opponentId;
-                            finishedGame.finished = true;
-                            // save game to static storage here;
-                            redisClient.set(gameId + "object", JSON.stringify(finishedGame));
-                            redisClient.publish(finishedGame.playerOne, serializeRedisMessage(CLIENT_GAME_OVER, { winner: opponentId }));
-                            redisClient.publish(finishedGame.playerTwo, serializeRedisMessage(CLIENT_GAME_OVER, { winner: opponentId }));
+                        if(!_.isUndefined(gameId) && !_.isNull(gameId)){
 
-                        })
+                            redisClient.get(gameId + "object", (err, reply) => {
+                                let finishedGame = JSON.parse(reply)
+                                finishedGame.winner = opponentId;
+                                finishedGame.finished = true;
+                                // save game to static storage here;
+                                redisClient.set(gameId + "object", JSON.stringify(finishedGame));
+                                redisClient.publish(finishedGame.playerOne, serializeRedisMessage(CLIENT_GAME_OVER, { winner: opponentId }));
+                                redisClient.publish(finishedGame.playerTwo, serializeRedisMessage(CLIENT_GAME_OVER, { winner: opponentId }));
+                                
+                            })
+                        }
                         break;
                     case GAME_REPLY_DRAW:
                         redisClient.get(gameId + "object", (err, reply) => {

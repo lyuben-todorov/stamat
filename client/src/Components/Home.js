@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import { serverUrl } from '../processVariables'
+import { serverUrl, endpoint } from '../processVariables'
 import GamePreview from './Dashboard/GamePreview';
 import { Divider, Container } from 'semantic-ui-react';
 
@@ -10,7 +10,7 @@ export class Home extends Component {
         this.state = { games: [] };
     }
     componentDidMount() {
-        axios.get(`${serverUrl}/statistics/gamesInfo`).then((res) => {
+        axios.get(`${serverUrl}${endpoint}/statistics/gamesInfo`).then((res) => {
             this.setState({ games: res.data.slice(0, 5) });
         })
     }

@@ -50,6 +50,7 @@ function reducer(state = initialState, action) {
         case CLIENT_PROPOSE_MATCHUP:
             return { ...state, action: "propose", opponentId: action.payload.sessionId, opponentName: action.payload.username }
         case CLIENT_START_GAME:
+            console.log(action.payload)
             return { ...state, action: "initiateGame", gameState: "ongoing", game: action.payload.game, history: [], color: action.payload.color }
         case CLIENT_RESUME_GAME:
             return { ...state, action: "resumeGame", gameState: "ongoing", game: action.payload.game, history: action.payload.game.history, color: action.payload.color }
