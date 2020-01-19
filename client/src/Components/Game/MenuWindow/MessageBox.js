@@ -53,7 +53,8 @@ class MessageBox extends Component {
                                         this.addMessage("server", this.props.latestMessage.message, this.props.latestMessage.sender)
                                         break;
                                 case "ownMessage":
-                                        break
+                                        this.addMessage("client", this.props.latestMessage.message, "opponent")
+					break;
                                 default:
                                         break;
                         }

@@ -90,7 +90,7 @@ var server = _http["default"].createServer(app);
 
 var io = (0, _socket["default"])(server, {
   path: "/socket"
-});
+}); // const io = socketio(server)
 
 function serializeRedisMessage(type, payload) {
   return JSON.stringify({
@@ -123,7 +123,7 @@ function getHumanTime() {
 io.on("connection", function (socket) {
   var sessionId = socket.handshake.query.session; // send register as guest and boot socket
 
-  if (_lodash["default"].isUndefined(sessionId)) {
+  if (_lodash["default"].isUndefined(sessionId) || sessionId == "null") {
     socket.disconnect();
     return;
   } else {
@@ -132,6 +132,13 @@ io.on("connection", function (socket) {
     _socketLogger.info("Socket connected");
 
     _redisClient["default"].hgetall(sessionId, function (err, res) {
+      // var sessionObject ={
+      //     chess: new Chess.Chess(),
+      //     sessionId:"",
+      //     clientUsername:"",
+      //     gameId:"",
+      //     gameObject:{},
+      // }
       var chess;
       var clientUsername;
       var opponentId;
@@ -173,8 +180,8 @@ io.on("connection", function (socket) {
                   }
                 });
               } else {
-                opponentName = "none";
-                opponentId = "none";
+                opponentName = "None";
+                opponentId = "None";
                 gameId = "none";
               }
             } else {}
@@ -277,7 +284,9 @@ io.on("connection", function (socket) {
             socket.emit('action', {
               type: _clientActions.CLIENT_START_GAME,
               payload: {
-                game: payload.game
+                game: payload.game,
+                opponentInfo: payload.opponentInfo,
+                color: payload.color
               }
             });
             break;
@@ -491,21 +500,23 @@ io.on("connection", function (socket) {
             break;
 
           case _clientActions.GAME_CONCEDE:
-            _redisClient["default"].get(gameId + "object", function (err, reply) {
-              var finishedGame = JSON.parse(reply);
-              finishedGame.winner = opponentId;
-              finishedGame.finished = true; // save game to static storage here;
+            if (!_lodash["default"].isUndefined(gameId) && !_lodash["default"].isNull(gameId)) {
+              _redisClient["default"].get(gameId + "object", function (err, reply) {
+                var finishedGame = JSON.parse(reply);
+                finishedGame.winner = opponentId;
+                finishedGame.finished = true; // save game to static storage here;
 
-              _redisClient["default"].set(gameId + "object", JSON.stringify(finishedGame));
+                _redisClient["default"].set(gameId + "object", JSON.stringify(finishedGame));
 
-              _redisClient["default"].publish(finishedGame.playerOne, serializeRedisMessage(_clientActions.CLIENT_GAME_OVER, {
-                winner: opponentId
-              }));
+                _redisClient["default"].publish(finishedGame.playerOne, serializeRedisMessage(_clientActions.CLIENT_GAME_OVER, {
+                  winner: opponentId
+                }));
 
-              _redisClient["default"].publish(finishedGame.playerTwo, serializeRedisMessage(_clientActions.CLIENT_GAME_OVER, {
-                winner: opponentId
-              }));
-            });
+                _redisClient["default"].publish(finishedGame.playerTwo, serializeRedisMessage(_clientActions.CLIENT_GAME_OVER, {
+                  winner: opponentId
+                }));
+              });
+            }
 
             break;
 

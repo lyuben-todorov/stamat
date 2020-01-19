@@ -19,8 +19,8 @@ import Home from './Home';
 function returnStore(sessionId) {
 
         let connectionString = `${serverUrl}/?session=${sessionId}`;
-        // let socket = io(connectionString, {path:"/api/socket"});
-        let socket = io(connectionString);
+        let socket = io(connectionString, {path:"/api/socket"});
+       // let socket = io(connectionString);
 
         let socketMiddleware = createSocketIoMiddleware(socket, ["server/", "game/"]);
         let gameStore = applyMiddleware(socketMiddleware)(createStore)(reducer);

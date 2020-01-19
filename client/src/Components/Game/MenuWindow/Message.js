@@ -10,8 +10,8 @@ export default class Message extends Component {
         let className
         if (this.props.level === "server") {
             className = "Message Server"
-        } else if (this.props.level === "player") {
-            className = "Message";
+        } else if (this.props.level === "player" || this.props.level ==="opponent") {
+		className = "Message";
         }
         this.state = {
             time: time.toString(),
