@@ -57,8 +57,8 @@ redisClient.del("matchmaking_queue");
 
 /** SOCKETS */
 const server = http.createServer(app);
-const io = socketio(server,{path:"/socket"})
-// const io = socketio(server)
+//const io = socketio(server,{path:"/socket"})
+const io = socketio(server)
 
 function serializeRedisMessage(type, payload) {
     return JSON.stringify({ type: type, payload: payload })
@@ -80,9 +80,6 @@ function createGame(gameId, p1id, p2id) {
         history: []
     }
     return gameObject;
-}
-function getHumanTime() {
-    return Math.floor(Date.now() / 1000);
 }
 
 io.on("connection", (socket) => {

@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import Chess from "chess.js"; // import Chess from  "chess.js"(default) if recieving an error about new Chess() not being a constructor
 
-import Chessboard from "chessboardjsx";
 import { connect } from "react-redux";
 import { playerReady, playerMove } from "../../../redux/actionCreators";
 import { observer } from "mobx-react";
+import Chessboard from "chessboardjsx";
+// import Chessground from 'react-chessground'
+// import 'react-chessground/dist/assets/theme.css' // Or your own chess theme
+// import 'react-chessground/dist/assets/chessground.css'
 
 @observer
 class ChessGame extends Component {
@@ -264,6 +267,15 @@ class ChessGame extends Component {
                                 onSquareClick={this.onSquareClick}
                                 onSquareRightClick={this.onSquareRightClick}
                         />
+                        // <Chessground
+                        //         width="38vw"
+                        //         height="38vw"
+                        //         fen={"rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2"}
+                        //         style={{ margin: "auto" }
+                        //         }
+
+                        // />
+
                 )
         }
 }
