@@ -77,19 +77,22 @@ inMatch: Bool
 matchId : String?
 ```
 ### Game Session Object
+Computed per player from game object in store.
 ```
 matchId: String
 playerName: String
 playerColor: String
-playerTime: String // in milliseconds 10*60*1000
+playerTime: String // individual time remaining in milliseconds 10*60*1000
 
 opponentName: String
 opponentColor: String
 opponentTime: String
 
+onMove: Bool 
 issueTime: // unix time of issue by matchmaker
-gameTime: // game time 
-gameType: enu,
+gameTime: //  game time by spec  in seconds 
+gameType: Enum // CHESS, CHESS_360?, FISCHER_CHESS?
+
 finished: Bool
 winner: String
 chatHistory: MessageObject[]  // 
