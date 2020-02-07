@@ -6,24 +6,50 @@ import Login from "./auth/Login";
 import { connect } from "react-redux";
 import { RootState } from "../redux/rootReducer";
 import { SessionState } from "../redux/sessionStore/sessionTypes";
+import { Game } from "./game/Game";
+import { Home } from "./Home";
+import processVariables from '../procVars'
+import axios from 'axios';
+import { loginUser, logoutUser } from "../redux/sessionStore/sessionActions";
 
+const { endpoint, serverUrl, mode } = processVariables
 
 export interface AppProps {
     sessionState: SessionState;
+    loginUser: Function
+    logoutUser: Function
 
 }
 export interface AppState {
-
+    loggedIn: Boolean
 }
 const mapState = (state: RootState) => ({
     sessionState: state.session
 })
 
 const mapDispatch = {
-    toggleOn: () => ({ type: 'TOGGLE_IS_ON' })
+    loginUser: loginUser,
+    logoutUsr: logoutUser
 }
 
 class App extends React.Component<AppProps, AppState> {
+    constructor(props: AppProps) {
+        super(props);
+
+        const sessionId = localStorage.getItem('sessionId');
+
+        this.state = {
+            loggedIn: sessionId ? true : false
+        }
+
+        if (sessionId) {
+            axios.get(`${serverUrl}${endpoint}/auth/restore`, { withCredentials: true }).then((res) => {
+                this.props.loginUser(res.data)
+            })
+            this.state = { loggedIn: true }
+        }
+
+    }
     render() {
         return (
             <div className="App">
@@ -42,7 +68,7 @@ class App extends React.Component<AppProps, AppState> {
                                 <NavLink to={"/game"}>Game</NavLink>
                             </Menu.Item>
                             <Menu.Item position='right'>
-                                {this.props.loggedIn ?
+                                {this.props.sessionState.loggedIn ?
                                     <div>
                                         <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
 
@@ -61,7 +87,7 @@ class App extends React.Component<AppProps, AppState> {
                         <Route path="/login" render={() => <Login />} />
                         <Route path="/register" render={() => <Register />} />
                         <Route path="/game" render={() =>
-                            this.props.loggedIn ?
+                            this.props.sessionState.loggedIn ?
                                 <Game > </Game>
                                 :
                                 <Redirect to={"/login"}></Redirect>
@@ -76,7 +102,7 @@ class App extends React.Component<AppProps, AppState> {
 }
 
 
-export default connect<AppProps, AppState>(
+export default connect(
     mapState,
     mapDispatch
 )(App)
