@@ -18,8 +18,10 @@ export function sessionReducer(
 ): SessionState {
     switch (action.type) {
         case LOG_IN_USER:
-            return state
+            return state;
         case LOG_OUT_USER:
-            return state
+            return state;
+        default:
+            return state;
     }
 }

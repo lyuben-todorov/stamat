@@ -1,5 +1,5 @@
-export interface MatchState{
-    
+export interface MatchState {
+
 }
 
 /* Client-Server actions */
@@ -33,4 +33,7 @@ export const CLIENT_RESUME_SESSION = "client/RESUME_SESSION"
 /* Client-Matchmaker actions */
 export const MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"
 
-export type MatchActionTypes = 
+interface GeneralMatchAction {
+    type: typeof SERVER_START_MATCHMAKING
+}
+export type MatchActionTypes = GeneralMatchAction

@@ -16,8 +16,8 @@ const { endpoint, serverUrl, mode } = processVariables
 
 export interface AppProps {
     sessionState: SessionState;
-    loginUser: Function
-    logoutUser: Function
+    loginUser?: Function
+    logoutUser?: Function
 
 }
 export interface AppState {
@@ -39,7 +39,7 @@ class App extends React.Component<AppProps, AppState> {
         const sessionId = localStorage.getItem('sessionId');
 
         this.state = {
-            loggedIn: sessionId ? true : false
+            loggedIn: false
         }
 
         if (sessionId) {
@@ -49,6 +49,10 @@ class App extends React.Component<AppProps, AppState> {
             this.state = { loggedIn: true }
         }
 
+    }
+
+    handleLogout() {
+        this.props.logoutUser();
     }
     render() {
         return (

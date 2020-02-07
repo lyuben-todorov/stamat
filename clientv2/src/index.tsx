@@ -3,6 +3,8 @@ import * as ReactDOM from "react-dom";
 import './sass/index.scss'
 
 import App from "./components/App";
+import { Provider } from "react-redux";
+import RootStore from "./redux/rootReducer";
 
 export interface processVariables {
     serverUrl: String
@@ -11,6 +13,10 @@ export interface processVariables {
 }
 
 ReactDOM.render(
-    <App loggedIn={true} />,
+    <Provider store={RootStore}>
+        <App />
+    </Provider>
+    ,
+
     document.getElementById("root")
 );
