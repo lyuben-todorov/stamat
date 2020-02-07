@@ -29,7 +29,9 @@ Client identity is determined by their sessionId and auth token. Sessions persis
 * Current match status and match identity (match key)
 * Client state unrelated to matches
 
-For brevity and maintainability we want to split our client states (mainly our client session info and different **dynamic** match states) into different stores (not everything in one place as for example redux is documented). Since session is tightly knit to a certain client state that's modifed via socket, client sockets should be initialized together with state. When a dynamic state store is initialized with a certain socket identity, it does so with a session query parameter:
+For brevity and maintainability we want to split our client states (mainly our client session info and different **dynamic** match states) into different stores (not everything in one place as for example redux is documented). 
+
+Since session is tightly knit to a certain client state that's modifed via socket, client sockets should be initialized together with state. When a dynamic state store is initialized with a certain socket identity, it does so with a session query parameter:
 ```javascript
 let socket = io(`http://server.com?session=${someSessionId}`);
 ```
@@ -80,6 +82,7 @@ matchId : String?
 Computed per player from game object in store.
 ```
 matchId: String
+
 playerName: String
 playerColor: String
 playerTime: String // individual time remaining in milliseconds 10*60*1000
