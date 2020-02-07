@@ -34,6 +34,7 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
+    "@types/semantic-ui": "^2.2.7",
     "axios": "^0.19.2",
     "chess.js": "^0.10.2",
     "react": "^16.12.0",

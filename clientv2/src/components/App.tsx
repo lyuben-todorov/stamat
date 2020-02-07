@@ -1,39 +1,65 @@
 import * as React from "react";
-import { Button, Divider, Form, Grid, Segment } from 'semantic-ui-react'
+import { BrowserRouter, NavLink, Link, Switch, Route } from "react-router-dom";
+import { Menu, Container, Button } from 'semantic-ui-react';
+import Register from "./auth/Register";
 
-export interface AppProps { compiler: string; framework: string; }
 
-export class App extends React.Component<AppProps> {
+export interface AppProps {
+    loggedIn:Boolean; 
+
+}
+export interface AppState{
+
+}
+
+export class App extends React.Component<AppProps, AppState> {
     render() {
         return (
-            <Segment placeholder>
-                <Grid columns={2} relaxed='very' stackable>
-                    <Grid.Column>
-                        <Form>
-                            <Form.Input
-                                icon='user'
-                                iconPosition='left'
-                                label='Username'
-                                placeholder='Username'
-                            />
-                            <Form.Input
-                                icon='lock'
-                                iconPosition='left'
-                                label='Password'
-                                type='password'
-                            />
+            <div className="App">
+                <BrowserRouter>
+                    <Menu size='large'>
+                        <Container>
+                            <Menu.Item >
 
-                            <Button content='Login' primary />
-                        </Form>
-                    </Grid.Column>
+                                Stamat
+                                    </Menu.Item>
+                            <Menu.Item >
+                                <NavLink to={"/"}>Home</NavLink>
+                            </Menu.Item>
+                            <Menu.Item >
 
-                    <Grid.Column verticalAlign='middle'>
-                        <Button content='Sign up' icon='signup' size='big' />
-                    </Grid.Column>
-                </Grid>
+                                <NavLink to={"/game"}>Game</NavLink>
+                            </Menu.Item>
+                            <Menu.Item position='right'>
+                                {this.props.loggedIn ?
+                                    <div>
+                                        <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
 
-                <Divider vertical>Or</Divider>
-            </Segment>
+                                    </div>
+                                    :
+                                    <div>
+                                        <Button as={Link} to={"/login"} >Log in</Button>
+                                        <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
+                                    </div>
+                                }
+
+                            </Menu.Item>
+                        </Container>
+                    </Menu>
+                    <Switch>
+                        <Route path="/login" render={() => <Login/>} />
+                        <Route path="/register" render={() => <Register/>} />
+                        <Route path="/game" render={() =>
+                            this.props.loggedIn ?
+                                <Game > </Game>
+                                :
+                                <Redirect to={"/login"}></Redirect>
+                        } />
+                        <Route path="/" render={() => <Home sessionStore={SessionStore} />} />
+
+                    </Switch>
+                </BrowserRouter>
+            </div>
         )
     }
 }

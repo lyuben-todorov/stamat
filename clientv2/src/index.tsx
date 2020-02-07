@@ -5,6 +5,6 @@ import './sass/index.scss'
 import { App } from "./components/App";
 
 ReactDOM.render(
-    <App compiler="TypeScript" framework="React" />,
+    <App loggedIn={true}/>,
     document.getElementById("root")
 );
