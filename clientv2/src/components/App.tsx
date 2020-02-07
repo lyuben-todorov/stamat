@@ -1,18 +1,29 @@
 import * as React from "react";
-import { BrowserRouter, NavLink, Link, Switch, Route } from "react-router-dom";
+import { BrowserRouter, NavLink, Link, Switch, Route, Redirect } from "react-router-dom";
 import { Menu, Container, Button } from 'semantic-ui-react';
 import Register from "./auth/Register";
+import Login from "./auth/Login";
+import { connect } from "react-redux";
+import { RootState } from "../redux/rootReducer";
+import { SessionState } from "../redux/sessionStore/sessionTypes";
 
 
 export interface AppProps {
-    loggedIn:Boolean; 
+    sessionState: SessionState;
 
 }
-export interface AppState{
+export interface AppState {
 
 }
+const mapState = (state: RootState) => ({
+    sessionState: state.session
+})
 
-export class App extends React.Component<AppProps, AppState> {
+const mapDispatch = {
+    toggleOn: () => ({ type: 'TOGGLE_IS_ON' })
+}
+
+class App extends React.Component<AppProps, AppState> {
     render() {
         return (
             <div className="App">
@@ -47,15 +58,15 @@ export class App extends React.Component<AppProps, AppState> {
                         </Container>
                     </Menu>
                     <Switch>
-                        <Route path="/login" render={() => <Login/>} />
-                        <Route path="/register" render={() => <Register/>} />
+                        <Route path="/login" render={() => <Login />} />
+                        <Route path="/register" render={() => <Register />} />
                         <Route path="/game" render={() =>
                             this.props.loggedIn ?
                                 <Game > </Game>
                                 :
                                 <Redirect to={"/login"}></Redirect>
                         } />
-                        <Route path="/" render={() => <Home sessionStore={SessionStore} />} />
+                        <Route path="/" render={() => <Home />} />
 
                     </Switch>
                 </BrowserRouter>
@@ -63,3 +74,9 @@ export class App extends React.Component<AppProps, AppState> {
         )
     }
 }
+
+
+export default connect<AppProps, AppState>(
+    mapState,
+    mapDispatch
+)(App)

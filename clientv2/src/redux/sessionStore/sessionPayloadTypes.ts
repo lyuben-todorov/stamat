@@ -3,4 +3,5 @@ export interface LoginPayload{
     userType: "user";
     username:String;
     email: String;
+    loggedIn:Boolean;
 }

@@ -1,11 +1,13 @@
 import { LoginPayload } from "./sessionPayloadTypes";
 
 export interface SessionState {
+    loggedIn:Boolean;
+    inMatch: Boolean;
     sessionId: String;
     userType: String;
     username: String;
+    
     email?: String;
-    inMatch: Boolean;
     matchId?: String;
 }
 
