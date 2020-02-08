@@ -5,6 +5,7 @@ import './sass/index.scss'
 import App from "./components/App";
 import { Provider } from "react-redux";
 import RootStore from "./redux/rootReducer";
+import { BrowserRouter } from "react-router-dom";
 
 export interface processVariables {
     serverUrl: String
@@ -13,9 +14,11 @@ export interface processVariables {
 }
 
 ReactDOM.render(
-    <Provider store={RootStore}>
-        <App />
-    </Provider>
+    <BrowserRouter>
+        <Provider store={RootStore}>
+            <App />
+        </Provider>
+    </BrowserRouter>
     ,
 
     document.getElementById("root")

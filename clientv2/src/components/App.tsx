@@ -9,18 +9,19 @@ import { SessionState } from "../redux/sessionStore/sessionTypes";
 import { Game } from "./game/Game";
 import { Home } from "./Home";
 import processVariables from '../procVars'
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { loginUser, logoutUser } from "../redux/sessionStore/sessionActions";
+import { AuthRestoreResponse } from "../axios/responseTypes";
 
 const { endpoint, serverUrl, mode } = processVariables
 
-export interface AppProps {
+interface AppProps {
     sessionState: SessionState;
     loginUser?: Function
     logoutUser?: Function
 
 }
-export interface AppState {
+interface AppState {
     loggedIn: Boolean
 }
 const mapState = (state: RootState) => ({
@@ -29,24 +30,39 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
     loginUser: loginUser,
-    logoutUsr: logoutUser
+    logoutUser: logoutUser
 }
 
 class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
         super(props);
 
-        const sessionId = localStorage.getItem('sessionId');
-
         this.state = {
             loggedIn: false
         }
 
-        if (sessionId) {
-            axios.get(`${serverUrl}${endpoint}/auth/restore`, { withCredentials: true }).then((res) => {
-                this.props.loginUser(res.data)
-            })
+        const session = localStorage.getItem('session');
+
+        if (session) {
+            const sessionObject = JSON.parse(session);
+            this.props.loginUser(sessionObject);
+
             this.state = { loggedIn: true }
+        } else {
+            axios.request<AxiosResponse>({
+                method: "GET",
+                url: `${serverUrl}${endpoint}/auth/restore`,
+                withCredentials: true,
+                transformResponse: (r: AxiosResponse) => r.data,
+
+            }).then((res) => {
+                if (res)
+                    this.props.loginUser(res)
+            }).catch((err) => {
+                
+            })
+
+
         }
 
     }
@@ -57,7 +73,6 @@ class App extends React.Component<AppProps, AppState> {
     render() {
         return (
             <div className="App">
-                <BrowserRouter>
                     <Menu size='large'>
                         <Container>
                             <Menu.Item >
@@ -79,7 +94,8 @@ class App extends React.Component<AppProps, AppState> {
                                     </div>
                                     :
                                     <div>
-                                        <Button as={Link} to={"/login"} >Log in</Button>
+                                        <Button as={Link} 
+                                        to={"/login"} >Log in</Button>
                                         <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
                                     </div>
                                 }
@@ -99,7 +115,6 @@ class App extends React.Component<AppProps, AppState> {
                         <Route path="/" render={() => <Home />} />
 
                     </Switch>
-                </BrowserRouter>
             </div>
         )
     }
