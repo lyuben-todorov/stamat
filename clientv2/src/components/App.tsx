@@ -8,10 +8,9 @@ import { RootState } from "../redux/rootReducer";
 import { SessionState } from "../redux/sessionStore/sessionTypes";
 import { Game } from "./game/Game";
 import { Home } from "./Home";
-import processVariables from '../procVars'
 import axios, { AxiosResponse } from 'axios';
 import { loginUser, logoutUser } from "../redux/sessionStore/sessionActions";
-import { AuthRestoreResponse } from "../axios/responseTypes";
+import processVariables from '../procVars'
 
 const { endpoint, serverUrl, mode } = processVariables
 
