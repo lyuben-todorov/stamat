@@ -1,5 +1,6 @@
 node_modules
 .vscode
+dist
 ./server/dist/
 ./matchmaker/dist/
 ./client/build/
