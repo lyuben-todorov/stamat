@@ -1,0 +1,3 @@
+export enum GameTypes{
+    CHESS
+}

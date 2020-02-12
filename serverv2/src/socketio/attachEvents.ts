@@ -1,93 +1,90 @@
 import _ from 'lodash';
 import redis from "ioredis";
-import { CLIENT_RESUME_GAME, CLIENT_RESUME_SESSION } from "./actionTypes";
+import { CLIENT_RESUME_GAME, CLIENT_RESUME_SESSION, AUTH_REQUEST_SESSION, AUTH_SESSION_UNKNOWN } from "./models/ActionTypes";
 import redisClient from "../redis/redisClient";
 import createLogger from "../createLogger";
 import { Chess } from 'chess.js';
-import attachRedisActions from './attachRedisActions';
-import attachSocketActions from './attachSocketActions';
-
+import attachRedisActions from './actions/attachRedisActions';
+import attachSocketActions from './actions/attachSocketActions';
+import { Logger } from 'winston';
+import { UserSession } from './models/sessions/UserSession';
+import SessionList from './models/sessions/SessionList';
+import { serverLogger } from '../server'
+import SocketAction from './models/actions/SocketAction';
+import ActionBuilder from './models/actions/ActionBuilder';
 export default function (io: SocketIO.Server) {
 
     io.on("connection", (socket) => {
-
-        const sessionId = socket.handshake.query.session;
-
-        // send register as guest and boot socket
-        if (_.isUndefined(sessionId) || sessionId == "null") {
-            socket.disconnect();
-            return;
-        } else {
+        var socketLogger: Logger = serverLogger;
+        var userSession: UserSession;
+        var sessionList: SessionList;
+        const personalChannel = new redis();
 
 
-            const socketLogger = createLogger(sessionId.slice(-5));
-            socketLogger.info("Socket connected");
+        socket.on('action', (action: SocketAction) => {
+            if (action.type === AUTH_REQUEST_SESSION) {
+                
+            } else {
+                socket.emit('action',
+                    new ActionBuilder()
+                        .setType(AUTH_SESSION_UNKNOWN)
+                        .setPayload({})
+                        .build()
+                )
+            }
+        })
+        socketLogger.info("Socket connected");
 
-            redisClient.hgetall(sessionId, (err, res) => {
-                var chess;
-                var clientUsername;
-                var opponentId;
-                var gameId;
-                var opponentName;
-                var color:any;
-                var autoAccept = true;
+        redisClient.hgetall(sessionId, (err, res) => {
+            if (!err && _.isEmpty(res)) {
+                socketLogger.info("No session to restore found");
 
-                if (!err && _.isEmpty(res)) {
-                    socketLogger.info("No session to restore found");
+            } else {
+                socketLogger.info("Socket session retrieved successfully");
 
-                } else {
-                    socketLogger.info("Socket session retrieved successfully");
+                if (res.gameId) {
+                    redisClient.get(res.gameId + "object", (err, reply) => {
+                        if (reply) {
 
-                    clientUsername = res.clientUsername;
-                    opponentId = res.opponentId;
-                    gameId = res.gameId;
-                    opponentName = res.opponentName;
-                    color = res.color;
+                            let gameObject = JSON.parse(reply);
+                            if (!gameObject.finished) {
+                                chess = new Chess(gameObject.position);
 
-                    if (res.gameId) {
-                        redisClient.get(res.gameId + "object", (err, reply) => {
-                            if (reply) {
-
-                                let gameObject = JSON.parse(reply);
-                                if (!gameObject.finished) {
-                                    chess = new Chess(gameObject.position);
-
-                                    socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: gameObject, color: color === 'w' ? 'white' : 'black' } });
+                                socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: gameObject, color: color === 'w' ? 'white' : 'black' } });
 
 
-                                } else {
-                                    opponentName = "None";
-                                    opponentId = "None";
-                                    gameId = "none";
-                                }
                             } else {
-
+                                opponentName = "None";
+                                opponentId = "None";
+                                gameId = "none";
                             }
-                        })
-                    }
+                        } else {
 
-                    socket.emit('action', {
-                        type: CLIENT_RESUME_SESSION,
-                        payload: {
-                            userType: "user",
-                            sessionId: sessionId,
-                            username: clientUsername,
-                            opponentName: opponentName,
-                            gameId: gameId ? gameId : "none",
-                            opponentId: opponentId,
                         }
                     })
-
                 }
 
-                const personalChannel = new redis();
-                personalChannel.subscribe(sessionId);
+                socket.emit('action', {
+                    type: CLIENT_RESUME_SESSION,
+                    payload: {
+                        userType: "user",
+                        sessionId: sessionId,
+                        username: clientUsername,
+                        opponentName: opponentName,
+                        gameId: gameId ? gameId : "none",
+                        opponentId: opponentId,
+                    }
+                })
 
-                // attach redis 
-                attachRedisActions(personalChannel);
-                attachSocketActions(socket);
+            }
 
-            });
-        }
+            personalChannel.subscribe();
+
+            // attach redis 
+            attachRedisActions(personalChannel);
+            attachSocketActions(socket);
+
+        });
+    }
     });
 }

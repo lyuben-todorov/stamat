@@ -1,3 +1,9 @@
+/* Auth actions */
+// this is the 404 message
+export const AUTH_SESSION_UNKNOWN = "auth/SESSION_UNKNOWN";
+//
+export const AUTH_REQUEST_SESSION = "auth/REQUEST_SESSION";
+export const AUTH_RESPOND_SESSION = "auth/RESPOND_SESSION";
 
 /* Client-Server actions */
 export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
@@ -25,7 +31,7 @@ export const CLIENT_REGISTER_USER = "client/REGISTER_USER";
 export const CLIENT_SEND_CHAT_MESSAGE = "client/SEND_CHAT_MESSAGE"
 
 export const CLIENT_RESUME_GAME = "client/RESUME_GAME";
-export const CLIENT_RESUME_SESSION = "client/RESUME_SESSION"
+
 
 /* Client-Matchmaker actions */
 export const MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"

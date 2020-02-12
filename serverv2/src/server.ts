@@ -8,7 +8,7 @@ import attachEvents from './socketio/attachEvents';
 
 
 const PORT = env.PORT || 5000;
-const serverLogger = createLogger("Server");
+export const serverLogger = createLogger("Server");
 const server = http.createServer(app);
 
 const io = socketio(server, { path: env.PATH })
