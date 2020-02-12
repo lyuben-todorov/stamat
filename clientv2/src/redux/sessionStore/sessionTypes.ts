@@ -1,9 +1,10 @@
 import { LoginPayload } from "./sessionPayloadTypes";
 
 export interface SessionState {
+    sessionId: string;
+    
     loggedIn: boolean;
     inMatch: boolean;
-    sessionId: string;
     userType: string;
     username: string;
 

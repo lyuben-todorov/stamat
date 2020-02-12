@@ -1,5 +1,5 @@
 import { MatchSession } from "./MatchSession";
 
-export default interface SessionList {
+export default interface MatchSessionList {
     [key: string]: MatchSession;
 }

@@ -1,4 +1,5 @@
-import { AUTH_SESSION_UNKNOWN } from '../ActionTypes';
+import { AUTH_SESSION_UNKNOWN, AUTH_RESPOND_SESSION, AUTH_REQUEST_SESSION } from '../ActionTypes';
+import { UserSession } from '../sessions/UserSession';
 
 interface SocketAction {
     type: string;
@@ -8,10 +9,19 @@ interface SocketAction {
 
 interface AuthSessionUnknownAction extends SocketAction {
     type: typeof AUTH_SESSION_UNKNOWN;
+    payload: never;
+}
+interface AuthRespondSessionAction extends SocketAction {
+    type: typeof AUTH_RESPOND_SESSION;
+    payload: UserSession
+}
+interface AuthRequestSessionAction extends SocketAction {
+    type: typeof AUTH_REQUEST_SESSION;
     payload: {
-        sessionId: string;
+        sessiondId: string;
     }
 }
-
-
-export type SocketActionTypes = AuthSessionUnknownAction 
+export type SocketActionTypes =
+    AuthSessionUnknownAction |
+    AuthRespondSessionAction |
+    AuthRequestSessionAction

@@ -18,7 +18,11 @@ export function sessionReducer(
 ): SessionState {
     switch (action.type) {
         case LOG_IN_USER:
-            return state;
+            return {
+                ...this.state,
+                sessionId: action.payload.sessionId,
+                userType: action.payload.userType
+            };
         case LOG_OUT_USER:
             return state;
         default:

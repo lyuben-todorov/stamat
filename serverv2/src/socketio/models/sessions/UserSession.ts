@@ -4,7 +4,7 @@ export interface UserSession{
     email:string
     inMatch:boolean
     connected:boolean
-    matchId:string
+    matchIds:string[]
     //session settings, matchmaker settings
     autoAccept:boolean
 
