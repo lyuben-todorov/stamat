@@ -136,7 +136,7 @@ io.on("connection", (socket) => {
                             if (!gameObject.finished) {
                                 chess = new Chess.Chess(gameObject.position);
 
-                                socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: gameObject, color: color === 'w' ? 'white' : 'black' } });
+                                socket.emit('action', { type: CLIENT_RESUME_GAME, payload: { game: gameObject, color: color === 'w' ? 'white' : 'black' } }, );
 
 
                             } else {
@@ -266,7 +266,7 @@ io.on("connection", (socket) => {
                         break;
                 }
             })
-            socket.on('action', (action) => {
+            socket.on('action', function(action) {
                 socketLogger.info("Recieved action on socket:" + JSON.stringify(action))
                 switch (action.type) {
                     case SERVER_START_MATCHMAKING:

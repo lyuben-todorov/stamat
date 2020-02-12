@@ -1,7 +1,8 @@
-export interface LoginPayload{
-    sessionId: String;
+export interface LoginPayload {
+    sessionId: string;
     userType: "user";
-    username:String;
-    email: String;
-    loggedIn:Boolean;
+    username: string;
+    email: string;
+    loggedIn: boolean;
+    inMatch: boolean;
 }

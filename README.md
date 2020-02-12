@@ -3,6 +3,7 @@ A chess server implementation based on express servers and redis. For a descript
 
 Currently going through an ovehaul with typings, better architecture and lighter protocol.
 # TODO
+1. TS migration is done apart from game components/server logic
 1. Client TS migration
 2. Server TS migration
 3. MM C/C++ migration
