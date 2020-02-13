@@ -78,6 +78,18 @@ email: String
 inMatch: Bool
 matchId : String?
 ```
+### Server Session Object
+```
+    sessionId:string
+    username:string
+    email:string
+    inMatch:boolean
+    connected:boolean
+    matchIds:string[]
+    //session settings, matchmaker settings
+    autoAccept:boolean
+
+```
 ### Game Session Object
 Computed per player from game object in store.
 ```

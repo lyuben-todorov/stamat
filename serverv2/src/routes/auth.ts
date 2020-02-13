@@ -69,9 +69,6 @@ router.get('/restore', (req, res) => {
                                                         let sessionObject = {
                                                                 sessionId: sessionId,
                                                                 clientUsername: user.username,
-                                                                gameId: "none",
-                                                                opponentId: "none",
-                                                                opponentName: "none"
                                                         }
                                                         console.log(sessionObject);
                                                         redisClient.hmset(sessionId, sessionObject, (err, res) => {

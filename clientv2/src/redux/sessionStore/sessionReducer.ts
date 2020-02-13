@@ -12,6 +12,8 @@ const initialState: SessionState = {
     inMatch: false,
     loggedIn: false
 }
+
+
 export function sessionReducer(
     state = initialState,
     action: SessionActionTypes
@@ -21,7 +23,9 @@ export function sessionReducer(
             return {
                 ...this.state,
                 sessionId: action.payload.sessionId,
-                userType: action.payload.userType
+                userType: action.payload.userType,
+                username: action.payload.username,
+                inMatch: action.payload.inMatch
             };
         case LOG_OUT_USER:
             return state;

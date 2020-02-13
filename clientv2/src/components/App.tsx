@@ -56,7 +56,7 @@ class App extends React.Component<AppProps, AppState> {
 
             }).then((res) => {
                 if (res)
-                    this.props.loginUser(res)
+                    this.props.loginUser(res)   
             }).catch((err) => {
                 
             })
