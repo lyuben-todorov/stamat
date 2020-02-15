@@ -52,11 +52,10 @@ class App extends React.Component<AppProps, AppState> {
                 method: "GET",
                 url: `${serverUrl}${endpoint}/auth/restore`,
                 withCredentials: true,
-                transformResponse: (r: AxiosResponse) => r.data,
 
             }).then((res) => {
-                if (res)
-                    this.props.loginUser(res)   
+                console.log(res.data)
+                if (res) this.props.loginUser(res.data)   
             }).catch((err) => {
                 
             })
@@ -86,7 +85,7 @@ class App extends React.Component<AppProps, AppState> {
                                 <NavLink to={"/game"}>Game</NavLink>
                             </Menu.Item>
                             <Menu.Item position='right'>
-                                {this.props.sessionState.loggedIn ?
+                                {this.props.sessionState.connected ?
                                     <div>
                                         <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
 
@@ -106,7 +105,7 @@ class App extends React.Component<AppProps, AppState> {
                         <Route path="/login" render={() => <Login />} />
                         <Route path="/register" render={() => <Register />} />
                         <Route path="/game" render={() =>
-                            this.props.sessionState.loggedIn ?
+                            this.props.sessionState.connected ?
                                 <Game > </Game>
                                 :
                                 <Redirect to={"/login"}></Redirect>

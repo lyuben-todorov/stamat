@@ -4,10 +4,10 @@ import {
     LOG_IN_USER,
     LOG_OUT_USER
 } from './sessionTypes'
-import { LoginPayload } from './sessionPayloadTypes'
+import { UserSession } from './sessionPayloadTypes'
 
 
-export function loginUser(newSession: LoginPayload): SessionActionTypes {
+export function loginUser(newSession: UserSession): SessionActionTypes {
     return {
         type: LOG_IN_USER,
         payload: newSession

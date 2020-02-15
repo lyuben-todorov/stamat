@@ -1,15 +1,16 @@
-import { LoginPayload } from "./sessionPayloadTypes";
+import { UserSession } from "./sessionPayloadTypes";
 
-export interface SessionState {
-    sessionId: string;
-    
-    loggedIn: boolean;
-    inMatch: boolean;
-    userType: string;
-    username: string;
+export interface SessionState{
+    sessionId:string
+    username:string
+    email:string
+    inMatch:boolean
+    connected:boolean
+    matchIds:string[]
+    //session settings, matchmaker settings
+    autoAccept:boolean
+    userType:string
 
-    email?: string;
-    matchId?: string;
 }
 
 export const LOG_IN_USER = "LOG_IN_USER";
@@ -18,7 +19,7 @@ export const LOG_OUT_USER = "LOG_OUT_USER";
 
 interface LoginUserAction {
     type: typeof LOG_IN_USER
-    payload: LoginPayload
+    payload: UserSession
 }
 interface LogoutUserAction {
     type: typeof LOG_OUT_USER

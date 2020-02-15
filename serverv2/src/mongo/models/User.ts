@@ -9,6 +9,7 @@ export interface IUser extends Document {
         password: string;
         username: string;
         id: string;
+
         comparePassword: Function;
 }
 const UserSchema: Schema = new Schema({

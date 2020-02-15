@@ -6,11 +6,15 @@ import {
 } from "./sessionTypes"
 
 const initialState: SessionState = {
-    sessionId: "none",
-    userType: "none",
-    username: "none",
+    sessionId: "",
+    username: "",
+    email: "",
     inMatch: false,
-    loggedIn: false
+    connected: false,
+    matchIds: [],
+    //session settings, matchmaker settings
+    userType: "GUEST",
+    autoAccept: false
 }
 
 
@@ -20,12 +24,19 @@ export function sessionReducer(
 ): SessionState {
     switch (action.type) {
         case LOG_IN_USER:
+            console.log("hi im " + action.payload);
             return {
-                ...this.state,
+                ...state,
                 sessionId: action.payload.sessionId,
-                userType: action.payload.userType,
                 username: action.payload.username,
-                inMatch: action.payload.inMatch
+                email: action.payload.email,
+                inMatch: action.payload.inMatch,
+                connected: action.payload.connected,
+                matchIds: action.payload.matchIds,
+
+                autoAccept: action.payload.autoAccept,
+                userType: "USER",
+
             };
         case LOG_OUT_USER:
             return state;

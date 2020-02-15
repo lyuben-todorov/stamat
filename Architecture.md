@@ -70,25 +70,19 @@ Session storing and retrieval should be **complete**, leaving no session variabl
 * ADD_TO_QUEUE
 
 # Data types
-### Client Session Object
+### Universal Session Object
 ```
-sessionId : String
-username: String
-email: String
-inMatch: Bool
-matchId : String?
+sessionId:string
+username:string
+email:string
+inMatch:boolean
+connected:boolean
+matchIds:string[]
+//session settings, matchmaker settings
 ```
-### Server Session Object
+### Session Settings 
 ```
-    sessionId:string
-    username:string
-    email:string
-    inMatch:boolean
-    connected:boolean
-    matchIds:string[]
-    //session settings, matchmaker settings
-    autoAccept:boolean
-
+autoAccept:boolean
 ```
 ### Game Session Object
 Computed per player from game object in store.

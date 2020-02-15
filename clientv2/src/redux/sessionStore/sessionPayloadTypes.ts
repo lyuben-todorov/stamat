@@ -1,7 +1,11 @@
-export interface LoginPayload {
-    sessionId: string;
-    userType: "user";
-    username: string;
-    inMatch: boolean;
-
+export interface UserSession{
+    sessionId:string
+    username:string
+    email:string
+    inMatch:boolean
+    connected:boolean
+    matchIds:string[]
+    //session settings, matchmaker settings
+    autoAccept:boolean
+    
 }

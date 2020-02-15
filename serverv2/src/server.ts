@@ -11,7 +11,7 @@ const PORT = env.PORT || 5000;
 export const serverLogger = createLogger("Server");
 const server = http.createServer(app);
 
-const io = socketio(server, { path: env.PATH })
+const io = socketio(server)
 // set socket callbacks;
 attachEvents(io);
 

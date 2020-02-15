@@ -1,7 +1,7 @@
 import { AUTH_SESSION_UNKNOWN, AUTH_RESPOND_SESSION, AUTH_REQUEST_SESSION } from '../ActionTypes';
 import { UserSession } from '../sessions/UserSession';
 
-interface SocketAction {
+export default interface SocketAction {
     type: string;
     payload: object
 
