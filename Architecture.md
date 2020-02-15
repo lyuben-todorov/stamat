@@ -24,50 +24,18 @@ Authentication is standard with the caveat that on successful login, the server 
 An **authenticated** client calls for a session restore from a server. The server checks the session store for an existing session. If successful, it restores it to the client. If not, it issues a new one. Sessions expire after 24hrs.
 
 # Sessions
-Client identity is determined by their sessionId and auth token. Sessions persist the following info:
+Client identity is determined by their sessionId. Sessions persist the following info:
 
 * Current match status and match identity (match key)
 * Client state unrelated to matches
 
 For brevity and maintainability we want to split our client states (mainly our client session info and different **dynamic** match states) into different stores (not everything in one place as for example redux is documented). 
 
-Since session is tightly knit to a certain client state that's modifed via socket, client sockets should be initialized together with state. When a dynamic state store is initialized with a certain socket identity, it does so with a session query parameter:
-```javascript
-let socket = io(`http://server.com?session=${someSessionId}`);
-```
-In turn, the server checks for an existing dynamic session object in the session store. 
-If it's found, the server issues a `client/RESUME_SESSION` with the corresponding parameters. 
+Session is tightly knit to client state. The client session is only retrieved by http request (`/restore`). Given a valid auth token and a sessionId, the server tries to restore a session, if one exists, or creates a new one. User settings are a separate object from state. Match-related transactions happen by socket.
 
-Related state is persisted to the session store on socket **disconnect** events.
+State is persisted to the session store on socket **disconnect** events.
 
 Session storing and retrieval should be **complete**, leaving no session variables unpersisted. The client shouldn't have to perform extra actions to regain state even if the server restarts.
-
-# Socket actions
-## server/
-* START_MATCHMAKING
-* REPLY_MATCHUP
-* REGISTER_USER
-
-## game/
-* PLAYER_READY
-* PLAYER_MOVE
-* OFFER_DRAW
-* CONCEDE
-
-## client/
-* GAME_OVER
-* UPDATE_GAME
-* OFFER_DRAW
-
-* PROPOSE_MATCHUP
-* START_GAME
-* ALREADY_IN_QUEUE
-
-* RESUME_GAME
-* RESUME_SESSION
-
-## matchmaker/
-* ADD_TO_QUEUE
 
 # Data types
 ### Universal Session Object
@@ -107,4 +75,46 @@ winner: String
 chatHistory: MessageObject[]  // 
 position: String // fen string
 moveHistory: String //not verbose
+```
+
+# Socket actions
+```
+/* Auth actions */
+// this is the 404 message
+AUTH_SESSION_UNKNOWN = "auth/SESSION_UNKNOWN";
+
+AUTH_REQUEST_SESSION = "auth/REQUEST_SESSION";
+AUTH_RESPOND_SESSION = "auth/RESPOND_SESSION";
+
+/* Client-Server actions */
+SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
+SERVER_REPLY_MATCHUP = "server/REPLY_MATCHUP";
+SERVER_REGISTER_USER = "server/REGISTER_USER"
+SERVER_SEND_CHAT_MESSAGE = "server/SEND_CHAT_MESSAGE";
+
+/* Game actions */
+SERVER_PLAYER_READY = "server/PLAYER_READY";
+SERVER_PLAYER_MOVE = "server/PLAYER_MOVE";
+SERVER_OFFER_DRAW = "server/OFFER_DRAW";
+SERVER_REPLY_DRAW = "server/REPLY_DRAW";
+SERVER_CONCEDE = "server/CONCEDE_GAME";
+
+/* Server-Client actions */
+CLIENT_GAME_OVER = "client/GAME_OVER";
+CLIENT_UPDATE_GAME = "client/UPDATE_GAME";
+CLIENT_OFFER_DRAW = "client/OFFER_DRAW";
+CLIENT_REPLY_DRAW = "client/REPLY_DRAW";
+
+CLIENT_PROPOSE_MATCHUP = "client/PROPOSE_MATCHUP";
+CLIENT_START_GAME = "client/START_GAME";
+CLIENT_ALREADY_IN_QUEUE = "client/ALREADY_IN_QUEUE"
+CLIENT_REGISTER_USER = "client/REGISTER_USER";
+CLIENT_SEND_CHAT_MESSAGE = "client/SEND_CHAT_MESSAGE"
+
+CLIENT_RESUME_GAME = "client/RESUME_GAME";
+
+
+/* Client-Matchmaker actions */
+MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"
+
 ```
