@@ -1,9 +1,10 @@
 /* Auth actions */
 // this is the 404 message
-export const AUTH_SESSION_UNKNOWN = "auth/SESSION_UNKNOWN";
+export const SESSION_UNKNOWN = "SESSION_UNKNOWN";
 //
 export const AUTH_REQUEST_SESSION = "auth/REQUEST_SESSION";
-export const AUTH_RESPOND_SESSION = "auth/RESPOND_SESSION";
+export const RESPOND_SESSION = "RESPOND_SESSION";
+export const AUTH_REGISTER_ON_SOCKET = "auth/REGISTER_ON_SOCKET";
 
 /* Client-Server actions */
 export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";

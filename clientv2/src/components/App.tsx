@@ -9,7 +9,7 @@ import { SessionState } from "../redux/sessionStore/sessionTypes";
 import { Game } from "./game/Game";
 import { Home } from "./Home";
 import axios, { AxiosResponse } from 'axios';
-import { loginUser, logoutUser } from "../redux/sessionStore/sessionActions";
+import { registerOnSocket, logoutUser, loginUser } from "../redux/sessionStore/sessionActions";
 import processVariables from '../procVars'
 
 const { endpoint, serverUrl, mode } = processVariables
@@ -18,6 +18,7 @@ interface AppProps {
     sessionState: SessionState;
     loginUser?: Function
     logoutUser?: Function
+    registerOnSocket?: Function
 
 }
 interface AppState {
@@ -29,6 +30,7 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
     loginUser: loginUser,
+    registerOnSocket: registerOnSocket,
     logoutUser: logoutUser
 }
 
@@ -55,7 +57,10 @@ class App extends React.Component<AppProps, AppState> {
 
             }).then((res) => {
                 console.log(res.data)
-                if (res) this.props.loginUser(res.data)   
+                if (res) {
+                    this.props.loginUser(res.data)
+                    this.props.registerOnSocket(res.data);
+                }   
             }).catch((err) => {
                 
             })

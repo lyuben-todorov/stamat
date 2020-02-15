@@ -63,7 +63,6 @@ router.get('/restore', (req, res) => {
 
                     redisClient.get(_id, (err, sessionId) => {
                         redisClient.get(sessionId, (err, serializedSessionObject) => {
-                            console.log(serializedSessionObject)
                             if (!sessionId || serializedSessionObject == null) {
                                 // make new session id
                                 sessionId = jwt.sign({ username }, secret);
@@ -98,7 +97,6 @@ router.get('/restore', (req, res) => {
                                     .send(sessionObject);
                             } else {
                                 redisClient.get(sessionId, (err, serializedSessionObject) => {
-                                    console.log(sessionId);
                                     var sessionObject: UserSession = JSON.parse(serializedSessionObject);
                                     res.cookie('sessionId', sessionObject.sessionId).send(sessionObject);
                                 })

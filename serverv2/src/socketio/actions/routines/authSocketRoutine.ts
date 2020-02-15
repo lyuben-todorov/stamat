@@ -1,4 +1,4 @@
-import { AUTH_REQUEST_SESSION, AUTH_RESPOND_SESSION, AUTH_SESSION_UNKNOWN } from "socketio/models/ActionTypes";
+import { AUTH_REQUEST_SESSION, RESPOND_SESSION, SESSION_UNKNOWN } from "socketio/models/actions/ActionTypes";
 import { SocketActionTypes } from "socketio/models/actions/SocketAction";
 import { UserSession } from "socketio/models/sessions/UserSession";
 import createLogger from "createLogger";
@@ -20,7 +20,7 @@ export function actionCallback(this: EventContext, action: SocketActionTypes) {
 
         var payload = action.payload;
 
-        redisClient.get(payload.sessiondId, (err, res) => {
+        redisClient.get(payload.sessionId, (err, res) => {
             if (!err && _.isEmpty(res)) {
                 this.socketLogger.info("No session to restore found");
 
@@ -47,7 +47,7 @@ export function actionCallback(this: EventContext, action: SocketActionTypes) {
 
                 this.socket.emit('action',
                     new ActionBuilder()
-                        .setType(AUTH_RESPOND_SESSION)
+                        .setType(RESPOND_SESSION)
                         .setPayload(parsedUserSessionObject)
                         .build(), () => {
 
@@ -64,7 +64,7 @@ export function actionCallback(this: EventContext, action: SocketActionTypes) {
     } else {
         this.socket.emit('action',
             new ActionBuilder()
-                .setType(AUTH_SESSION_UNKNOWN)
+                .setType(SESSION_UNKNOWN)
                 .setPayload({})
                 .build()
         )
