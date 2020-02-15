@@ -52,6 +52,10 @@ matchIds:string[]
 ```
 autoAccept:boolean
 ```
+### Server Session Info
+```
+connected:boolean
+```
 ### Game Session Object
 Computed per player from game object in store.
 ```
