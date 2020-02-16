@@ -11,6 +11,4 @@ export interface EventContext {
     sessionList: MatchSessionList;
     personalChannel: Redis;
 
-    emit :Function
-    next: Function;
 }

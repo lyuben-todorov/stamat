@@ -8,18 +8,14 @@ import { Socket } from 'socket.io';
 export default function (io: SocketIO.Server) {
 
     io.on("connection", function actionCallback(socket: Socket) {
-        // var socketLogger: Logger = serverLogger;
-        // var userSession: UserSession;
-        // var sessionList: MatchSessionList;
-        // const personalChannel = new redis();
-
-        // var sessionLoaded: boolean = false;
 
         this.socket = socket;
         this.socketLogger.info("Socket connected");
 
         socket.on('action', loadSessionRoutine.bind(this));
 
+        // This bind here is critical. This is where we supply our further functions with this context.
+        // This is done for code separation and readablity  
     }.bind({
         socketLogger: serverLogger,
         userSession: {},
