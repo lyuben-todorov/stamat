@@ -1,14 +1,13 @@
 import _ from 'lodash';
 import { EventContext } from "../../EventContext";
-import { SocketActionTypes } from "../../models/actions/SocketAction";
+import { ActionTypes } from "../../models/actions/Action";
 import { AUTH_REGISTER_ON_SOCKET, SESSION_UNKNOWN, RESPOND_SESSION } from "../../models/actions/ActionTypes";
 import ActionBuilder from "../../models/actions/ActionBuilder";
 import createLogger from "../../../createLogger";
 import redisClient from "redis/redisClient";
 import { UserSession } from "socketio/models/sessions/UserSession";
 import { MatchSession } from "socketio/models/sessions/MatchSession";
-import mainStamatRoutine from './mainRoutine/mainSocketActionCallback';
-export default function actionCallback(this: EventContext, action: SocketActionTypes) {
+export default function actionCallback(this: EventContext, action: ActionTypes) {
     console.log("loadSession");
     var { type, payload } = action;
 
@@ -52,9 +51,6 @@ export default function actionCallback(this: EventContext, action: SocketActionT
                 }
             })
             
-
-
-
             this.socket.emit('action',
                 new ActionBuilder()
                     .setType(RESPOND_SESSION)

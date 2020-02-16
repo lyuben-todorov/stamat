@@ -1,4 +1,4 @@
-import { MatchSession } from "../sessions/MatchSession";
+import { MatchSession } from "../sessions/ServerMatchObject";
 import ChessParticipant from "./ChessParticipant";
 import { GameTypes } from "../GameTypes";
 

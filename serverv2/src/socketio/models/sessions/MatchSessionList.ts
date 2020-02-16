@@ -1,5 +1,5 @@
-import { MatchSession } from "./MatchSession";
+import PersonalMatchSession from "./PersonalMatchSession";
 
 export default interface MatchSessionList {
-    [key: string]: MatchSession;
+    [key: string]: PersonalMatchSession;
 }

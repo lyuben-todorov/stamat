@@ -1,4 +1,4 @@
-import SocketAction from "./SocketAction";
+import Action from "./Action";
 
 export default class ActionBuilder {
     private type: string;
@@ -13,7 +13,7 @@ export default class ActionBuilder {
         this.payload = payload
         return this;
     }
-    build(): SocketAction {
+    build(): Action {
         return { type: this.type, payload: this.payload }
     }
 
