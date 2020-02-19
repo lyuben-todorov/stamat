@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 import { RootState } from "../redux/rootReducer";
 import { SessionState } from "../redux/sessionStore/sessionTypes";
 import { Game } from "./game/Game";
-import { Home } from "./Home";
+import Home from "./Home";
 import axios, { AxiosResponse } from 'axios';
 import { registerOnSocket, logoutUser, loginUser } from "../redux/sessionStore/sessionActions";
 import processVariables from '../procVars'
@@ -60,9 +60,9 @@ class App extends React.Component<AppProps, AppState> {
                 if (res) {
                     this.props.loginUser(res.data)
                     this.props.registerOnSocket(res.data);
-                }   
+                }
             }).catch((err) => {
-                
+
             })
 
 
@@ -76,48 +76,48 @@ class App extends React.Component<AppProps, AppState> {
     render() {
         return (
             <div className="App">
-                    <Menu size='large'>
-                        <Container>
-                            <Menu.Item >
+                <Menu size='large'>
+                    <Container>
+                        <Menu.Item >
 
-                                Stamat
+                            Stamat
                                     </Menu.Item>
-                            <Menu.Item >
-                                <NavLink to={"/"}>Home</NavLink>
-                            </Menu.Item>
-                            <Menu.Item >
+                        <Menu.Item >
+                            <NavLink to={"/"}>Home</NavLink>
+                        </Menu.Item>
+                        <Menu.Item >
 
-                                <NavLink to={"/game"}>Game</NavLink>
-                            </Menu.Item>
-                            <Menu.Item position='right'>
-                                {this.props.sessionState.connected ?
-                                    <div>
-                                        <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
+                            <NavLink to={"/game"}>Game</NavLink>
+                        </Menu.Item>
+                        <Menu.Item position='right'>
+                            {this.props.sessionState.connected ?
+                                <div>
+                                    <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
 
-                                    </div>
-                                    :
-                                    <div>
-                                        <Button as={Link} 
-                                        to={"/login"} >Log in</Button>
-                                        <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
-                                    </div>
-                                }
-
-                            </Menu.Item>
-                        </Container>
-                    </Menu>
-                    <Switch>
-                        <Route path="/login" render={() => <Login />} />
-                        <Route path="/register" render={() => <Register />} />
-                        <Route path="/game" render={() =>
-                            this.props.sessionState.connected ?
-                                <Game > </Game>
+                                </div>
                                 :
-                                <Redirect to={"/login"}></Redirect>
-                        } />
-                        <Route path="/" render={() => <Home />} />
+                                <div>
+                                    <Button as={Link}
+                                        to={"/login"} >Log in</Button>
+                                    <Button as={Link} to={"/register"} primary={true} style={{ marginLeft: '0.5em' }}>Sign Up</Button>
+                                </div>
+                            }
 
-                    </Switch>
+                        </Menu.Item>
+                    </Container>
+                </Menu>
+                <Switch>
+                    <Route path="/login" render={() => <Login />} />
+                    <Route path="/register" render={() => <Register />} />
+                    <Route path="/game" render={() =>
+                        this.props.sessionState.connected ?
+                            <Game > </Game>
+                            :
+                            <Redirect to={"/login"}></Redirect>
+                    } />
+                    <Route path="/" render={() => <Home />} />
+
+                </Switch>
             </div>
         )
     }

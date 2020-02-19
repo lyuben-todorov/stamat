@@ -1,5 +1,5 @@
-import { EventContext } from "socketio/EventContext";
-import redisClient from "redis/redisClient";
+import { EventContext } from "../../../../socketio/EventContext";
+import redisClient from "../../../../redis/redisClient";
 import _ from 'lodash'
 export default function mainSocketDisconnectCallback(this: EventContext) {
     // persist session here

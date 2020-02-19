@@ -1,7 +1,7 @@
-import { EventContext } from "socketio/EventContext";
-import { ActionTypes } from "socketio/models/actions/Action";
+import { EventContext } from "../../../../socketio/EventContext";
+import { ActionTypes } from "../../../../socketio/models/actions/Action";
 import _ from 'lodash'
-import redisClient from "redis/redisClient";
+import redisClient from "../../../../redis/redisClient";
 export default function mainSocketActionCallback(this: EventContext, action: ActionTypes) {
     console.log("mainStamat");
 

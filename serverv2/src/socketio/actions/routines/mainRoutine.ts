@@ -1,4 +1,4 @@
-import { EventContext } from "socketio/EventContext";
+import { EventContext } from "../../../socketio/EventContext";
 import mainSocketDisconnectCallback from './mainRoutine/mainSocketDisconnectCallback';
 import mainSocketActionCallback from './mainRoutine/mainSocketActionCallback';
 import mainRedisMessageCallback from "./mainRoutine/mainRedisMessageCallback";

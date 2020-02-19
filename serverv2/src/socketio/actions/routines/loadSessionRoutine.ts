@@ -4,12 +4,9 @@ import { ActionTypes, AuthRegisterOnSocket } from "../../models/actions/Action";
 import { AUTH_REGISTER_ON_SOCKET, SESSION_UNKNOWN, RESPOND_SESSION, AUTH_REQUEST_SESSION } from "../../models/actions/ActionTypes";
 import ActionBuilder from "../../models/actions/ActionBuilder";
 import createLogger from "../../../createLogger";
-import redisClient from "redis/redisClient";
-import { UserSession } from "socketio/models/sessions/UserSession";
-import { MatchSession } from "socketio/models/sessions/ServerMatchObject";
-import PersonalMatchSession from 'socketio/models/sessions/PersonalMatchSession';
-import mainSocketActionCallback from './mainRoutine/mainSocketActionCallback';
-import mainSocketDisconnectCallback from './mainRoutine/mainSocketDisconnectCallback';
+import redisClient from "../../../redis/redisClient";
+import { UserSession } from "../../../socketio/models/sessions/UserSession";
+import PersonalMatchSession from '../../../socketio/models/sessions/PersonalMatchSession';
 import mainRoutine from './mainRoutine';
 export default function actionCallback(this: EventContext, action: ActionTypes) {
     console.log("loadSession");

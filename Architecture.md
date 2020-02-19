@@ -59,26 +59,26 @@ connected:boolean
 ### Game Session Object
 Computed per player from game object in store.
 ```
-matchId: String
+matchId: string
 
-playerName: String
-playerColor: String
-playerTime: String // individual time remaining in milliseconds 10*60*1000
+playerName: string
+playerColor: string
+playerTime: string // individual time remaining in milliseconds 10*60*1000
 
-opponentName: String
-opponentColor: String
-opponentTime: String
+opponentName: string
+opponentColor: string
+opponentTime: string
 
-onMove: Bool 
-issueTime: // unix time of issue by matchmaker
-gameTime: //  game time by spec  in seconds 
-gameType: Enum // CHESS, CHESS_360?, FISCHER_CHESS?
+onMove: boolean;
+issueTime: number // unix time of issue by matchmaker
+gameTime: number //  game time by spec  in seconds 
+gameType: GameTypes // CHESS, CHESS_360?, FISCHER_CHESS?
 
-finished: Bool
-winner: String
-chatHistory: MessageObject[]  // 
-position: String // fen string
-moveHistory: String //not verbose
+finished: boolean
+winner: string
+chatHistory: string[]  // 
+position: string // fen string
+moveHistory: string //not verbose
 ```
 
 # Socket actions

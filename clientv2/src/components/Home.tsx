@@ -4,16 +4,19 @@ import { RootState } from '../redux/rootReducer'
 import { testConnection } from '../redux/sessionStore/sessionActions'
 import { Button } from 'semantic-ui-react'
 import { UserSession } from '../redux/sessionStore/sessionPayloadTypes'
+import { SessionState } from '../redux/sessionStore/sessionTypes'
 interface HomeProps {
-    session: UserSession
+    session: SessionState
     testConnection: Function
 }
 interface HomeState {
 
 }
 
-export class Home extends React.Component<HomeProps, HomeState> {
-    state = {}
+class Home extends React.Component<HomeProps, HomeState> {
+    constructor(props:HomeProps){
+        super(props);
+    }
 
     render() {
         return (
@@ -26,11 +29,11 @@ export class Home extends React.Component<HomeProps, HomeState> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-    session: state.session
+    session:state.session
 })
 
 const mapDispatchToProps = {
-    testConnection: testConnection
+    testConnection:testConnection
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home)

@@ -1,10 +1,7 @@
-import IORedis = require("ioredis");
-import { EventContext } from "socketio/EventContext";
-import redisClient from "redis/redisClient";
-import { SERVER_REPLY_MATCHUP, CLIENT_START_GAME, CLIENT_SEND_CHAT_MESSAGE, CLIENT_RESUME_GAME, CLIENT_OFFER_DRAW, CLIENT_UPDATE_GAME, CLIENT_REPLY_DRAW, CLIENT_GAME_OVER } from "socketio/models/actions/ActionTypes";
-import { ActionTypes, ServerReplyMatchup, ClientStartGame, ClientSendChatMessage, ClientResumeGame, ClientOfferDraw, ClientUpdateGame, ClientReplyDraw, ClientGameOver } from "socketio/models/actions/Action";
-import serializeRedisMessage from "util/serializeRedisMessage";
-import { Server, Client } from "socket.io";
+import { EventContext } from "../../../../socketio/EventContext";
+import redisClient from "../../../../redis/redisClient";
+import { SERVER_REPLY_MATCHUP, CLIENT_START_GAME, CLIENT_SEND_CHAT_MESSAGE, CLIENT_RESUME_GAME, CLIENT_OFFER_DRAW, CLIENT_UPDATE_GAME, CLIENT_REPLY_DRAW, CLIENT_GAME_OVER } from "../../../../socketio/models/actions/ActionTypes";
+import { ActionTypes, ServerReplyMatchup, ClientStartGame, ClientSendChatMessage, ClientResumeGame, ClientOfferDraw, ClientUpdateGame, ClientReplyDraw, ClientGameOver } from "../../../../socketio/models/actions/Action";
 
 export default function mainRedisMessageCallback(this: EventContext, channel: string, message: string) {
     this.socketLogger.info("Redis message on: " + this.userSession.sessionId.slice(-5));
