@@ -6,7 +6,7 @@ import ActionBuilder from "../../models/actions/ActionBuilder";
 import createLogger from "../../../createLogger";
 import redisClient from "redis/redisClient";
 import { UserSession } from "socketio/models/sessions/UserSession";
-import { MatchSession } from "socketio/models/sessions/MatchSession";
+import { MatchSession } from "socketio/models/sessions/ServerMatchObject";
 export default function actionCallback(this: EventContext, action: ActionTypes) {
     console.log("loadSession");
     var { type, payload } = action;
