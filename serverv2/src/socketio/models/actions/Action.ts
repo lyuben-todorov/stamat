@@ -10,20 +10,22 @@ export default interface Action {
 }
 
 /* AUTH */
-interface AuthSessionUnknownAction extends Action {
+export interface AuthSessionUnknownAction extends Action {
     type: typeof SESSION_UNKNOWN;
     payload: never;
 }
 
-interface AuthRequestSessionAction extends Action {
+export interface AuthRequestSessionAction extends Action {
     type: typeof AUTH_REQUEST_SESSION;
     payload: {
         sessionId: string;
     }
 }
-interface AuthRegisterOnSocket extends Action {
+export interface AuthRegisterOnSocket extends Action {
     type: typeof AUTH_REGISTER_ON_SOCKET;
-    payload: never
+    payload: {
+        sessionId: string;
+    }
 }
 
 /* MATCHMAKING */
@@ -91,4 +93,5 @@ export type ActionTypes =
     ClientOfferDraw |
     ClientUpdateGame |
     ClientReplyDraw | 
-    ClientGameOver
+    ClientGameOver |
+    AuthRequestSessionAction
