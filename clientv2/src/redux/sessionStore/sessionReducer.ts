@@ -4,7 +4,8 @@ import {
     LOG_OUT_USER,
     LOG_IN_USER,
     AUTH_REGISTER_ON_SOCKET,
-    RESPOND_SESSION
+    RESPOND_SESSION,
+    AUTH_TEST_CONNECTION
 } from "./sessionTypes"
 
 const initialState: SessionState = {
@@ -26,7 +27,10 @@ export function sessionReducer(
 ): SessionState {
     switch (action.type) {
         case AUTH_REGISTER_ON_SOCKET:
-            return state
+            return state;
+        case AUTH_TEST_CONNECTION:
+            console.log(action.payload);
+            return state;
 
         case LOG_IN_USER:
             console.log("hi im " + action.payload);

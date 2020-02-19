@@ -20,19 +20,21 @@ export const LOG_OUT_USER = "LOG_OUT_USER";
 // this is the 404 message
 export const SESSION_UNKNOWN = "SESSION_UNKNOWN";
 
-
 export const RESPOND_SESSION = "RESPOND_SESSION";
 
 export const AUTH_REGISTER_ON_SOCKET = "auth/REGISTER_ON_SOCKET";
 
+export const AUTH_TEST_CONNECTION = "auth/TEST_CONNECTION";
 // hot action
 interface RegisterOnSocketAction {
     type: typeof AUTH_REGISTER_ON_SOCKET
-    payload: {sessionId:string}
+    payload: { sessionId: string }
 }
 
-
-
+interface TestConnectionAction {
+    type: typeof AUTH_TEST_CONNECTION;
+    payload: UserSession;
+}
 // cold actions
 interface LogInUserAction {
     type: typeof LOG_IN_USER
@@ -49,4 +51,5 @@ export type SessionActionTypes =
     RegisterOnSocketAction |
     LogoutUserAction |
     LogInUserAction |
-    RespondSessionAction
+    RespondSessionAction |
+    TestConnectionAction

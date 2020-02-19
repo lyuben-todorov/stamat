@@ -9,6 +9,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Act
 
     switch (type) {
         default:
+            console.log(this.userSession);
             break;
     }
 }
