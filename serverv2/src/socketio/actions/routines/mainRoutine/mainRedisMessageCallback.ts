@@ -1,10 +1,10 @@
 import IORedis = require("ioredis");
 import { EventContext } from "socketio/EventContext";
 import redisClient from "redis/redisClient";
-import { SERVER_REPLY_MATCHUP, CLIENT_START_GAME, CLIENT_SEND_CHAT_MESSAGE, CLIENT_RESUME_GAME } from "socketio/models/actions/ActionTypes";
-import { ActionTypes, ServerReplyMatchup, ClientStartGame, ClientSendChatMessage, ClientResumeGame } from "socketio/models/actions/Action";
+import { SERVER_REPLY_MATCHUP, CLIENT_START_GAME, CLIENT_SEND_CHAT_MESSAGE, CLIENT_RESUME_GAME, CLIENT_OFFER_DRAW, CLIENT_UPDATE_GAME, CLIENT_REPLY_DRAW, CLIENT_GAME_OVER } from "socketio/models/actions/ActionTypes";
+import { ActionTypes, ServerReplyMatchup, ClientStartGame, ClientSendChatMessage, ClientResumeGame, ClientOfferDraw, ClientUpdateGame, ClientReplyDraw, ClientGameOver } from "socketio/models/actions/Action";
 import serializeRedisMessage from "util/serializeRedisMessage";
-import { Server } from "socket.io";
+import { Server, Client } from "socket.io";
 
 export default function mainRedisMessageCallback(this: EventContext, channel: string, message: string) {
     this.socketLogger.info("Redis message on: " + this.userSession.sessionId.slice(-5));
@@ -86,26 +86,37 @@ export default function mainRedisMessageCallback(this: EventContext, channel: st
                 break;
             }
         case CLIENT_OFFER_DRAW:
-            socket.emit('action', { type: CLIENT_SEND_CHAT_MESSAGE, payload: { message: "Opponent is offering a draw.", channel: "opponent", sender: "server" } });
-            socket.emit('action', { type: CLIENT_OFFER_DRAW, payload: { gameId: payload.gameId } });
-            break;
-        // case CLIENT_UPDATE_GAME:
-        //     // update socket chess instance;
-        //     // this move has already been verified by the server
-        //     chess.move(payload.move)
-        //     socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload });
-        //     break;
-        // case GAME_REPLY_DRAW:
-        //     socket.emit('action', { type: CLIENT_SEND_CHAT_MESSAGE, payload: { message: "Opponent denied draw", channel: "opponent", sender: "server" } });
+            {
+                const { payload } = messageObject as ClientOfferDraw
+                this.socket.emit('action', { type: CLIENT_SEND_CHAT_MESSAGE, payload: { message: "Opponent is offering a draw.", channel: "opponent", sender: "server" } });
+                this.socket.emit('action', { type: CLIENT_OFFER_DRAW, payload: payload});
+                break;
+            }
+        case CLIENT_UPDATE_GAME:
+            // General action for opponent moves and game changes.
+            // Already verified by server
+            {
+                const { payload } = messageObject as ClientUpdateGame
+                this.chess.move(payload.move)
+                this.socket.emit('action', { type: CLIENT_UPDATE_GAME, payload: payload });
+                break;
 
-        //     socket.emit('action', { type: CLIENT_REPLY_DRAW, payload: { reply: payload.reply } })
-        //     break;
-        // // in case game isn't ended by a move
-        // case CLIENT_GAME_OVER:
+            }
+        case CLIENT_REPLY_DRAW:
+            {
+                const { payload } = messageObject as ClientReplyDraw
+                // Only sent when opponent replied with a deny. Otherwise the server just sends a GAME_OVER.
+                this.socket.emit('action', { type: CLIENT_SEND_CHAT_MESSAGE, payload: { message: "Opponent denied draw", channel: "opponent", sender: "server" } });
 
-        //     socket.emit('action', { type: CLIENT_GAME_OVER, payload: { winner: payload.winner } });
-        //     flushState();
+                this.socket.emit('action', { type: CLIENT_REPLY_DRAW, payload: payload })
+                break;
+            }
+        case CLIENT_GAME_OVER:
 
-        //     break;
+            {
+                const { payload } = messageObject as ClientGameOver
+                this.socket.emit('action', { type: CLIENT_GAME_OVER, payload: payload });
+                break;
+            }
     }
 }
