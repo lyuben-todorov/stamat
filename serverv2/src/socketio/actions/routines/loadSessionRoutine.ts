@@ -1,4 +1,6 @@
 import _ from 'lodash';
+import redis from 'ioredis';
+
 import { EventContext } from "../../EventContext";
 import { ActionTypes, AuthRegisterOnSocket } from "../../models/actions/Action";
 import { AUTH_REGISTER_ON_SOCKET, SESSION_UNKNOWN, RESPOND_SESSION, AUTH_REQUEST_SESSION } from "../../models/actions/ActionTypes";
@@ -8,8 +10,10 @@ import redisClient from "../../../redis/redisClient";
 import { UserSession } from "../../../socketio/models/sessions/UserSession";
 import PersonalMatchSession from '../../../socketio/models/sessions/PersonalMatchSession';
 import mainRoutine from './mainRoutine';
+import mainSocketDisconnectCallback from './mainRoutine/mainSocketDisconnectCallback';
+import mainSocketActionCallback from './mainRoutine/mainSocketActionCallback';
+import mainRedisMessageCallback from './mainRoutine/mainRedisMessageCallback';
 export default function actionCallback(this: EventContext, action: ActionTypes) {
-    console.log("loadSession");
     var { type } = action;
 
     switch (type) {
@@ -21,7 +25,7 @@ export default function actionCallback(this: EventContext, action: ActionTypes) 
             //set session here
             this.socketLogger = createLogger(payload.sessionId.slice(-5));
 
-            this.socketLogger.info("Session registered:" + payload.sessionId.slice(-5));
+            this.socketLogger.info("Session registered: " + payload.sessionId.slice(-5));
 
 
 
@@ -31,8 +35,6 @@ export default function actionCallback(this: EventContext, action: ActionTypes) 
 
                 } else {
                     var parsedUserSessionObject: UserSession = JSON.parse(res);
-
-                    this.socketLogger = createLogger(parsedUserSessionObject.sessionId);
 
                     this.socketLogger.info("Socket session retrieved successfully");
 
@@ -51,7 +53,15 @@ export default function actionCallback(this: EventContext, action: ActionTypes) 
 
                     this.socket.removeListener('action', actionCallback)
 
-                    mainRoutine.call(this);
+
+                    this.socket.on('disconnect', mainSocketDisconnectCallback.bind(this));
+                    this.socket.on('action', mainSocketActionCallback.bind(this));
+
+                    this.personalChannel = new redis();
+                    this.personalChannel.subscribe(this.userSession.sessionId);
+                
+                    this.personalChannel.on('message', mainRedisMessageCallback.bind(this));
+                    // mainRoutine.call(this);
                 }
             })
 

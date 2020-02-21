@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { RootState } from '../../redux/rootReducer'
+import { Grid } from 'semantic-ui-react'
+import MenuWindow from './MenuWindow/MenuWindow'
+import MoveWindow from './MoveWindow/MoveWindow'
 
 interface GameProps {
 
@@ -14,9 +17,19 @@ export class Game extends React.Component<GameProps, GameState> {
 
     render() {
         return (
-            <div>
-                Game
-            </div>
+            <Grid stackable divided="vertically">
+                <Grid.Row columns={3}>
+                    <Grid.Column className="flexbox" width={4}>
+                        <MenuWindow />
+                    </Grid.Column>
+                    <Grid.Column width={8}>
+                        da {/* <ChessGame className="MainChessboard" /> */}
+                    </Grid.Column>
+                    <Grid.Column className="flexbox" width={4}>
+                        <MoveWindow />
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
         )
     }
 }
