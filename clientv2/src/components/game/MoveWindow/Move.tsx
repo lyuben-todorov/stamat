@@ -9,6 +9,8 @@ interface Props {
         flags: string;
     }
     index: number;
+    type: string;
+    className: string;
 }
 interface State {
     icon: string;

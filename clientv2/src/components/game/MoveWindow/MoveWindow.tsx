@@ -8,8 +8,28 @@ import { RootState } from '../../../redux/rootReducer';
 interface State {
     userTimer: React.RefObject<any>;
     opponentTimer: React.RefObject<any>;
+    gameTime: number;
+    opponentTime: number;
+    userTime: number;
+    active: string;
+    offeringDraw: true | false;
+    playerOfferingDraw: true | false;
+    opponent: string;
+    gameOver: true | false;
 }
 interface Props {
+
+    //to be impl.
+    action: string;
+    game: any;
+    moveCount: number;
+    color: string;
+    history: any;
+    username: string;
+
+    concedeGame: Function;
+    replyDraw: Function;
+    offerDraw: Function;
 
 }
 
@@ -18,17 +38,15 @@ class MoveWindow extends React.Component<Props, State> {
         super(props);
         this.state = {
             userTimer: React.createRef(),
-            opponentTimer: React.createRef()
-        }
-
-        this.state = {
+            opponentTimer: React.createRef(),
             gameTime: 600000,
             opponentTime: 600000,
             userTime: 600000,
             active: "none",
             offeringDraw: false,
             playerOfferingDraw: false,
-            opponent: "None"
+            opponent: "None",
+            gameOver: false,
         }
     }
 
@@ -38,20 +56,20 @@ class MoveWindow extends React.Component<Props, State> {
 
             if (this.props.moveCount !== prevProps.moveCount) {
                 if (this.props.action === "clientMove") {
-                    this.userTimer.current.stop()
-                    this.opponentTimer.current.start();
+                    this.state.userTimer.current.stop()
+                    this.state.opponentTimer.current.start();
                     this.setState({ active: "opponent" })
 
                 } else if (this.props.action === "opponentMove") {
 
-                    this.userTimer.current.start()
-                    this.opponentTimer.current.stop();
+                    this.state.userTimer.current.start()
+                    this.state.opponentTimer.current.stop();
                     this.setState({ active: "user" })
                 }
             }
             if (this.props.action === "gameOver") {
-                this.userTimer.current.stop();
-                this.opponentTimer.current.stop()
+                this.state.userTimer.current.stop();
+                this.state.opponentTimer.current.stop()
                 this.setState({ playerOfferingDraw: false, gameOver: true })
             }
             if (this.props.action === "offerDraw") {
@@ -62,15 +80,15 @@ class MoveWindow extends React.Component<Props, State> {
                 this.setState({ playerOfferingDraw: true })
             }
             if (this.props.game !== prevProps.game) {
-                if (this.props.action === "clientMove" || this.props === "opponentMove") {
+                if (this.props.action === "clientMove" || this.props.action === "opponentMove") {
                     let { blackTime, whiteTime } = this.props.game;
                     if (this.props.color.charAt(0) === 'w') {
-                        this.userTimer.current.setTime(whiteTime);
-                        this.opponentTimer.current.setTime(blackTime);
+                        this.state.userTimer.current.setTime(whiteTime);
+                        this.state.opponentTimer.current.setTime(blackTime);
                     } else {
 
-                        this.userTimer.current.setTime(blackTime)
-                        this.opponentTimer.current.setTime(whiteTime);
+                        this.state.userTimer.current.setTime(blackTime)
+                        this.state.opponentTimer.current.setTime(whiteTime);
                     }
 
                 }
@@ -89,20 +107,20 @@ class MoveWindow extends React.Component<Props, State> {
                         }
                     }
                     if (this.props.color.charAt(0) === 'w') {
-                        this.userTimer.current.setTime(whiteTime);
-                        this.opponentTimer.current.setTime(blackTime);
+                        this.state.userTimer.current.setTime(whiteTime);
+                        this.state.opponentTimer.current.setTime(blackTime);
                     } else {
 
-                        this.userTimer.current.setTime(blackTime)
-                        this.opponentTimer.current.setTime(whiteTime);
+                        this.state.userTimer.current.setTime(blackTime)
+                        this.state.opponentTimer.current.setTime(whiteTime);
                     }
 
                     if ((this.props.color.charAt(0) === 'w') === (toMove === 'w')) {
-                        this.userTimer.current.start();
+                        this.state.userTimer.current.start();
 
                         this.setState({ active: "user", opponent: opponent })
                     } else {
-                        this.opponentTimer.current.start();
+                        this.state.opponentTimer.current.start();
                         this.setState({ active: "opponent", opponent: opponent })
                     }
                 }
@@ -110,7 +128,7 @@ class MoveWindow extends React.Component<Props, State> {
             }
         }
     }
-    renderNumbers(time) {
+    renderNumbers(time: number) {
         return time < 10 ? `0${time}` : `${time}`
     }
 
@@ -120,7 +138,7 @@ class MoveWindow extends React.Component<Props, State> {
             <Grid className="MoveWindow">
 
                 <div className={this.state.active === "opponent" ? "Timer active" : "Timer"}>
-                    <Timer ref={this.opponentTimer} startImmediately={false} timeToUpdate={1000} initialTime={this.state.opponentTime} direction={"backward"} >
+                    {/* <Timer ref={this.state.opponentTimer} startImmediately={false} timeToUpdate={1000} initialTime={this.state.opponentTime} direction={"backward"} >
                         {() => (
 
                             <div className="CenterContainer">
@@ -133,7 +151,7 @@ class MoveWindow extends React.Component<Props, State> {
                             </div>
                         )
                         }
-                    </Timer>
+                    </Timer> */}
                 </div>
                 <Segment className="PlayerBox">
                     <Menu>
@@ -151,8 +169,8 @@ class MoveWindow extends React.Component<Props, State> {
 
                 <Segment className="MoveBox">
                     <Grid className="MoveGrid" columns={2}>
-                        {this.props.history.map((message, index) => (
-                            <Move className="Move" onMessageAction={this.onMessageAction} type={"history"} index={index} key={index} message={message}></Move>
+                        {this.props.history.map((message: any, index: number) => (
+                            <Move className="Move" type={"history"} index={index} key={index} message={message}></Move>
                         ))}
                     </Grid>
                 </Segment>
@@ -163,7 +181,7 @@ class MoveWindow extends React.Component<Props, State> {
                         <Menu.Item className="User">
                             <Icon name={"circle"} color={"green"}></Icon>
                             <div className="Username">
-                                {this.props.sessionStore.username}
+                                {this.props.username}
                             </div>
                         </Menu.Item>
                         <Menu.Item>
@@ -196,7 +214,7 @@ class MoveWindow extends React.Component<Props, State> {
                 </Segment>
                 <div className={this.state.active === "user" ? "Timer active" : "Timer"}>
 
-                <Timer ref={this.userTimer} startImmediately={false} timeToUpdate={1000} initialTime={this.state.userTime} direction={"backward"} >
+                    {/* <Timer ref={this.userTimer} startImmediately={false} timeToUpdate={1000} initialTime={this.state.userTime} direction={"backward"} >
                         {() => (
 
                             <div className="CenterContainer">
@@ -208,7 +226,7 @@ class MoveWindow extends React.Component<Props, State> {
                                 </div>
                             </div>
                         )}
-                    </Timer>
+                    </Timer> */}
                 </div>
 
             </Grid>
@@ -218,15 +236,16 @@ class MoveWindow extends React.Component<Props, State> {
 }
 const mapStateToProps = (state: RootState/*, ownProps*/) => {
     return {
-        game: state.game,
-        moveCount: state.moveCount,
-        history: state.history,
-        action: state.action,
-        sessionId: state.sessionId,
-        color: state.color
+        game: "",
+        moveCount: 0,
+        history: "",
+        action: "",
+        sessionId: "",
+        color: "",
+        username:""
     }
 }
-const mapDispatchToProps = { concedeGame, offerDraw, replyDraw }
+const mapDispatchToProps = { concedeGame: () => { }, offerDraw: () => { }, replyDraw: () => { } }
 
 export default connect(
     mapStateToProps,

@@ -1,32 +1,32 @@
-import React, { Component } from 'react'
+import * as React from 'react'
 import { Message as SemanticMessage } from 'semantic-ui-react'
-import { CLIENT_PROPOSE_MATCHUP, CLIENT_GAME_OVER } from '../../../actions';
+import { CLIENT_PROPOSE_MATCHUP, CLIENT_GAME_OVER } from '../../../../../redux/matchStore/matchTypes';
 
-
-export default class Message extends Component {
-    constructor(props) {
+interface State {
+    time: string;
+    className: string;
+}
+interface Props {
+    level: string;
+    type: string;
+    message: string;
+}
+export default class Message extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props)
         const time = new Date().toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
         let className
         if (this.props.level === "server") {
             className = "Message Server"
 
-		className = "Message";
+            className = "Message";
         }
         this.state = {
             time: time.toString(),
             className: className,
         }
     }
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
 
-        this.setState({
-            [name]: value
-        });
-    }
     render() {
         var messageBody;
 
@@ -80,7 +80,6 @@ export default class Message extends Component {
 
         return (
             <SemanticMessage className={this.state.className}>
-
 
                 <div className="MessageBody flexbox">
                     {messageBody}

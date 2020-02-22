@@ -1,15 +1,27 @@
-import React, { Component } from 'react'
-import { observer } from 'mobx-react';
+import * as React from 'react'
 import Message from './Message';
 
-import { startMatchmaking, replyMatchmaking } from '../../../redux/actionCreators'
+// import { startMatchmaking, replyMatchmaking } from '../../../redux/actionCreators'
 import { connect } from 'react-redux';
-import { CLIENT_PROPOSE_MATCHUP, CLIENT_GAME_OVER, CLIENT_SEND_CHAT_MESSAGE } from '../../../actions';
+import { CLIENT_PROPOSE_MATCHUP, CLIENT_GAME_OVER, CLIENT_SEND_CHAT_MESSAGE } from '../../../../../redux/matchStore/matchTypes';
+import { RootState } from '../../../../../redux/rootReducer';
 
+interface Props {
 
-@observer
-class MessageBox extends Component {
-        constructor(props) {
+        action: string;
+        chatHistory: any;
+        winner: string;
+        opponentName: string;
+        latestMessage: any;
+        sessionId: string;
+        username: string;
+}
+interface State {
+        messages: any;
+}
+
+class MessageBox extends React.Component<Props, State> {
+        constructor(props: Props) {
                 super(props);
                 this.state = {
                         messages: [],
@@ -21,7 +33,7 @@ class MessageBox extends Component {
         componentDidMount() {
                 this.addMessage("greet", "hi");
         }
-        addMessage(type, message, level = "server") {
+        addMessage(type: string, message?: string, level = "server") {
 
                 this.setState(state => {
                         const messages = [...state.messages, {
@@ -33,7 +45,7 @@ class MessageBox extends Component {
                 })
         }
 
-        componentDidUpdate(prevProps) {
+        componentDidUpdate(prevProps: Props) {
                 if (this.props.action !== prevProps.action || this.props.chatHistory !== prevProps.chatHistory) {
                         switch (this.props.action) {
                                 case "initiateGame" || "resumeGame":
@@ -54,7 +66,7 @@ class MessageBox extends Component {
                                         break;
                                 case "ownMessage":
                                         this.addMessage("client", this.props.latestMessage.message, "opponent")
-					break;
+                                        break;
                                 default:
                                         break;
                         }
@@ -69,7 +81,7 @@ class MessageBox extends Component {
                         return { messages }
                 })
         }
-        addTextMessage(message) {
+        addTextMessage(message: string) {
                 this.setState(state => {
                         const messages = [...state.messages, { type: CLIENT_SEND_CHAT_MESSAGE, message: message }]
                         return { messages }
@@ -79,7 +91,7 @@ class MessageBox extends Component {
         render() {
                 return (
                         <div className="ChatHistory">
-                                {this.state.messages.map((message, index) => (
+                                {this.state.messages.map((message: any, index: number) => (
                                         <Message type={message.type} level={message.level} key={index} message={message.message}></Message>
                                 ))}
 
@@ -89,21 +101,19 @@ class MessageBox extends Component {
         }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: RootState) => {
         return {
-                userType: state.userType,
-                gameState: state.gameState,
-                sessionId: state.sessionId,
-                opponentName: state.opponentName,
-                winner: state.winner,
-                username: state.username,
-                action: state.action,
-                latestMessage: state.latestMessage,
-                chatHistory: state.chatHistory
+                action: "string",
+                chatHistory: "",
+                winner: "",
+                opponentName: "",
+                latestMessage: "any",
+                sessionId: "string",
+                username: "string"
         }
 }
 
-const mapDispatchToProps = { startMatchmaking, replyMatchmaking }
+const mapDispatchToProps = { startMatchmaking: () => { }, replyMatchmaking: () => { } }
 
 export default connect(
         mapStateToProps,
