@@ -2,10 +2,12 @@ import { sessionReducer } from './sessionStore/sessionReducer';
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 import createSocketIoMiddleware from 'redux-socket.io';
 import { rootSocket } from './rootSocket';
+import { matchReducer } from './matchStore/matchReducer';
 
-const socketMiddleware = createSocketIoMiddleware(rootSocket, ["auth/"])
+const socketMiddleware = createSocketIoMiddleware(rootSocket, ["auth/", "client/"])
 const rootReducer = combineReducers({
-    session: sessionReducer
+    session: sessionReducer,
+    match: matchReducer
 })
 
 export type RootState = ReturnType<typeof rootReducer>

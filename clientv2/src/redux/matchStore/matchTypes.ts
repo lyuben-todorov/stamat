@@ -1,6 +1,4 @@
-export interface MatchState {
-
-}
+import { MatchSession } from "./models/MatchSession";
 
 /* Client-Server actions */
 export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
@@ -33,7 +31,14 @@ export const CLIENT_RESUME_SESSION = "client/RESUME_SESSION"
 /* Client-Matchmaker actions */
 export const MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"
 
-interface GeneralMatchAction {
-    type: typeof SERVER_START_MATCHMAKING
+export const CLIENT_FOUND_GAME = "client/FOUND_GAME";
+
+
+interface ClientFoundGameAction {
+    type: typeof CLIENT_FOUND_GAME,
+    payload: {
+        gameObject:MatchSession
+    }
 }
-export type MatchActionTypes = GeneralMatchAction
+export type MatchActionTypes = 
+ClientFoundGameAction 

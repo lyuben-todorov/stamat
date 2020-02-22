@@ -34,6 +34,17 @@ module.exports = {
                     'sass-loader',
                 ],
             },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                ],
+            },
+            {
+                test: /\.svg$/,
+                loader: 'file-loader'
+            },
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             {
                 enforce: "pre",
@@ -51,7 +62,7 @@ module.exports = {
         contentBase: path.join(__dirname, "public/"),
         port: 3000,
         publicPath: "http://localhost:3000/",
-        historyApiFallback:true
+        historyApiFallback: true
     },
     plugins: [new webpack.HotModuleReplacementPlugin()],
 

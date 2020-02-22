@@ -24,7 +24,7 @@ interface Props {
     game: any;
     moveCount: number;
     color: string;
-    history: any;
+    history: any[];
     username: string;
 
     concedeGame: Function;
@@ -169,9 +169,9 @@ class MoveWindow extends React.Component<Props, State> {
 
                 <Segment className="MoveBox">
                     <Grid className="MoveGrid" columns={2}>
-                        {this.props.history.map((message: any, index: number) => (
+                        {/* {this.props.history.map((message: any, index: number) => (
                             <Move className="Move" type={"history"} index={index} key={index} message={message}></Move>
-                        ))}
+                        ))} */}
                     </Grid>
                 </Segment>
 
@@ -238,7 +238,7 @@ const mapStateToProps = (state: RootState/*, ownProps*/) => {
     return {
         game: "",
         moveCount: 0,
-        history: "",
+        history: {},
         action: "",
         sessionId: "",
         color: "",

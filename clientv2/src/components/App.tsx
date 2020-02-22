@@ -5,8 +5,8 @@ import Register from "./auth/Register";
 import Login from "./auth/Login";
 import { connect } from "react-redux";
 import { RootState } from "../redux/rootReducer";
-import { SessionState } from "../redux/sessionStore/sessionTypes";
-import { Game } from "./game/Game";
+import { SessionState } from "../redux/sessionStore/sessionReducer";
+import Game from "./game/Game";
 import Home from "./Home";
 import axios, { AxiosResponse } from 'axios';
 import { registerOnSocket, logoutUser, loginUser } from "../redux/sessionStore/sessionActions";
@@ -24,22 +24,13 @@ interface AppProps {
 interface AppState {
     loggedIn: Boolean
 }
-const mapState = (state: RootState) => ({
-    sessionState: state.session
-})
-
-const mapDispatch = {
-    loginUser: loginUser,
-    registerOnSocket: registerOnSocket,
-    logoutUser: logoutUser
-}
 
 class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
         super(props);
 
         this.state = {
-            loggedIn: false
+            loggedIn: this.props.sessionState.connected
         }
 
         const session = localStorage.getItem('session');
@@ -60,6 +51,7 @@ class App extends React.Component<AppProps, AppState> {
                 if (res) {
                     this.props.loginUser(res.data)
                     this.props.registerOnSocket(res.data);
+                    this.setState({ loggedIn: true });
                 }
             }).catch((err) => {
 
@@ -90,7 +82,7 @@ class App extends React.Component<AppProps, AppState> {
                             <NavLink to={"/game"}>Game</NavLink>
                         </Menu.Item>
                         <Menu.Item position='right'>
-                            {this.props.sessionState.connected ?
+                            {this.state.loggedIn ?
                                 <div>
                                     <Button as={Link} to={"/"} onClick={this.handleLogout} >Log Out</Button>
 
@@ -109,18 +101,22 @@ class App extends React.Component<AppProps, AppState> {
                 <Switch>
                     <Route path="/login" render={() => <Login />} />
                     <Route path="/register" render={() => <Register />} />
-                    <Route path="/game" render={() =>
-                        this.props.sessionState.connected ?
-                            <Game > </Game>
-                            :
-                            <Redirect to={"/login"}></Redirect>
-                    } />
+                    <Route path="/game" render={() => <Game />} />
                     <Route path="/" render={() => <Home />} />
 
                 </Switch>
             </div>
         )
     }
+}
+const mapState = (state: RootState) => ({
+    sessionState: state.session
+})
+
+const mapDispatch = {
+    loginUser: loginUser,
+    registerOnSocket: registerOnSocket,
+    logoutUser: logoutUser
 }
 
 

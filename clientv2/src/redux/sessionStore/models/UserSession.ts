@@ -1,4 +1,4 @@
-export interface UserSession{
+export default interface UserSession{
     sessionId:string
     username:string
     email:string

@@ -1,0 +1,286 @@
+.MenuWindow {
+    display: flex !important;
+    width: 100%;
+    padding: 0;
+    margin: auto !important;
+    margin-left: 20px !important;
+    max-height: 100%;
+    height: 100%;
+    max-height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+
+    .Menu {
+        max-height: 6%;
+
+    }
+
+    .Content {
+        max-height: 94%;
+        height: 94%;
+
+        .MenuRouter {
+            height: 100%;
+        }
+
+        .MatchmakingBox {
+            height: 100%;
+
+
+            .Dropdown {
+                width: 100%;
+                line-height: 2em;
+                font-size: 16pt !important;
+                text-align: center;
+                margin: 5px;
+
+                .mainIcon {
+                    font-size: 1.5em !important;
+                    width: 20%;
+                }
+
+                .icon,
+                .item {
+                    //width:25%;
+                    text-align: right;
+                    font-size: 1em;
+                }
+            }
+
+            button.SubmitButton {
+                position: absolute !important;
+                left: 50%;
+                width: 90%;
+                margin-left: -45%;
+                height: 50px;
+                bottom: 5%;
+            }
+
+        }
+
+        .ChatBox {
+            height: 100%;
+            width: 100%;
+            max-height: 100%;
+            overflow-y: auto;
+
+            .ChatHistory {
+                height: 60vh;
+                overflow-y: auto;
+
+                .Message {
+                    text-align: center;
+                    background-color: rgba(200, 200, 200, 0.322);
+                    box-shadow: none;
+                    height: 30px !important;
+                    padding: 5px 1.5em !important;
+
+                    text-align: center;
+                    color: rgb(99, 99, 99);
+                    font: size 10pt;
+                    ;
+
+                    .MessageBody {
+                        float: left;
+                    }
+
+                    .MessageTime {
+                        float: right;
+                        font-size: 10pt;
+                    }
+
+                    .Sender {
+                        font-weight: bold;
+                        margin-right: 10px;
+                    }
+                }
+
+
+                .Message.Server {
+                    background-color: transparent;
+                    text-align: center;
+                    color: rgb(99, 99, 99);
+                    font-size: 16pt;
+                    font-style: italic;
+                }
+            }
+
+            .input {
+
+                padding: 0;
+                margin: 0;
+                width: 100%;
+                height: 30px;
+            }
+        }
+    }
+}
+
+.segment {
+    background: #ededed !important;
+    border-radius: 0 !important;
+}
+
+.flexbox {
+    display: flex !important;
+}
+
+.MoveWindow {
+    display: flex !important;
+    width: 100%;
+    padding: 0;
+    margin: auto !important;
+    margin-right: 20px !important;
+    max-height: 100%;
+
+    .Timer {
+        color: rgb(63, 63, 63);
+        background-color: rgba(200, 200, 200, 0.658);
+        width: 100%;
+        font-size: 3em;
+        line-height: 1;
+        text-align: center;
+        margin: auto;
+        margin-bottom: 5px;
+        margin-top: 5px;
+
+        .CenterContainer {
+            width: fit-content;
+            text-align: center;
+            margin: auto;
+
+            .TimerNumber {
+                padding: 0px 10px;
+                font-size: 1.5em;
+                float: left;
+            }
+        }
+    }
+
+    .Timer.active {
+        background-color: rgb(63, 63, 63);
+        color: white;
+        ;
+    }
+
+    .MoveBox {
+
+        .Move {
+            width: 50%;
+            background-color: white !important;
+            margin: 0 !important;
+            font-size: 2em;
+            font-weight: bold;
+            max-height: 2em;
+            padding: 0.5em;
+            text-align: center;
+            border-radius: 0em;
+            border: none;
+            border-top: 2px solid rgba(200, 200, 200, 0.5) !important;
+
+
+        }
+
+        .MoveNumber {
+            padding: 1rem 0em 1rem 0em !important;
+            border-right: 2px solid rgba(200, 200, 200, 0.658) !important;
+        }
+
+        .Move.Black {
+            background-color: black !important;
+            color: white;
+        }
+
+
+        overflow-y: scroll;
+        height: 16em;
+        margin: auto;
+        width: 100%;
+        max-height: 100%;
+        overflow: auto;
+        display: flex;
+        flex-direction: column-reverse;
+
+    }
+
+    .PlayerBox {
+        text-align: left;
+        width: 100%;
+
+        .User {
+            .Username {
+                padding-left: 5px;
+            }
+        }
+
+        .icon {
+            margin: auto !important;
+        }
+    }
+
+}
+
+.Home {
+    font-size: 18pt;
+
+    .GamePreview {
+        width: 70%;
+        margin: auto;
+        margin-top: 1em;
+        margin-bottom: 1em;
+
+        .Game {
+            display: flex;
+            flex-direction: row;
+            .WinnerText{
+                margin:auto;
+                line-height: 200px;
+            }
+        }
+    }
+
+    .MoveBox {
+
+        .MoveGrid {
+            overflow-y: auto;
+        }
+
+        .Move {
+            width: 50%;
+            background-color: white !important;
+            margin: 0 !important;
+            font-size: 2em;
+            font-weight: bold;
+            max-height: 2em;
+            padding: 0.5em;
+            text-align: center;
+            border-radius: 0em;
+            border: none;
+            border-top: 2px solid rgba(200, 200, 200, 0.5) !important;
+        }
+
+        .MoveNumber {
+            padding: 1rem 0em 1rem 0em !important;
+            border-right: 2px solid rgba(200, 200, 200, 0.658) !important;
+        }
+
+        .Move.Black {
+            background-color: black !important;
+            color: white;
+        }
+
+
+        height: 200px;
+        margin: auto;
+        width: 100%;
+
+    }
+
+    .segment {
+        font-size: 14pt;
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        flex-direction: column;
+    }
+}

@@ -1,5 +1,4 @@
 import {
-    SessionState,
     SessionActionTypes,
     LOG_OUT_USER,
     LOG_IN_USER,
@@ -7,6 +6,20 @@ import {
     RESPOND_SESSION,
     AUTH_TEST_CONNECTION
 } from "./sessionTypes"
+
+
+export interface SessionState {
+    sessionId: string
+    username: string
+    email: string
+    inMatch: boolean
+    connected: boolean
+    matchIds: string[]
+    //session settings, matchmaker settings
+    autoAccept: boolean
+    userType: string
+
+}
 
 const initialState: SessionState = {
     sessionId: "",

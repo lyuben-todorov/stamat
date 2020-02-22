@@ -1,17 +1,4 @@
-import { UserSession } from "./sessionPayloadTypes";
-
-export interface SessionState {
-    sessionId: string
-    username: string
-    email: string
-    inMatch: boolean
-    connected: boolean
-    matchIds: string[]
-    //session settings, matchmaker settings
-    autoAccept: boolean
-    userType: string
-
-}
+import UserSession from "./models/UserSession";
 
 export const LOG_IN_USER = "LOG_IN_USER";
 export const LOG_OUT_USER = "LOG_OUT_USER";

@@ -82,7 +82,7 @@ class MenuWindow extends React.Component<MenuProps, MenuState> {
 
 const mapStateToProps = (state: RootState) => ({
     // to be implemented
-    gameState:"to be implemented"
+    gameState:"default"
 })
 const mapDispatchToProps = {
 
