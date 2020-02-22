@@ -33,6 +33,7 @@ export const CLIENT_SEND_CHAT_MESSAGE = "client/SEND_CHAT_MESSAGE"
 
 export const CLIENT_RESUME_GAME = "client/RESUME_GAME";
 
+export const CLIENT_FOUND_GAME = "client/FOUND_GAME";
 
 /* Client-Matchmaker actions */
 export const MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"

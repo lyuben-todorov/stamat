@@ -41,12 +41,12 @@ router.post('/register', (req, res) => {
 // if the token is valid the server tries to retrieve session 
 // if there is a session the cookie session is sent
 // otherwise a new session is generated
-// sessions are redis-instance specific as they don't get persisted to static storage (mongodb)
 
-// note: this is only used to restore the token itself. Data such as game state is restored on it's own through sockets.
 router.get('/restore', (req, res) => {
 
     const token = req.cookies.token;
+
+
     if (!token) {
         res.status(401).send('Unauthorized: No token provided');
     } else {
@@ -61,7 +61,9 @@ router.get('/restore', (req, res) => {
                 User.findOne({ email }, (err, user) => {
                     var { email, username, _id } = user;
 
+                    // find session linked to player id 
                     redisClient.get(_id, (err, sessionId) => {
+                        // retrieve session
                         redisClient.get(sessionId, (err, serializedSessionObject) => {
                             if (!sessionId || serializedSessionObject == null) {
                                 // make new session id
@@ -102,7 +104,6 @@ router.get('/restore', (req, res) => {
                                 })
                             }
                         })
-                        //no session for user found
 
 
                     })

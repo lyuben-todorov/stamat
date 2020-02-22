@@ -3,7 +3,7 @@ import redis from 'ioredis';
 
 import { EventContext } from "../../EventContext";
 import { ActionTypes, AuthRegisterOnSocket } from "../../models/actions/Action";
-import { AUTH_REGISTER_ON_SOCKET, SESSION_UNKNOWN, RESPOND_SESSION, AUTH_REQUEST_SESSION } from "../../models/actions/ActionTypes";
+import { AUTH_REGISTER_ON_SOCKET, SESSION_UNKNOWN, RESPOND_SESSION, AUTH_REQUEST_SESSION, CLIENT_FOUND_GAME } from "../../models/actions/ActionTypes";
 import ActionBuilder from "../../models/actions/ActionBuilder";
 import createLogger from "../../../createLogger";
 import redisClient from "../../../redis/redisClient";
@@ -13,6 +13,9 @@ import mainRoutine from './mainRoutine';
 import mainSocketDisconnectCallback from './mainRoutine/mainSocketDisconnectCallback';
 import mainSocketActionCallback from './mainRoutine/mainSocketActionCallback';
 import mainRedisMessageCallback from './mainRoutine/mainRedisMessageCallback';
+import { Server } from 'socket.io';
+import ServerMatchSession from '../../../socketio/models/chess/ServerMatchSession';
+import returnPersonalMatchSession from '../../../util/returnPersonalMatchSession';
 export default function actionCallback(this: EventContext, action: ActionTypes) {
     var { type } = action;
 
@@ -42,10 +45,17 @@ export default function actionCallback(this: EventContext, action: ActionTypes) 
 
                     if (parsedUserSessionObject.inMatch) {
                         parsedUserSessionObject.matchIds.forEach(matchId => {
-                            console.log(matchId)
+                            console.log("oooopa")
                             redisClient.get(matchId + "object", (err, reply) => {
-                                var parsedMatchSessionObject: PersonalMatchSession = JSON.parse(reply);
-                                this.sessionList[parsedMatchSessionObject.matchId] = parsedMatchSessionObject;
+                                var parsedMatchSessionObject: ServerMatchSession = JSON.parse(reply);
+                                var personalizedSessionObject = returnPersonalMatchSession(parsedMatchSessionObject, payload.sessionId);
+
+                                this.sessionList[personalizedSessionObject.matchId] = personalizedSessionObject;
+                                this.socket.emit('action', 
+                                    new ActionBuilder()
+                                    .setType(CLIENT_FOUND_GAME)
+                                    .setPayload({gameObject:personalizedSessionObject})
+                                    );
                             })
                         });
                     }

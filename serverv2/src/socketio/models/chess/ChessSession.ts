@@ -1,14 +1,24 @@
-import { MatchSession } from "../sessions/ServerMatchObject";
 import ChessParticipant from "./ChessParticipant";
 import { GameTypes } from "../GameTypes";
+import MessageObject from "../chat/MessageObject";
 
-export interface ChessSession extends MatchSession {
+export interface ChessSession {
+    matchId: string
+
+ 
+    
     proponent: ChessParticipant
-    oponent: ChessParticipant
-
+    opponent: ChessParticipant
+    
     onMove: boolean
+    issueTime: number // unix time of issue by matchmaker
     gameType: GameTypes.CHESS
+    gameTime: number //  game time by spec  in seconds 
+    
+    finished: boolean
+    winner: String
+    chatHistory: MessageObject[]  // 
     position: String // fen string
     moveHistory: String //not verbose    
-
+    
 }

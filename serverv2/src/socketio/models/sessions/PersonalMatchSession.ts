@@ -1,16 +1,13 @@
 import { GameTypes } from "../GameTypes";
+import ChessParticipant from "../chess/ChessParticipant";
+import MessageObject from "../chat/MessageObject";
 
 export default interface PersonalMatchSession {
 
     matchId: string
 
-    playerName: string
-    playerColor: string
-    playerTime: string // individual time remaining in milliseconds 10*60*1000
-
-    opponentName: string
-    opponentColor: string
-    opponentTime: string
+    proponent: ChessParticipant
+    opponent: ChessParticipant
 
     onMove: boolean;
     issueTime: number // unix time of issue by matchmaker
@@ -19,7 +16,7 @@ export default interface PersonalMatchSession {
 
     finished: boolean
     winner: string
-    chatHistory: string[]  // 
+    chatHistory: MessageObject[]  // 
     position: string // fen string
     moveHistory: string //not verbose
 }
