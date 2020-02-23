@@ -11,7 +11,8 @@ module.exports = {
         // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".ts", ".tsx", ".js"]
     },
-
+    // disable bundle size limit warning
+    performance: { hints: false },
     module: {
         rules: [
             {
@@ -43,6 +44,10 @@ module.exports = {
             },
             {
                 test: /\.svg$/,
+                loader: 'file-loader'
+            },
+            {
+                test: /\.png$/,
                 loader: 'file-loader'
             },
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.

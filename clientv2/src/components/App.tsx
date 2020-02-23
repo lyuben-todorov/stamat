@@ -47,7 +47,6 @@ class App extends React.Component<AppProps, AppState> {
                 withCredentials: true,
 
             }).then((res) => {
-                console.log(res.data)
                 if (res) {
                     this.props.loginUser(res.data)
                     this.props.registerOnSocket(res.data);

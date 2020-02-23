@@ -1,5 +1,5 @@
 import ChessParticipant from "./ChessParticipant";
-import { GameTypes } from "../GameTypes";
+import { GameType } from "../GameType";
 import MessageObject from "../chat/MessageObject";
 
 export interface ChessSession {
@@ -12,7 +12,7 @@ export interface ChessSession {
     
     onMove: boolean
     issueTime: number // unix time of issue by matchmaker
-    gameType: GameTypes.CHESS
+    gameType: GameType.CHESS
     gameTime: number //  game time by spec  in seconds 
     
     finished: boolean

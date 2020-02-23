@@ -3,6 +3,7 @@ import MatchSessionList from "./models/sessions/MatchSessionList";
 import { UserSession } from "./models/sessions/UserSession";
 import { Logger } from "winston";
 import { ChessInstance } from "chess.js";
+import PersonalMatchSession from "./models/sessions/PersonalMatchSession";
 export interface EventContext {
     (...args: any[]): void
 
@@ -12,5 +13,6 @@ export interface EventContext {
     sessionList: MatchSessionList;
     personalChannel: Redis;
     chess: ChessInstance;
+    activeGame: PersonalMatchSession
 
 }

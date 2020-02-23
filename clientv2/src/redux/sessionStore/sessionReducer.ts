@@ -46,7 +46,6 @@ export function sessionReducer(
             return state;
 
         case LOG_IN_USER:
-            console.log("hi im " + action.payload);
             return {
                 ...state,
                 sessionId: action.payload.sessionId,
@@ -64,11 +63,17 @@ export function sessionReducer(
         case LOG_OUT_USER:
             return state;
         case RESPOND_SESSION:
-            console.log(action.payload.status)
             return state;
         default:
-            console.log("Unknown action received by server");
-            console.log(action)
+            //@ts-ignore
+            if (action.type.startsWith("@@redux")) {
+
+                // redux internal action
+            } else {
+
+                console.log("Unknown action received by server");
+                console.log(action)
+            }
             return state;
     }
 }

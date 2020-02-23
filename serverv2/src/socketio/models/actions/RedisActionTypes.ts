@@ -1,7 +1,7 @@
 import { SESSION_UNKNOWN, AUTH_REQUEST_SESSION, AUTH_REGISTER_ON_SOCKET, SERVER_REPLY_MATCHUP, CLIENT_START_GAME, CLIENT_SEND_CHAT_MESSAGE, CLIENT_RESUME_GAME, CLIENT_OFFER_DRAW, CLIENT_UPDATE_GAME, CLIENT_REPLY_DRAW, CLIENT_GAME_OVER } from './ActionTypes';
 import { UserSession } from '../sessions/UserSession';
 import PersonalMatchSession from '../sessions/PersonalMatchSession'
-import { GameTypes } from '../GameTypes';
+import { GameType } from '../GameType';
 
 export default interface Action {
     type: string;
@@ -82,7 +82,7 @@ export interface ClientGameOver extends Action{
         winner: string
     }
 }
-export type ActionTypes =
+export type RedisActionTypes =
     AuthSessionUnknownAction |
     AuthRequestSessionAction |
     AuthRegisterOnSocket |

@@ -2,21 +2,18 @@ import _ from 'lodash';
 import redis from 'ioredis';
 
 import { EventContext } from "../../EventContext";
-import { ActionTypes, AuthRegisterOnSocket } from "../../models/actions/Action";
-import { AUTH_REGISTER_ON_SOCKET, SESSION_UNKNOWN, RESPOND_SESSION, AUTH_REQUEST_SESSION, CLIENT_FOUND_GAME } from "../../models/actions/ActionTypes";
+import { RedisActionTypes, AuthRegisterOnSocket } from "../../models/actions/RedisActionTypes";
+import { AUTH_REGISTER_ON_SOCKET, SESSION_UNKNOWN, RESPOND_SESSION, CLIENT_FOUND_GAME } from "../../models/actions/ActionTypes";
 import ActionBuilder from "../../models/actions/ActionBuilder";
 import createLogger from "../../../createLogger";
 import redisClient from "../../../redis/redisClient";
 import { UserSession } from "../../../socketio/models/sessions/UserSession";
-import PersonalMatchSession from '../../../socketio/models/sessions/PersonalMatchSession';
-import mainRoutine from './mainRoutine';
 import mainSocketDisconnectCallback from './mainRoutine/mainSocketDisconnectCallback';
 import mainSocketActionCallback from './mainRoutine/mainSocketActionCallback';
 import mainRedisMessageCallback from './mainRoutine/mainRedisMessageCallback';
-import { Server } from 'socket.io';
 import ServerMatchSession from '../../../socketio/models/chess/ServerMatchSession';
 import returnPersonalMatchSession from '../../../util/returnPersonalMatchSession';
-export default function actionCallback(this: EventContext, action: ActionTypes) {
+export default function actionCallback(this: EventContext, action: RedisActionTypes) {
     var { type } = action;
 
     switch (type) {
