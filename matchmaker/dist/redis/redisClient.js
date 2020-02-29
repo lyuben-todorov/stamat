@@ -1,23 +1,17 @@
 "use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var _ioredis = _interopRequireDefault(require("ioredis"));
-
-var _logger = _interopRequireDefault(require("../logger"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-var logger = (0, _logger["default"])('Matchmaking Redis');
-var redisClient = new _ioredis["default"]();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const ioredis_1 = __importDefault(require("ioredis"));
+const createLogger_1 = __importDefault(require("../createLogger"));
+const logger = createLogger_1.default('Matchmaking Redis');
+const redisClient = new ioredis_1.default();
 redisClient.on("error", function (err) {
-  logger.error("Redis error: " + err);
+    logger.error("Redis error: " + err);
 });
-redisClient.on("ready", function () {
-  logger.info("Redis connection opened!");
+redisClient.on("ready", () => {
+    logger.info("Redis connection opened!");
 });
-var _default = redisClient;
-exports["default"] = _default;
+exports.default = redisClient;
+//# sourceMappingURL=redisClient.js.map
