@@ -4,6 +4,9 @@ import { connect } from 'react-redux'
 import Move from './Move'
 import * as Timer from 'react-compound-timer';
 import { RootState } from '../../../redux/rootReducer';
+import { MatchSession } from '../../../redux/matchStore/models/MatchSession';
+import { ClientState } from '../../../redux/clientStateStore/clientStateReducer';
+import UserSession from '../../../redux/sessionStore/models/UserSession';
 // import { concedeGame, offerDraw, replyDraw } from '../../redux/actionCreators'
 interface State {
     userTimer: React.RefObject<any>;
@@ -20,12 +23,10 @@ interface State {
 interface Props {
 
     //to be impl.
-    action: string;
-    game: any;
-    moveCount: number;
-    color: string;
-    history: any[];
-    username: string;
+    gameId: string;
+    game: MatchSession;
+    clientState: ClientState;
+    userSession: UserSession;
 
     concedeGame: Function;
     replyDraw: Function;
@@ -52,87 +53,88 @@ class MoveWindow extends React.Component<Props, State> {
 
 
     componentDidUpdate(prevProps: Props) {
-        if (this.props.action !== prevProps.action || this.props.game !== prevProps.game) {
+        // if (this.props.action !== prevProps.action || this.props.game !== prevProps.game) {
 
-            if (this.props.moveCount !== prevProps.moveCount) {
-                if (this.props.action === "clientMove") {
-                    this.state.userTimer.current.stop()
-                    this.state.opponentTimer.current.start();
-                    this.setState({ active: "opponent" })
+        //     if (this.props.moveCount !== prevProps.moveCount) {
+        //         if (this.props.action === "clientMove") {
+        //             this.state.userTimer.current.stop()
+        //             this.state.opponentTimer.current.start();
+        //             this.setState({ active: "opponent" })
 
-                } else if (this.props.action === "opponentMove") {
+        //         } else if (this.props.action === "opponentMove") {
 
-                    this.state.userTimer.current.start()
-                    this.state.opponentTimer.current.stop();
-                    this.setState({ active: "user" })
-                }
-            }
-            if (this.props.action === "gameOver") {
-                this.state.userTimer.current.stop();
-                this.state.opponentTimer.current.stop()
-                this.setState({ playerOfferingDraw: false, gameOver: true })
-            }
-            if (this.props.action === "offerDraw") {
-                this.setState({ offeringDraw: true });
-            } else if (this.props.action === "repliedDraw") {
-                this.setState({ offeringDraw: false, playerOfferingDraw: false });
-            } else if (this.props.action === "playerOfferDraw") {
-                this.setState({ playerOfferingDraw: true })
-            }
-            if (this.props.game !== prevProps.game) {
-                if (this.props.action === "clientMove" || this.props.action === "opponentMove") {
-                    let { blackTime, whiteTime } = this.props.game;
-                    if (this.props.color.charAt(0) === 'w') {
-                        this.state.userTimer.current.setTime(whiteTime);
-                        this.state.opponentTimer.current.setTime(blackTime);
-                    } else {
+        //             this.state.userTimer.current.start()
+        //             this.state.opponentTimer.current.stop();
+        //             this.setState({ active: "user" })
+        //         }
+        //     }
+        //     if (this.props.action === "gameOver") {
+        //         this.state.userTimer.current.stop();
+        //         this.state.opponentTimer.current.stop()
+        //         this.setState({ playerOfferingDraw: false, gameOver: true })
+        //     }
+        //     if (this.props.action === "offerDraw") {
+        //         this.setState({ offeringDraw: true });
+        //     } else if (this.props.action === "repliedDraw") {
+        //         this.setState({ offeringDraw: false, playerOfferingDraw: false });
+        //     } else if (this.props.action === "playerOfferDraw") {
+        //         this.setState({ playerOfferingDraw: true })
+        //     }
+        //     if (this.props.game !== prevProps.game) {
+        //         if (this.props.action === "clientMove" || this.props.action === "opponentMove") {
+        //             let { blackTime, whiteTime } = this.props.game;
+        //             if (this.props.color.charAt(0) === 'w') {
+        //                 this.state.userTimer.current.setTime(whiteTime);
+        //                 this.state.opponentTimer.current.setTime(blackTime);
+        //             } else {
 
-                        this.state.userTimer.current.setTime(blackTime)
-                        this.state.opponentTimer.current.setTime(whiteTime);
-                    }
+        //                 this.state.userTimer.current.setTime(blackTime)
+        //                 this.state.opponentTimer.current.setTime(whiteTime);
+        //             }
 
-                }
-                if (this.props.action === "startGame" || this.props.action === "resumeGame" || this.props.action === "gameReady" || this.props.action === "initiateGame") {
-                    let { blackTime, whiteTime, toMove, lastPlayerMoveTime, gameTime, blackName, whiteName } = this.props.game;
+        //         }
+        //         if (this.props.action === "startGame" || this.props.action === "resumeGame" || this.props.action === "gameReady" || this.props.action === "initiateGame") {
+        //             let { blackTime, whiteTime, toMove, lastPlayerMoveTime, gameTime, blackName, whiteName } = this.props.game;
 
-                    console.log(whiteTime)
+        //             console.log(whiteTime)
 
-                    let opponent = this.props.color.charAt(0) === 'w' ? this.props.game.blackName : this.props.game.whiteName;
-                    if (lastPlayerMoveTime) {
+        //             let opponent = this.props.color.charAt(0) === 'w' ? this.props.game.blackName : this.props.game.whiteName;
+        //             if (lastPlayerMoveTime) {
 
-                        if (toMove === 'w') {
-                            whiteTime = gameTime + lastPlayerMoveTime - Date.now()
-                        } else {
-                            blackTime = gameTime + lastPlayerMoveTime - Date.now()
-                        }
-                    }
-                    if (this.props.color.charAt(0) === 'w') {
-                        this.state.userTimer.current.setTime(whiteTime);
-                        this.state.opponentTimer.current.setTime(blackTime);
-                    } else {
+        //                 if (toMove === 'w') {
+        //                     whiteTime = gameTime + lastPlayerMoveTime - Date.now()
+        //                 } else {
+        //                     blackTime = gameTime + lastPlayerMoveTime - Date.now()
+        //                 }
+        //             }
+        //             if (this.props.color.charAt(0) === 'w') {
+        //                 this.state.userTimer.current.setTime(whiteTime);
+        //                 this.state.opponentTimer.current.setTime(blackTime);
+        //             } else {
 
-                        this.state.userTimer.current.setTime(blackTime)
-                        this.state.opponentTimer.current.setTime(whiteTime);
-                    }
+        //                 this.state.userTimer.current.setTime(blackTime)
+        //                 this.state.opponentTimer.current.setTime(whiteTime);
+        //             }
 
-                    if ((this.props.color.charAt(0) === 'w') === (toMove === 'w')) {
-                        this.state.userTimer.current.start();
+        //             if ((this.props.color.charAt(0) === 'w') === (toMove === 'w')) {
+        //                 this.state.userTimer.current.start();
 
-                        this.setState({ active: "user", opponent: opponent })
-                    } else {
-                        this.state.opponentTimer.current.start();
-                        this.setState({ active: "opponent", opponent: opponent })
-                    }
-                }
+        //                 this.setState({ active: "user", opponent: opponent })
+        //             } else {
+        //                 this.state.opponentTimer.current.start();
+        //                 this.setState({ active: "opponent", opponent: opponent })
+        //             }
+        //         }
 
-            }
-        }
+        //     }
+        // }
     }
     renderNumbers(time: number) {
         return time < 10 ? `0${time}` : `${time}`
     }
 
     render() {
+        let opponentName = this.props.game ? this.props.game.opponent.name : "None";
         return (
 
             <Grid className="MoveWindow">
@@ -155,9 +157,11 @@ class MoveWindow extends React.Component<Props, State> {
                 </div>
                 <Segment className="PlayerBox">
                     <Menu>
-                        <Menu.Item className="UserName">
+                        <Menu.Item className="User">
                             <Icon name={"circle"} color={"green"}></Icon>
-                            {this.state.opponent}
+                            <div className="Username">
+                                {opponentName}
+                            </div>
                         </Menu.Item>
                         <Menu.Item>
                             <Button onClick={() => { }}>
@@ -181,7 +185,7 @@ class MoveWindow extends React.Component<Props, State> {
                         <Menu.Item className="User">
                             <Icon name={"circle"} color={"green"}></Icon>
                             <div className="Username">
-                                {this.props.username}
+                                {this.props.userSession.username}
                             </div>
                         </Menu.Item>
                         <Menu.Item>
@@ -234,17 +238,13 @@ class MoveWindow extends React.Component<Props, State> {
     }
 
 }
-const mapStateToProps = (state: RootState/*, ownProps*/) => {
-    return {
-        game: "",
-        moveCount: 0,
-        history: {},
-        action: "",
-        sessionId: "",
-        color: "",
-        username:""
-    }
-}
+const mapStateToProps = (state: RootState) => ({
+    gameId: state.match.activeMatch,
+    game: state.match.matches[state.match.activeMatch],
+    clientState: state.clientState,
+    userSession: state.session
+})
+
 const mapDispatchToProps = { concedeGame: () => { }, offerDraw: () => { }, replyDraw: () => { } }
 
 export default connect(

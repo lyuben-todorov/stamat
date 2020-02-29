@@ -19,7 +19,30 @@ init
 const matchmakingLogger = createLogger("MATCHMAKER");
 const matchmakingClient = new redis();
 
+function returnPersonalMatchSession(session, playerId) {
+        var color = session.whiteId === playerId;
+        return {
+                matchId: session.matchId,
 
+                proponent: color ? session.white : session.black,
+                opponent: color ? session.black : session.white,
+
+                onMove: session.onMove,
+                issueTime: session.issueTime,
+                gameTime: session.gameTime,
+                gameType: session.gameType,
+
+                finished: session.finished,
+                winner: session.winner,
+                chatHistory: session.chatHistory,
+                position: session.position,
+                moveCount: session.moveCount,
+                moveHistory: session.moveHistory,
+
+                startTime: session.startTime,
+                lastPlayerMoveTime: session.lastPlayerMoveTime,
+        }
+}
 function serializeRedisMessage(type, payload) {
         return JSON.stringify({ type: type, payload: payload })
 }
@@ -28,27 +51,38 @@ function createGame(gameId, playerOne, playerTwo) {
         const startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         let white = Math.floor(Math.random() * 2);
         const gameObject = {
-                moveCount: 0,
+
+                matchId: gameId,
+
+                white: {
+                        name: white ? playerOne.username : playerTwo.username,
+                        color: "white",
+                        timeLeft: 600000
+                },
+                black: {
+                        name: white ? playerTwo.username : playerOne.username,
+                        color: "black",
+                        timeLeft: 600000
+                },
+
+                // player ids of each side;
+                whiteId: white ? playerOne.sessionId : playerTwo.sessionId,
+                blackId: white ? playerTwo.sessionId : playerOne.sessionId,
+
+                onMove: "white",
                 issueTime: Date.now(),
-                gameId: gameId,
-                playerOneName: playerOne.username,
-                playerTwoName: playerTwo.username,
-                whiteName: white ? playerOne.username : playerTwo.username,
-                blackName: white ? playerTwo.username : playerOne.username,
-                playerOne: playerOne.sessionId,
-                playerTwo: playerTwo.sessionId,
-                playerOneColor: white ? 'w' : 'b',
-                playerTwoColor: white ? 'b' : 'w',
-                blackTime: 600000,
-                whiteTime: 600000,
                 gameTime: 600000,
-                toMove: 'w',
-                white: white ? playerOne.sessionId : playerTwo.sessionId,
-                black: white ? playerTwo.sessionId : playerOne.sessionId,
-                position: startingPosition,
+                gameType: "CHESS", // CHESS, CHESS_360?, FISCHER_CHESS?
+
                 finished: false,
                 winner: "none",
-                history: []
+                chatHistory: [],  // 
+                position: startingPosition, // fen string
+                moveCount: 0,
+                moveHistory: [], //not verbose
+
+                startTime: -1,
+                lastPlayerMoveTime: -1,
         }
         return gameObject;
 }
@@ -60,16 +94,22 @@ matchmakingClient.on('message', (channel, message) => {
         let { type, payload } = messageObject;
         switch (type) {
                 case MATCHMAKER_ADD_TO_QUEUE:
-                        var { sessionId, username, opponentType, mode, time } = payload;
+                        var { sessionId, username, opponentType, mode, time } = payload.matchObject;
+                        console.log(payload)
                         if (sessionId) {
-                                redisClient.incr(`${mode}Count`);
+                                redisClient.incr(`chessCount`);
                                 redisClient.hmset(sessionId, { username, opponentType, mode, type });
 
                                 redisClient.sismember('matchmaking_queue', sessionId, (err, reply) => {
+
                                         if (reply) {
+
                                                 redisClient.publish(sessionId, serializeRedisMessage(CLIENT_ALREADY_IN_QUEUE));
                                         } else {
-                                                redisClient.sadd('matchmaking_queue', sessionId, (number) => {
+                                                redisClient.sadd('matchmaking_queue', sessionId, (number,err) => {
+                                                        if(err){
+                                                                console.log("asd");
+                                                        }
                                                         matchmakingLogger.info("Pushed client to MM queue:" + username)
                                                         redisClient.smembers('matchmaking_queue', (err, reply) => {
                                                                 if (!err) {
@@ -93,18 +133,12 @@ matchmakingClient.on('message', (channel, message) => {
                                                                                         let game = createGame(gameId, playerOne, playerTwo);
                                                                                         redisClient.set(gameId + "object", JSON.stringify(game));
 
-                                                                                        let opponentInfoOne = {
-                                                                                                opponentId: playerTwo.sessionId,
-                                                                                                opponentName: playerTwo.username,
-                                                                                                gameId: gameId
-                                                                                        }
-                                                                                        let opponentInfoTwo = {
-                                                                                                opponentId: playerOne.sessionId,
-                                                                                                opponentName: playerOne.username,
-                                                                                                gameId: gameId
-                                                                                        }
-                                                                                        redisClient.publish(playerOne.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: game, opponentInfo: opponentInfoOne, color: game.playerOneColor }));
-                                                                                        redisClient.publish(playerTwo.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: game, opponentInfo: opponentInfoTwo, color: game.playerTwoColor }));
+
+                                                                                        const p1s = returnPersonalMatchSession(game, playerOne.sessionId);
+                                                                                        const p2s = returnPersonalMatchSession(game, playerTwo.sessionId);
+
+                                                                                        redisClient.publish(playerOne.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: p1s }));
+                                                                                        redisClient.publish(playerTwo.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: p2s }));
 
                                                                                 })
 

@@ -2,7 +2,7 @@ import { EventContext } from "../../../../socketio/EventContext";
 import { SocketActionTypes, ServerStartMatchmaking, ServerSendChatMessage, ServerPlayerMove, ServerPlayerReady } from "../../../models/actions/SocketActionTypes";
 import _ from 'lodash'
 import redisClient from "../../../../redis/redisClient";
-import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, CLIENT_UPDATE_GAME, CLIENT_GAME_OVER } from "../../../../socketio/models/actions/ActionTypes";
+import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, CLIENT_UPDATE_GAME, CLIENT_GAME_OVER, MATCHMAKER_ADD_TO_QUEUE } from "../../../../socketio/models/actions/ActionTypes";
 import serializeRedisMessage from "../../../../util/serializeRedisMessage";
 import ServerMatchSession from "../../../../socketio/models/chess/ServerMatchSession";
 import returnPersonalMatchSession from "../../../../util/returnPersonalMatchSession";
@@ -16,7 +16,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
         case SERVER_START_MATCHMAKING:
             const { payload } = action as ServerStartMatchmaking;
             redisClient.publish('matchmaking', serializeRedisMessage({
-                type: SERVER_START_MATCHMAKING, payload: payload
+                type: MATCHMAKER_ADD_TO_QUEUE, payload: payload
             }));
             break;
         case SERVER_SEND_CHAT_MESSAGE:
@@ -89,6 +89,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
                         newGame.position = this.chess.fen();
                         newGame.onMove = newGame.onMove === "white" ? "black" : "white";
 
+                        var opponentGame = returnPersonalMatchSession(newGame, opponentId);
                         // is over
                         if (this.chess.game_over() || newGame.finished) {
                             //checkmate
@@ -104,10 +105,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
                                 {
                                     gameId: payload.gameId,
                                     move: payload.move,
-                                    whiteTime: newGame.white.timeLeft,
-                                    blackTime: newGame.black.timeLeft,
-                                    finished: newGame.finished,
-                                    winner: newGame.winner
+                                    newGame: opponentGame
                                 }
                             }), () => {
                                 // game over shouldn't arrive before the last move 
@@ -124,10 +122,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
                                 {
                                     gameId: payload.gameId,
                                     move: payload.move,
-                                    whiteTime: newGame.white.timeLeft,
-                                    blackTime: newGame.black.timeLeft,
-                                    finished: false,
-                                    winner: "none"
+                                    newGame: opponentGame
                                 }
                             }));
                         }
@@ -177,7 +172,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
 
         //     })
         //     break;
-        // default:
-        //     console.log(action);
+        default:
+            console.log(action);
     }
 }

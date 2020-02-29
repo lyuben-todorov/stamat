@@ -1,19 +1,19 @@
 import { EventContext } from "../../../../socketio/EventContext";
 import { SERVER_REPLY_MATCHUP, CLIENT_START_GAME, CLIENT_SEND_CHAT_MESSAGE, CLIENT_RESUME_GAME, CLIENT_OFFER_DRAW, CLIENT_UPDATE_GAME, CLIENT_REPLY_DRAW, CLIENT_GAME_OVER } from "../../../../socketio/models/actions/ActionTypes";
 import { RedisActionTypes, ServerReplyMatchup, ClientStartGame, ClientSendChatMessage, ClientResumeGame, ClientOfferDraw, ClientUpdateGame, ClientReplyDraw, ClientGameOver } from "../../../models/actions/RedisActionTypes";
+import { Chess } from "chess.js";
 
 export default function mainRedisMessageCallback(this: EventContext, channel: string, message: string) {
     this.socketLogger.info("Redis message on: " + this.userSession.sessionId.slice(-5));
     const messageObject: RedisActionTypes = JSON.parse(message);
-
     var { type } = messageObject;
     switch (type) {
         case CLIENT_START_GAME:
             {
                 const { payload } = messageObject as ClientStartGame
-
                 this.sessionList[payload.matchId] = payload;
 
+                this.chess = new Chess();
                 this.socket.emit('action', { type: CLIENT_START_GAME, payload: payload });
                 break;
             }

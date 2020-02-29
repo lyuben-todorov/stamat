@@ -22,9 +22,11 @@ export interface ServerSendChatMessage extends Action {
         channel: "opponent" | "global"
     }
 }
+
 export interface ServerPlayerReady extends Action {
     type: typeof SERVER_PLAYER_READY
 }
+
 export interface ServerPlayerMove extends Action {
     type: typeof SERVER_PLAYER_MOVE,
     payload:{

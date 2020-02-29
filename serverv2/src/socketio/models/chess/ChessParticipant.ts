@@ -1,4 +1,4 @@
-export default interface ChessParticipant{
+export default interface ChessParticipant {
     name: string
     color: string
     timeLeft: number

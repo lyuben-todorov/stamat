@@ -1,8 +1,12 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Header, Divider, Dropdown, Icon, Button, Message, DropdownItemProps } from 'semantic-ui-react'
-// import { startMatchmaking } from '../../../redux/actionCreators';
 import { RootState } from '../../../../redux/rootReducer';
+import { startMatchmaking } from '../../../../redux/matchStore/matchActions';
+import MatchmakingRequest from '../../../../redux/matchStore/models/MatchmakingRequest';
+import { GameTypes } from '../../../../redux/GameTypes';
+import UserSession from '../../../../redux/sessionStore/models/UserSession';
+import { MatchState } from '../../../../redux/matchStore/matchReducer';
 const chessOptions = [
     {
         text: 'Regular Chess',
@@ -43,8 +47,10 @@ const opponentOptions = [
 ]
 
 interface Props {
-    gameState: string;
+    matchSession: MatchState,
+    userSession: UserSession
 
+    gameState: string,
     startMatchmaking: Function;
 }
 interface State {
@@ -155,7 +161,17 @@ class Matchmaking extends React.Component<Props, State> {
         let { opponentType, mode, time } = this.state;
         if (opponentType && mode && time) {
 
-            this.props.startMatchmaking({ opponentType, mode, time });
+
+            var matchmakingObject = {
+                mode: GameTypes.CHESS,
+                opponentType: "USER",
+                time: 10,
+                username: this.props.userSession.username,
+                sessionId: this.props.userSession.sessionId,
+                autoAccept:true
+            }
+            this.props.startMatchmaking(matchmakingObject);
+
             this.setState({ submitted: true })
         } else {
             this.setState({ errorState: true });
@@ -232,12 +248,15 @@ class Matchmaking extends React.Component<Props, State> {
 
 const mapStateToProps = (state: RootState) => {
     return {
-        gameState:"to be implemented"
+        matchSession: state.match,
+        userSession: state.session,
+        gameState:""
     }
 }
 
-const mapDispatchToProps = { 
-    startMatchmaking: () => { } }
+const mapDispatchToProps = {
+    startMatchmaking: startMatchmaking
+}
 
 export default connect(
     mapStateToProps,

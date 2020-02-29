@@ -1,0 +1,1 @@
+export type GameTime = 15 | 10 | 5;

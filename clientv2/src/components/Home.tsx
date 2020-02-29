@@ -21,8 +21,6 @@ class Home extends React.Component<HomeProps, HomeState> {
     render() {
         return (
             <div>
-                Home
-                <Button onClick={this.props.testConnection(this.props.session)}></Button>
             </div>
         )
     }

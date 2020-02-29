@@ -3,18 +3,24 @@ import { Segment, Menu, MenuItemProps } from 'semantic-ui-react'
 import { MenuRouter } from './MenuRouter/MenuRouter'
 import { connect } from 'react-redux';
 import { RootState } from '../../../redux/rootReducer';
-interface MenuProps{
-    gameState:string;
+import { MatchSession } from '../../../redux/matchStore/models/MatchSession';
+import { ClientState } from '../../../redux/clientStateStore/clientStateReducer';
+
+interface MenuProps {
+    gameId: string;
+    game: MatchSession;
+    clientState: ClientState;
 }
-interface MenuState{
-    activeItem:string;
+
+interface MenuState {
+    activeItem: string;
 
 }
 
 class MenuWindow extends React.Component<MenuProps, MenuState> {
     constructor(props: MenuProps) {
         super(props);
-        switch (this.props.gameState) {
+        switch (this.props.clientState.gameState) {
             case "ongoing":
                 this.state = { activeItem: "chat" }
                 break;
@@ -28,8 +34,8 @@ class MenuWindow extends React.Component<MenuProps, MenuState> {
     }
     componentDidUpdate(prevProps: MenuProps) {
         if (this.props !== prevProps) {
-            switch (this.props.gameState) {
-                case "ongoing" || "initiateGame":
+            switch (this.props.clientState.gameState) {
+                case "ongoing" || "starting":
                     this.setState({ activeItem: "chat" })
                     break;
                 case "default":
@@ -40,7 +46,7 @@ class MenuWindow extends React.Component<MenuProps, MenuState> {
             }
         }
     }
-    handleItemClick = (e: React.MouseEvent<HTMLAnchorElement,MouseEvent>, 
+    handleItemClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
         data: MenuItemProps) => this.setState({ activeItem: data.name })
 
     render() {
@@ -81,8 +87,9 @@ class MenuWindow extends React.Component<MenuProps, MenuState> {
 
 
 const mapStateToProps = (state: RootState) => ({
-    // to be implemented
-    gameState:"default"
+    gameId: state.match.activeMatch,
+    game: state.match.matches[state.match.activeMatch],
+    clientState: state.clientState
 })
 const mapDispatchToProps = {
 

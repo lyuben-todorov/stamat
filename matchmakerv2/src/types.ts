@@ -1,8 +1,6 @@
-import { GameType } from "../GameType";
-import MessageObject from "../chat/MessageObject";
-import ChessParticipant from "./ChessParticipant";
 import { Move } from "chess.js";
-export default interface ServerMatchSession {
+
+export interface ServerMatchSession {
     matchId: string
 
     white: ChessParticipant
@@ -26,6 +24,30 @@ export default interface ServerMatchSession {
 
     startTime: number;
     lastPlayerMoveTime: number;
-    
 
+}
+
+export interface ChessParticipant {
+    name: string
+    color: string
+    timeLeft: number
+}
+
+export enum GameType {
+    CHESS
+}
+export type GameTime = 15 | 10 | 5;
+
+export interface MessageObject {
+    messageBody: string
+    channel: string
+    sender: string;
+}
+export interface MatchmakingRequest {
+    opponentType: "USER" | "GUEST";
+    mode: GameType
+    time: GameTime
+    username: string
+    sessionId: string,
+    autoAccept: boolean
 }

@@ -1,26 +1,23 @@
 import _ from 'lodash';
 import redis from "ioredis";
-import { serverLogger } from '../server'
-import loadSessionRoutine from './actions/routines/loadSessionRoutine';
+import { loadSessionRoutine } from './actions/routines/loadSessionRoutine';
 import { Socket } from 'socket.io';
+import createLogger from '../createLogger';
 
 
-export default function (io: SocketIO.Server) {
+export default function (socket: SocketIO.Socket) {
 
-    io.on("connection", function actionCallback(socket: Socket) {
 
-        this.socket = socket;
-        this.socketLogger.info("Socket connected");
+    var logger = createLogger("Unknown")
+    logger.info("Socket connected");
 
-        socket.on('action', loadSessionRoutine.bind(this));
-
-        // This bind here is critical. This is where we supply our further functions with this context.
-        // This is done for code separation and readablity  
-    }.bind({
-        socketLogger: serverLogger,
+    var callback = loadSessionRoutine.bind({
+        socket: socket,
+        socketLogger: logger,
         userSession: {},
         sessionList: {},
         personalChannel: new redis(),
         sessionLoaded: false
-    }));
+    });
+    socket.on('action', callback);
 }

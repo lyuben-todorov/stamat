@@ -13,7 +13,8 @@ import mainSocketActionCallback from './mainRoutine/mainSocketActionCallback';
 import mainRedisMessageCallback from './mainRoutine/mainRedisMessageCallback';
 import ServerMatchSession from '../../../socketio/models/chess/ServerMatchSession';
 import returnPersonalMatchSession from '../../../util/returnPersonalMatchSession';
-export default function actionCallback(this: EventContext, action: RedisActionTypes) {
+
+export const loadSessionRoutine = function actionCallback(this: EventContext, action: RedisActionTypes) {
     var { type } = action;
 
     switch (type) {
@@ -22,7 +23,8 @@ export default function actionCallback(this: EventContext, action: RedisActionTy
 
             //no need for block scope as there is only one action.
             const { payload } = action as AuthRegisterOnSocket
-            //set session here
+
+
             this.socketLogger = createLogger(payload.sessionId.slice(-5));
 
             this.socketLogger.info("Session registered: " + payload.sessionId.slice(-5));
@@ -42,31 +44,31 @@ export default function actionCallback(this: EventContext, action: RedisActionTy
 
                     if (parsedUserSessionObject.inMatch) {
                         parsedUserSessionObject.matchIds.forEach(matchId => {
-                            console.log("oooopa")
                             redisClient.get(matchId + "object", (err, reply) => {
                                 var parsedMatchSessionObject: ServerMatchSession = JSON.parse(reply);
                                 var personalizedSessionObject = returnPersonalMatchSession(parsedMatchSessionObject, payload.sessionId);
 
                                 this.sessionList[personalizedSessionObject.matchId] = personalizedSessionObject;
-                                this.socket.emit('action', 
+                                this.socket.emit('action',
                                     new ActionBuilder()
-                                    .setType(CLIENT_FOUND_GAME)
-                                    .setPayload({gameObject:personalizedSessionObject})
-                                    );
+                                        .setType(CLIENT_FOUND_GAME)
+                                        .setPayload({ gameObject: personalizedSessionObject })
+                                );
                             })
                         });
                     }
 
 
-                    this.socket.removeListener('action', actionCallback)
-
+                    this.socket.removeAllListeners();
 
                     this.socket.on('disconnect', mainSocketDisconnectCallback.bind(this));
                     this.socket.on('action', mainSocketActionCallback.bind(this));
 
                     this.personalChannel = new redis();
-                    this.personalChannel.subscribe(this.userSession.sessionId);
-                
+                    this.personalChannel.subscribe(this.userSession.sessionId).then((res) => {
+
+                    });
+
                     this.personalChannel.on('message', mainRedisMessageCallback.bind(this));
                     // mainRoutine.call(this);
                 }

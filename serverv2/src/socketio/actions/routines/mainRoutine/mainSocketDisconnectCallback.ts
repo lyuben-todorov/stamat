@@ -1,9 +1,14 @@
 import { EventContext } from "../../../../socketio/EventContext";
 import redisClient from "../../../../redis/redisClient";
 import _ from 'lodash'
+
 export default function mainSocketDisconnectCallback(this: EventContext) {
     // persist session here
     this.socketLogger.info("Socket disconnected: " + this.userSession.sessionId.slice(-5));
+
+
+    // quit redis subscription
+    this.personalChannel.quit();
 
     // we don't want to persist an undefined session do we
     if (!_.isUndefined(this.userSession.sessionId) && !_.isNull(this.userSession.sessionId) &&
@@ -19,6 +24,4 @@ export default function mainSocketDisconnectCallback(this: EventContext) {
             }
         })
     }
-    // quit redis subscription
-    this.personalChannel.quit()
 }

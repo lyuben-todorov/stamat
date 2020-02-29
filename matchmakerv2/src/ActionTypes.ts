@@ -1,6 +1,10 @@
-import { MatchSession } from "./models/MatchSession";
-import MatchmakingRequest from "./models/MatchmakingRequest";
-import { Move } from "chess.js";
+/* Auth actions */
+// this is the 404 message
+export const SESSION_UNKNOWN = "SESSION_UNKNOWN";
+//
+export const AUTH_REQUEST_SESSION = "auth/REQUEST_SESSION";
+export const RESPOND_SESSION = "RESPOND_SESSION";
+export const AUTH_REGISTER_ON_SOCKET = "auth/REGISTER_ON_SOCKET";
 
 /* Client-Server actions */
 export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
@@ -28,53 +32,8 @@ export const CLIENT_REGISTER_USER = "client/REGISTER_USER";
 export const CLIENT_SEND_CHAT_MESSAGE = "client/SEND_CHAT_MESSAGE"
 
 export const CLIENT_RESUME_GAME = "client/RESUME_GAME";
-export const CLIENT_RESUME_SESSION = "client/RESUME_SESSION"
-
-/* Client-Matchmaker actions */
-export const MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"
 
 export const CLIENT_FOUND_GAME = "client/FOUND_GAME";
 
-
-interface ClientFoundGameAction {
-    type: typeof CLIENT_FOUND_GAME,
-    payload: {
-        gameObject: MatchSession
-    }
-}
-
-interface ClientStartGameAction {
-
-    type: typeof CLIENT_START_GAME,
-    payload: {
-        game: MatchSession
-    }
-}
-
-interface ServerStartMatchmakingAction {
-    type: typeof SERVER_START_MATCHMAKING,
-    payload: MatchmakingRequest
-}
-
-interface ServerPlayerMoveAction {
-    type: typeof SERVER_PLAYER_MOVE,
-    payload: {
-        gameId: string,
-        move: Move
-    }
-}
-
-interface ClientUpdateGameAction {
-    type: typeof CLIENT_UPDATE_GAME,
-    payload: {
-        gameId: string,
-        move: Move,
-        newGame: MatchSession
-    }
-}
-export type MatchActionTypes =
-    ClientFoundGameAction |
-    ClientStartGameAction |
-    ServerStartMatchmakingAction |
-    ServerPlayerMoveAction |
-    ClientUpdateGameAction
+/* Client-Matchmaker actions */
+export const MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"

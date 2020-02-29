@@ -65,15 +65,6 @@ export function sessionReducer(
         case RESPOND_SESSION:
             return state;
         default:
-            //@ts-ignore
-            if (action.type.startsWith("@@redux")) {
-
-                // redux internal action
-            } else {
-
-                console.log("Unknown action received by server");
-                console.log(action)
-            }
             return state;
     }
 }

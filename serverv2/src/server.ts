@@ -1,5 +1,5 @@
 import http from 'http'
-import socketio from 'socket.io'
+import socketio, { Socket } from 'socket.io'
 
 import env from "./env";
 import app from "./app";
@@ -12,8 +12,13 @@ export const serverLogger = createLogger("Server");
 const server = http.createServer(app);
 
 const io = socketio(server)
-// set socket callbacks;
-attachEvents(io);
+
+io.on("connection", function actionCallback(socket: Socket) {
+
+    // set socket callbacks;
+    attachEvents(socket);
+})
+
 
 server.on("close", () => {
     serverLogger.warn(`Server Closed`)

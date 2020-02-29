@@ -14,10 +14,15 @@ import '../../../sass/assets/theme.css'
 import '../../../sass/assets/chessground.css'
 import toDests from "../../../util/toDest";
 import toColor from "../../../util/toColor";
+import { ClientState } from "../../../redux/clientStateStore/clientStateReducer";
+import { playerMove } from "../../../redux/matchStore/matchActions";
 
 interface Props {
     gameId: string;
     game: MatchSession;
+    clientState: ClientState;
+
+    playerMove: (move: Chess.Move, gameId: string) => void
 }
 interface State {
 
@@ -38,22 +43,75 @@ const boardStyle = {
 class ChessGame extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props)
-        if (this.props.gameId !== "none") {
-
-
-        } else {
-            //@ts-ignore
-            const chess: ChessInstance = new Chess();
+        if (this.props.clientState.gameState === "ongoing") {
+            const game = this.props.game;
+            console.log(this.props.gameId);
+            //@ts-ignore broken chess.js types
+            const chess: ChessInstance = new Chess(game.position);
 
             const state = this.makeState(chess);
             this.state = {
                 ...state,
-                orientation: "white",
+                orientation: game.proponent.color,
                 chess: chess,
-
-
             }
 
+        } else {
+
+            //@ts-ignore broken chess.js types
+            const chess: ChessInstance = new Chess();
+
+            const state = this.makeState(chess);
+            this.props
+            this.state = {
+                ...state,
+                orientation: "white",
+                chess: chess,
+            }
+        }
+    }
+
+    componentDidUpdate(prevProps: Props) {
+        console.log("asd");
+        console.log(this.props);
+        if (prevProps !== this.props) {
+            if (prevProps.clientState.gameState !== this.props.clientState.gameState) {
+
+
+                switch (this.props.clientState.gameState) {
+                    case "starting":
+                        {
+
+                            const game = this.props.game;
+                            
+                            //@ts-ignore
+                            const chess: ChessInstance = new Chess(game.position);
+                            const state = this.makeState(chess);
+                            this.setState({
+                                ...state,
+                                orientation: game.proponent.color,
+                                chess: chess,
+                            })
+                        }
+                        break;
+                    case "update":
+                        {
+
+                            var game = this.props.game;
+                            var chess = this.state.chess;
+
+                            chess.move(game.moveHistory[game.moveHistory.length - 1]);
+                            const state = this.makeState(chess);
+                            this.setState({
+                                ...state,
+                                orientation: game.proponent.color,
+                                chess: chess,
+                            })
+                        }
+                        break;
+
+                }
+            }
         }
     }
     makeState = (chess: ChessInstance): any => {
@@ -69,10 +127,12 @@ class ChessGame extends React.Component<Props, State> {
     // already verified
     onMove = (from: any, to: any) => {
         var moveObject: Chess.ShortMove = { from: from, to: to, promotion: 'q' }
-        
+
         var move = this.state.chess.move(moveObject);
-        
+
         const newState = this.makeState(this.state.chess);
+
+        this.props.playerMove(move, this.props.gameId);
         this.setState({
             ...newState,
         })
@@ -80,13 +140,15 @@ class ChessGame extends React.Component<Props, State> {
     render() {
 
         let { position, movableDestinations, turnColor, orientation } = this.state;
+        console.log
         return (
             <div className="MainChessboard">
 
                 <Chessground
                     onMove={this.onMove}
                     turnColor={turnColor}
-                    movable={{ free: false, dests: movableDestinations, color: orientation, showDests: true }}
+                    movable={{ free: false, dests: movableDestinations, color: turnColor, showDests: true }}
+                    orientation={orientation}
                     fen={position}
                     style={boardStyle}
                     height={"740px"}
@@ -100,10 +162,14 @@ class ChessGame extends React.Component<Props, State> {
 const mapStateToProps = (state: RootState /*, ownProps*/) => {
     return {
         gameId: state.match.activeMatch,
-        game: state.match.matches[state.match.activeMatch]
+        game: state.match.matches[state.match.activeMatch],
+        clientState: state.clientState,
     }
 }
-const mapDispatchToProps = { playerReady: () => { }, playerMove: () => { } }
+const mapDispatchToProps = {
+    playerReady: () => { },
+    playerMove: playerMove
+}
 
 
 export default connect(
