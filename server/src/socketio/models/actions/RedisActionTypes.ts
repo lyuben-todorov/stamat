@@ -40,7 +40,9 @@ export interface ServerReplyMatchup extends Action {
 /* Game actions */
 export interface ClientStartGame extends Action {
     type: typeof CLIENT_START_GAME;
-    payload: PersonalMatchSession;
+    payload: {
+        game: PersonalMatchSession;
+    }
 }
 
 export interface ClientSendChatMessage extends Action {

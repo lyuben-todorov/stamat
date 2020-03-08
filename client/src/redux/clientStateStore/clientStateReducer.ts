@@ -1,8 +1,8 @@
 import { SessionActionTypes } from "../sessionStore/sessionTypes";
-import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME } from "../matchStore/matchTypes";
+import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME } from "../matchStore/matchTypes";
 
 export interface ClientState {
-    gameState: "ongoing" | "starting" | "default" | "update"
+    gameState: "ongoing" | "starting" | "default" | "update" | "ack" | "continue"
 }
 
 const initialState: ClientState = {
@@ -17,7 +17,17 @@ export function clientStateReducer(
             return { gameState: "starting" }
         case CLIENT_UPDATE_GAME:
             return { gameState: "update" }
+        case CLIENT_FOUND_GAME:
+            return { gameState: "continue" }
+        case ACKNOWLEDGE:
+            return { gameState: "ack" }
         default:
             return state;
+    }
+}
+
+export function acknowledge(): MatchActionTypes {
+    return {
+        type: ACKNOWLEDGE
     }
 }

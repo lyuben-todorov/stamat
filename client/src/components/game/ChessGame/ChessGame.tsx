@@ -14,7 +14,7 @@ import '../../../sass/assets/theme.css'
 import '../../../sass/assets/chessground.css'
 import toDests from "../../../util/toDest";
 import toColor from "../../../util/toColor";
-import { ClientState } from "../../../redux/clientStateStore/clientStateReducer";
+import { ClientState, acknowledge } from "../../../redux/clientStateStore/clientStateReducer";
 import { playerMove } from "../../../redux/matchStore/matchActions";
 
 interface Props {
@@ -23,6 +23,7 @@ interface Props {
     clientState: ClientState;
 
     playerMove: (move: Chess.Move, gameId: string) => void
+    acknowledge: () => void
 }
 interface State {
 
@@ -30,7 +31,7 @@ interface State {
     orientation: "white" | "black";
 
     position: string;
-    turnColor: "white" | "black";
+    turnColor: "white" | "black" | "undefined";
     movableDestinations: {
 
     }
@@ -72,18 +73,16 @@ class ChessGame extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        console.log("asd");
         console.log(this.props);
         if (prevProps !== this.props) {
             if (prevProps.clientState.gameState !== this.props.clientState.gameState) {
-
 
                 switch (this.props.clientState.gameState) {
                     case "starting":
                         {
 
                             const game = this.props.game;
-                            
+
                             //@ts-ignore
                             const chess: ChessInstance = new Chess(game.position);
                             const state = this.makeState(chess);
@@ -92,6 +91,7 @@ class ChessGame extends React.Component<Props, State> {
                                 orientation: game.proponent.color,
                                 chess: chess,
                             })
+                            this.props.acknowledge();
                         }
                         break;
                     case "update":
@@ -107,19 +107,46 @@ class ChessGame extends React.Component<Props, State> {
                                 orientation: game.proponent.color,
                                 chess: chess,
                             })
+                            this.props.acknowledge();
                         }
                         break;
+                    case "continue":
+                        {
 
+                            const game = this.props.game;
+
+                            //@ts-ignore
+                            const chess: ChessInstance = new Chess(game.position);
+                            const state = this.makeState(chess);
+                            this.setState({
+                                ...state,
+                                orientation: game.proponent.color,
+                                chess: chess,
+                            })
+                            this.props.acknowledge();
+
+                            this.props.acknowledge();
+                        }
+                        break;
                 }
             }
         }
     }
     makeState = (chess: ChessInstance): any => {
+        var turnColor;
+
+        if (this.props.game) {
+            turnColor = this.props.game.proponent.color === toColor(chess) ? toColor(chess) : "undefined";
+        } else {
+            turnColor = "white";
+        }
+
         var state = {
             position: chess.fen(),
-            turnColor: toColor(chess),
+            turnColor: turnColor,
             movableDestinations: toDests(chess)
         };
+
         return state;
 
     }
@@ -168,7 +195,8 @@ const mapStateToProps = (state: RootState /*, ownProps*/) => {
 }
 const mapDispatchToProps = {
     playerReady: () => { },
-    playerMove: playerMove
+    playerMove: playerMove,
+    acknowledge: acknowledge
 }
 
 

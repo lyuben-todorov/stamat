@@ -35,6 +35,8 @@ export const MATCHMAKER_ADD_TO_QUEUE = "matchmaker/ADD_TO_QUEUE"
 
 export const CLIENT_FOUND_GAME = "client/FOUND_GAME";
 
+export const ACKNOWLEDGE = "client/ack"
+
 
 interface ClientFoundGameAction {
     type: typeof CLIENT_FOUND_GAME,
@@ -72,7 +74,12 @@ interface ClientUpdateGameAction {
         newGame: MatchSession
     }
 }
+
+interface Acknowledge {
+    type: typeof ACKNOWLEDGE,
+}
 export type MatchActionTypes =
+    Acknowledge |
     ClientFoundGameAction |
     ClientStartGameAction |
     ServerStartMatchmakingAction |

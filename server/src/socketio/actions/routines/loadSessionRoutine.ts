@@ -13,6 +13,8 @@ import mainSocketActionCallback from './mainRoutine/mainSocketActionCallback';
 import mainRedisMessageCallback from './mainRoutine/mainRedisMessageCallback';
 import ServerMatchSession from '../../../socketio/models/chess/ServerMatchSession';
 import returnPersonalMatchSession from '../../../util/returnPersonalMatchSession';
+import { parse } from 'dotenv/types';
+import { Chess } from 'chess.js';
 
 export const loadSessionRoutine = function actionCallback(this: EventContext, action: RedisActionTypes) {
     var { type } = action;
@@ -48,6 +50,8 @@ export const loadSessionRoutine = function actionCallback(this: EventContext, ac
                                 var parsedMatchSessionObject: ServerMatchSession = JSON.parse(reply);
                                 var personalizedSessionObject = returnPersonalMatchSession(parsedMatchSessionObject, payload.sessionId);
 
+                                this.chess = new Chess(personalizedSessionObject.position);
+                                
                                 this.sessionList[personalizedSessionObject.matchId] = personalizedSessionObject;
                                 this.socket.emit('action',
                                     new ActionBuilder()

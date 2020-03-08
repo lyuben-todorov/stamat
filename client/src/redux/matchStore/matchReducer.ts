@@ -27,13 +27,13 @@ export function matchReducer(
             return { ...state, activeMatch: matchId, matches: matches }
         case CLIENT_START_GAME:
             var matches = state.matches;
+            console.log(action.payload);
             var matchId = action.payload.game.matchId;
             matches[matchId] = action.payload.game;
             return { ...state, activeMatch: matchId, matches: matches }
         case CLIENT_UPDATE_GAME:
             var matchId = action.payload.gameId;
             state.matches[matchId] = action.payload.newGame;
-            console.log(action);
             return { ...state, lastMove: action.payload.move }
         default:
             return state;

@@ -11,7 +11,10 @@ export default function mainRedisMessageCallback(this: EventContext, channel: st
         case CLIENT_START_GAME:
             {
                 const { payload } = messageObject as ClientStartGame
-                this.sessionList[payload.matchId] = payload;
+                this.sessionList[payload.game.matchId] = payload.game;
+                this.userSession.inMatch = true;
+                console.log(payload.game.matchId);
+                this.userSession.matchIds.push(payload.game.matchId);
 
                 this.chess = new Chess();
                 this.socket.emit('action', { type: CLIENT_START_GAME, payload: payload });
