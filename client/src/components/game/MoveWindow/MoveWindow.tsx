@@ -13,14 +13,21 @@ import * as chess from "chess.js";
 interface State {
     userTimer: React.RefObject<any>;
     opponentTimer: React.RefObject<any>;
+
     gameTime: number;
+
     opponentTime: number;
     userTime: number;
+
     active: string;
+
     offeringDraw: true | false;
     playerOfferingDraw: true | false;
+
     opponent: string;
+
     gameOver: true | false;
+
     moveHistory: chess.Move[]
 }
 interface Props {
@@ -44,9 +51,9 @@ class MoveWindow extends React.Component<Props, State> {
         this.state = {
             userTimer: React.createRef(),
             opponentTimer: React.createRef(),
-            gameTime: 600000,
-            opponentTime: 600000,
-            userTime: 600000,
+            gameTime: this.props.game ? this.props.game.gameTime : 600000,
+            opponentTime: this.props.game ? this.props.game.opponent.timeLeft : 600000,
+            userTime: this.props.game ? this.props.game.proponent.timeLeft : 600000,
             active: "none",
             offeringDraw: false,
             playerOfferingDraw: false,
@@ -63,29 +70,38 @@ class MoveWindow extends React.Component<Props, State> {
             if (this.props.clientState.gameState !== prevProps.clientState.gameState) {
                 switch (this.props.clientState.gameState) {
                     case "client_update":
+                        this.state.userTimer.current.stop()
+                        this.state.opponentTimer.current.start();
+                        this.setState({ active: "opponent" })
                         break;
                     case "server_update":
+                        {
+
+                            var opponentTime = this.props.game.opponent.timeLeft;
+                            var proponentTime = this.props.game.proponent.timeLeft;
+
+                            this.state.userTimer.current.start()
+                            this.state.opponentTimer.current.stop();
+
+                            this.state.userTimer.current.setTime(proponentTime);
+                            this.state.opponentTimer.current.setTime(opponentTime);
+                            this.setState({ active: "user" })
+                        }
                         break;
                     case "starting":
                         break;
+                    case "continue":
+                        {
+                            this.state.opponentTimer.current.setTime(this.props.game.opponent.timeLeft)
+                            this.state.userTimer.current.setTime(this.props.game.proponent.timeLeft);
+                        }
+                        break;
+
                     case "ack":
                         break;
                 }
             }
 
-            //     if (this.props.moveCount !== prevProps.moveCount) {
-            //         if (this.props.action === "clientMove") {
-            //             this.state.userTimer.current.stop()
-            //             this.state.opponentTimer.current.start();
-            //             this.setState({ active: "opponent" })
-
-            //         } else if (this.props.action === "opponentMove") {
-
-            //             this.state.userTimer.current.start()
-            //             this.state.opponentTimer.current.stop();
-            //             this.setState({ active: "user" })
-            //         }
-            //     }
             //     if (this.props.action === "gameOver") {
             //         this.state.userTimer.current.stop();
             //         this.state.opponentTimer.current.stop()
