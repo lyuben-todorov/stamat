@@ -1,5 +1,6 @@
 import { GameTypes } from "../../GameTypes";
 import ChessParticipant from "./ChessParticipant";
+import { Move } from "chess.js";
 
 export interface MatchSession {
     matchId: string
@@ -18,5 +19,5 @@ export interface MatchSession {
     finished: boolean
     winner: string
     chatHistory: string[]  // 
-    moveHistory: string //not verbose
+    moveHistory: Move[]  //not verbose
 }

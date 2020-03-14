@@ -37,7 +37,7 @@
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
-    "@types/chess.js": "^0.10.0",
+    "@types/chess.js": "^0.10.1",
     "@types/redux-socket.io": "^1.4.0",
     "@types/semantic-ui": "^2.2.7",
     "axios": "^0.19.2",

@@ -1,6 +1,6 @@
 import { MatchSession } from "./models/MatchSession";
 import MatchSessionList from "./models/MatchSessionList";
-import { MatchActionTypes, SERVER_START_MATCHMAKING, CLIENT_START_GAME, CLIENT_UPDATE_GAME } from "./matchTypes";
+import { MatchActionTypes, SERVER_START_MATCHMAKING, CLIENT_START_GAME, CLIENT_UPDATE_GAME, SERVER_PLAYER_MOVE } from "./matchTypes";
 import { CLIENT_FOUND_GAME } from './matchTypes'
 import { match } from "assert";
 import { Move } from "chess.js";
@@ -21,20 +21,43 @@ export function matchReducer(
 ): MatchState {
     switch (action.type) {
         case CLIENT_FOUND_GAME:
-            var matches = state.matches;
-            var matchId = action.payload.gameObject.matchId;
-            matches[matchId] = action.payload.gameObject;
-            return { ...state, activeMatch: matchId, matches: matches }
+            {
+                var matches = state.matches;
+                var matchId = action.payload.gameObject.matchId;
+                matches[matchId] = action.payload.gameObject;
+
+                return { ...state, activeMatch: matchId, matches: matches }
+            }
         case CLIENT_START_GAME:
-            var matches = state.matches;
-            console.log(action.payload);
-            var matchId = action.payload.game.matchId;
-            matches[matchId] = action.payload.game;
-            return { ...state, activeMatch: matchId, matches: matches }
+            {
+
+                var matches = state.matches;
+                console.log(action.payload);
+                var matchId = action.payload.game.matchId;
+                matches[matchId] = action.payload.game;
+
+                return { ...state, activeMatch: matchId, matches: matches }
+            }
         case CLIENT_UPDATE_GAME:
-            var matchId = action.payload.gameId;
-            state.matches[matchId] = action.payload.newGame;
-            return { ...state, lastMove: action.payload.move }
+            {
+
+                var matchId = action.payload.gameId;
+                state.matches[matchId] = action.payload.newGame;
+
+                return { ...state, lastMove: action.payload.move }
+            }
+        case SERVER_PLAYER_MOVE:
+            {
+                var move = action.payload.move
+                var matchId = action.payload.gameId;
+
+                var match = state.matches[matchId];
+                match.moveHistory.push(move);
+
+                state.matches[matchId] = match;
+
+                return { ...state, lastMove: move };
+            }
         default:
             return state;
     }

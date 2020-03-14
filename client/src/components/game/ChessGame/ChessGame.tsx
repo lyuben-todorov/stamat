@@ -94,7 +94,7 @@ class ChessGame extends React.Component<Props, State> {
                             this.props.acknowledge();
                         }
                         break;
-                    case "update":
+                    case "server_update":
                         {
 
                             var game = this.props.game;

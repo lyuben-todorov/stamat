@@ -1,8 +1,8 @@
 import { SessionActionTypes } from "../sessionStore/sessionTypes";
-import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME } from "../matchStore/matchTypes";
+import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME, SERVER_PLAYER_MOVE } from "../matchStore/matchTypes";
 
 export interface ClientState {
-    gameState: "ongoing" | "starting" | "default" | "update" | "ack" | "continue"
+    gameState: "ongoing" | "starting" | "default" | "server_update" | "client_update" | "ack" | "continue"
 }
 
 const initialState: ClientState = {
@@ -16,11 +16,13 @@ export function clientStateReducer(
         case CLIENT_START_GAME:
             return { gameState: "starting" }
         case CLIENT_UPDATE_GAME:
-            return { gameState: "update" }
+            return { gameState: "server_update" }
         case CLIENT_FOUND_GAME:
             return { gameState: "continue" }
         case ACKNOWLEDGE:
             return { gameState: "ack" }
+        case SERVER_PLAYER_MOVE:
+            return { gameState: "client_update" }
         default:
             return state;
     }
