@@ -73,7 +73,7 @@ class ChessGame extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        console.log(this.props);
+        console.log(this.props.clientState.gameState);
         if (prevProps !== this.props) {
             if (prevProps.clientState.gameState !== this.props.clientState.gameState) {
 

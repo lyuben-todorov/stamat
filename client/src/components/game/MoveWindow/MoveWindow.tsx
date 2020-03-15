@@ -11,18 +11,18 @@ import * as chess from "chess.js";
 
 // import { concedeGame, offerDraw, replyDraw } from '../../redux/actionCreators'
 interface State {
-    userTimer: React.RefObject<any>;
+    proponentTimer: React.RefObject<any>;
     opponentTimer: React.RefObject<any>;
 
     gameTime: number;
 
+    proponentTime: number;
     opponentTime: number;
-    userTime: number;
 
-    active: string;
+    active: "proponent" | "opponent" | "none";
 
-    offeringDraw: true | false;
-    playerOfferingDraw: true | false;
+    proOfferingDraw: true | false;
+    oppOfferingDraw: true | false;
 
     opponent: string;
 
@@ -49,14 +49,14 @@ class MoveWindow extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            userTimer: React.createRef(),
+            proponentTimer: React.createRef(),
             opponentTimer: React.createRef(),
             gameTime: this.props.game ? this.props.game.gameTime : 600000,
             opponentTime: this.props.game ? this.props.game.opponent.timeLeft : 600000,
-            userTime: this.props.game ? this.props.game.proponent.timeLeft : 600000,
+            proponentTime: this.props.game ? this.props.game.proponent.timeLeft : 600000,
             active: "none",
-            offeringDraw: false,
-            playerOfferingDraw: false,
+            proOfferingDraw: false,
+            oppOfferingDraw: false,
             opponent: "None",
             gameOver: false,
             moveHistory: props.game ? props.game.moveHistory : []
@@ -70,9 +70,12 @@ class MoveWindow extends React.Component<Props, State> {
             if (this.props.clientState.gameState !== prevProps.clientState.gameState) {
                 switch (this.props.clientState.gameState) {
                     case "client_update":
-                        this.state.userTimer.current.stop()
+
+                        this.state.proponentTimer.current.stop()
                         this.state.opponentTimer.current.start();
+
                         this.setState({ active: "opponent" })
+
                         break;
                     case "server_update":
                         {
@@ -80,91 +83,93 @@ class MoveWindow extends React.Component<Props, State> {
                             var opponentTime = this.props.game.opponent.timeLeft;
                             var proponentTime = this.props.game.proponent.timeLeft;
 
-                            this.state.userTimer.current.start()
+                            this.state.proponentTimer.current.start()
                             this.state.opponentTimer.current.stop();
 
-                            this.state.userTimer.current.setTime(proponentTime);
+                            this.state.proponentTimer.current.setTime(proponentTime);
                             this.state.opponentTimer.current.setTime(opponentTime);
-                            this.setState({ active: "user" })
+
+                            this.setState({ active: "proponent" })
                         }
                         break;
                     case "starting":
                         break;
                     case "continue":
                         {
-                            this.state.opponentTimer.current.setTime(this.props.game.opponent.timeLeft)
-                            this.state.userTimer.current.setTime(this.props.game.proponent.timeLeft);
+
+                            var oppTime = this.props.game.opponent.timeLeft;
+                            var proTime = this.props.game.proponent.timeLeft;
+
+
+                            if (this.props.game.lastPlayerMoveTime) {
+                                if (this.props.game.proponent.color === this.props.game.onMove) {
+
+                                    proTime += this.props.game.lastPlayerMoveTime - Date.now();
+
+                                } else {
+
+                                    oppTime += this.props.game.lastPlayerMoveTime - Date.now();
+
+                                }
+                            }
+
+                            this.state.opponentTimer.current.setTime(oppTime);
+                            this.state.proponentTimer.current.setTime(proTime);
+
+                            if (this.props.game.proponent.color === this.props.game.onMove) {
+
+                                this.state.proponentTimer.current.start();
+                                this.state.opponentTimer.current.stop();
+
+                                this.setState({ active: "proponent" })
+                            } else {
+
+                                this.state.opponentTimer.current.start();
+                                this.state.proponentTimer.current.stop();
+
+                                this.setState({ active: "opponent" })
+
+                            }
                         }
                         break;
 
+                    case "game_over":
+                        {
+
+                            this.state.proponentTimer.current.stop();
+                            this.state.opponentTimer.current.stop();
+
+                            this.setState({ proOfferingDraw: false, gameOver: true });
+
+                        }
+                        break;
+                    case "pro_offer_draw":
+
+                        this.setState({ proOfferingDraw: true });
+
+                        break;
+                    case "opp_offer_draw":
+
+                        this.setState({ oppOfferingDraw: true });
+
+                        break;
+                    case "opp_replied_draw":
+
+                        this.setState({ proOfferingDraw: false });
+                        
                     case "ack":
                         break;
                 }
             }
-
-            //     if (this.props.action === "gameOver") {
-            //         this.state.userTimer.current.stop();
-            //         this.state.opponentTimer.current.stop()
-            //         this.setState({ playerOfferingDraw: false, gameOver: true })
-            //     }
-            //     if (this.props.action === "offerDraw") {
-            //         this.setState({ offeringDraw: true });
-            //     } else if (this.props.action === "repliedDraw") {
-            //         this.setState({ offeringDraw: false, playerOfferingDraw: false });
-            //     } else if (this.props.action === "playerOfferDraw") {
-            //         this.setState({ playerOfferingDraw: true })
-            //     }
-            //     if (this.props.game !== prevProps.game) {
-            //         if (this.props.action === "clientMove" || this.props.action === "opponentMove") {
-            //             let { blackTime, whiteTime } = this.props.game;
-            //             if (this.props.color.charAt(0) === 'w') {
-            //                 this.state.userTimer.current.setTime(whiteTime);
-            //                 this.state.opponentTimer.current.setTime(blackTime);
-            //             } else {
-
-            //                 this.state.userTimer.current.setTime(blackTime)
-            //                 this.state.opponentTimer.current.setTime(whiteTime);
-            //             }
-
-            //         }
-            //         if (this.props.action === "startGame" || this.props.action === "resumeGame" || this.props.action === "gameReady" || this.props.action === "initiateGame") {
-            //             let { blackTime, whiteTime, toMove, lastPlayerMoveTime, gameTime, blackName, whiteName } = this.props.game;
-
-            //             console.log(whiteTime)
-
-            //             let opponent = this.props.color.charAt(0) === 'w' ? this.props.game.blackName : this.props.game.whiteName;
-            //             if (lastPlayerMoveTime) {
-
-            //                 if (toMove === 'w') {
-            //                     whiteTime = gameTime + lastPlayerMoveTime - Date.now()
-            //                 } else {
-            //                     blackTime = gameTime + lastPlayerMoveTime - Date.now()
-            //                 }
-            //             }
-            //             if (this.props.color.charAt(0) === 'w') {
-            //                 this.state.userTimer.current.setTime(whiteTime);
-            //                 this.state.opponentTimer.current.setTime(blackTime);
-            //             } else {
-
-            //                 this.state.userTimer.current.setTime(blackTime)
-            //                 this.state.opponentTimer.current.setTime(whiteTime);
-            //             }
-
-            //             if ((this.props.color.charAt(0) === 'w') === (toMove === 'w')) {
-            //                 this.state.userTimer.current.start();
-
-            //                 this.setState({ active: "user", opponent: opponent })
-            //             } else {
-            //                 this.state.opponentTimer.current.start();
-            //                 this.setState({ active: "opponent", opponent: opponent })
-            //             }
-            //         }
-
-            //     }
         }
     }
+
     renderNumbers(time: number) {
+        // no negative time; shouldn't happen
+        time = time < 0 ? 0 : time;
+        // formatting
         return time < 10 ? `0${time}` : `${time}`
+
     }
 
     render() {
@@ -228,29 +233,32 @@ class MoveWindow extends React.Component<Props, State> {
                         </Menu.Item>
                         <Menu.Item>
                             <Button
-                                color={this.state.offeringDraw ? "green" : "grey"}
-                                loading={this.state.playerOfferingDraw}
-                                onClick={() => { this.state.offeringDraw ? this.props.replyDraw(true) : this.props.offerDraw(); }}>
+                                color={this.state.proOfferingDraw ? "green" : "grey"}
+                                loading={this.state.proOfferingDraw}
+                                onClick={() => {
+                                    this.state.proOfferingDraw ?
+                                        this.props.replyDraw(true) :
+                                        this.props.offerDraw();
+                                }}>
 
-                                <Icon size={"large"} name={this.state.offeringDraw ? "thumbs up" : "handshake outline"}></Icon>
+                                <Icon size={"large"} name={this.state.proOfferingDraw ? "thumbs up" : "handshake outline"}></Icon>
 
                             </Button>
                         </Menu.Item>
                         {
-                            this.state.offeringDraw ?
+                            this.state.oppOfferingDraw ?
                                 <Menu.Item>
                                     <Button color={"red"} onClick={() => { this.props.replyDraw(false); }}>
                                         <Icon size={"large"} name={"thumbs down"}></Icon>
                                     </Button>
                                 </Menu.Item>
-                                :
-                                ""
+                                : ""
                         }
 
                     </Menu>
                 </Segment>
-                <div className={this.state.active === "user" ? "Timer active" : "Timer"}>
-                    <Timer ref={this.state.userTimer} startImmediately={false} timeToUpdate={1000} initialTime={this.state.userTime} direction={"backward"} >
+                <div className={this.state.active === "proponent" ? "Timer active" : "Timer"}>
+                    <Timer ref={this.state.proponentTimer} startImmediately={false} timeToUpdate={1000} initialTime={this.state.proponentTime} direction={"backward"} >
                         {() => (
                             <div className="CenterContainer">
                                 <div className="TimerNumber">

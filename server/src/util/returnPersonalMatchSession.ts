@@ -19,6 +19,8 @@ export default function returnPersonalMatchSession(session: ServerMatchSession, 
         chatHistory: session.chatHistory,
         position: session.position,
         moveCount: session.moveCount,
-        moveHistory: session.moveHistory
+        moveHistory: session.moveHistory,
+        
+        lastPlayerMoveTime: session.lastPlayerMoveTime
     }
 }

@@ -10,8 +10,7 @@ export interface MatchSession {
     proponent: ChessParticipant
     opponent: ChessParticipant
 
-
-    onMove: boolean;
+    onMove: "white" | "black";
     issueTime: number // unix time of issue by matchmaker
     gameType: GameTypes // CHESS, CHESS_360?, FISCHER_CHESS?
     gameTime: number //  game time by spec  in seconds 
@@ -19,5 +18,9 @@ export interface MatchSession {
     finished: boolean
     winner: string
     chatHistory: string[]  // 
+    moveCount: number;
     moveHistory: Move[]  //not verbose
+
+    lastPlayerMoveTime: number;
+
 }

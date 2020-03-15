@@ -25,9 +25,8 @@ class MenuWindow extends React.Component<MenuProps, MenuState> {
                 this.state = { activeItem: "chat" }
                 break;
             case "default":
-                this.state = { activeItem: "matchmaking" }
-                break;
             default:
+                this.state = { activeItem: "matchmaking" }
                 break;
         }
         this.handleItemClick = this.handleItemClick.bind(this);
