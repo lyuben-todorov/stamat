@@ -1,4 +1,4 @@
-import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, SERVER_CONCEDE } from "./ActionTypes";
+import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, SERVER_CONCEDE, SERVER_OFFER_DRAW, SERVER_REPLY_DRAW } from "./ActionTypes";
 import Action from "./RedisActionTypes";
 import { GameTypes } from "../GameType";
 import { GameTime } from "../GameTime";
@@ -29,8 +29,8 @@ export interface ServerPlayerReady extends Action {
 
 export interface ServerPlayerMove extends Action {
     type: typeof SERVER_PLAYER_MOVE,
-    payload:{
-        gameId:string,
+    payload: {
+        gameId: string,
         move: Move
     }
 
@@ -38,8 +38,23 @@ export interface ServerPlayerMove extends Action {
 
 export interface ServerConcede extends Action {
     type: typeof SERVER_CONCEDE,
-    payload:{
-        gameId:string
+    payload: {
+        gameId: string
+    }
+}
+
+export interface ServerOfferDraw extends Action {
+    type: typeof SERVER_OFFER_DRAW,
+    payload: {
+        gameId: string
+    }
+}
+
+export interface ServerReplyDraw extends Action {
+    type: typeof SERVER_REPLY_DRAW,
+    payload: {
+        reply: boolean,
+        gameId: string
     }
 }
 export type SocketActionTypes =
@@ -47,4 +62,6 @@ export type SocketActionTypes =
     ServerStartMatchmaking |
     ServerPlayerReady |
     ServerPlayerMove |
-    ServerConcede
+    ServerConcede |
+    ServerOfferDraw |
+    ServerReplyDraw

@@ -13,6 +13,5 @@ export interface EventContext {
     sessionList: MatchSessionList;
     personalChannel: Redis;
     chess: ChessInstance;
-    activeGame: string;
 
 }

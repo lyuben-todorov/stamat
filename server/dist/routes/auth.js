@@ -68,6 +68,8 @@ router.get('/restore', (req, res) => {
                                     inMatch: false,
                                     connected: true,
                                     matchIds: [],
+                                    activeGameId: null,
+                                    activeGameOpponentId: null,
                                     // user settings
                                     autoAccept: true,
                                 };
@@ -146,6 +148,8 @@ router.post('/login', (req, res) => {
                                 inMatch: false,
                                 connected: true,
                                 matchIds: [],
+                                activeGameId: null,
+                                activeGameOpponentId: null,
                                 //user settings
                                 autoAccept: true
                             };

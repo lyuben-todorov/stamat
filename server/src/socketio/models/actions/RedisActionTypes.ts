@@ -40,6 +40,7 @@ export interface ClientStartGame extends Action {
     type: typeof CLIENT_START_GAME;
     payload: {
         game: PersonalMatchSession;
+        opponentId: string;
     }
 }
 
@@ -76,11 +77,11 @@ export interface ClientReplyDraw extends Action {
         reply: boolean
     }
 }
-export interface ClientGameOver extends Action{
+export interface ClientGameOver extends Action {
     type: typeof CLIENT_GAME_OVER;
-    payload:{
-        winner: string,
-        game:PersonalMatchSession
+    payload: {
+        winner: string | "draw",
+        game: PersonalMatchSession
     }
 }
 export type RedisActionTypes =
@@ -93,6 +94,6 @@ export type RedisActionTypes =
     ClientResumeGame |
     ClientOfferDraw |
     ClientUpdateGame |
-    ClientReplyDraw | 
+    ClientReplyDraw |
     ClientGameOver |
     AuthRequestSessionAction

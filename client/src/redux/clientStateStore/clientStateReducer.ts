@@ -1,5 +1,5 @@
 import { SessionActionTypes } from "../sessionStore/sessionTypes";
-import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER } from "../matchStore/matchTypes";
+import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW } from "../matchStore/matchTypes";
 
 export interface ClientState {
     gameState: "ongoing" |
@@ -12,7 +12,7 @@ export interface ClientState {
     "game_over" |
     "pro_offer_draw" |
     "opp_offer_draw" |
-    "opp_replied_draw"
+    "opp_reply_draw"
 }
 
 const initialState: ClientState = {
@@ -29,12 +29,16 @@ export function clientStateReducer(
             return { gameState: "server_update" }
         case CLIENT_FOUND_GAME:
             return { gameState: "continue" }
+        case CLIENT_GAME_OVER:
+            return { gameState: "game_over" }
+        case CLIENT_OFFER_DRAW:
+            return { gameState: "opp_offer_draw" }
+        case CLIENT_REPLY_DRAW:
+            return { gameState: "opp_reply_draw"}
         case ACKNOWLEDGE:
             return { gameState: "ack" }
         case SERVER_PLAYER_MOVE:
             return { gameState: "client_update" }
-        case CLIENT_GAME_OVER:
-            return { gameState: "game_over" }
         default:
             return state;
     }

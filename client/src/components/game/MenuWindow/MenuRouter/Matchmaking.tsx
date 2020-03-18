@@ -51,7 +51,7 @@ interface Props {
     userSession: UserSession
 
     gameState: string,
-    startMatchmaking: Function;
+    startMatchmaking: typeof startMatchmaking;
 }
 interface State {
     mode: string,
@@ -162,13 +162,13 @@ class Matchmaking extends React.Component<Props, State> {
         if (opponentType && mode && time) {
 
 
-            var matchmakingObject = {
+            var matchmakingObject: MatchmakingRequest = {
                 mode: GameTypes.CHESS,
                 opponentType: "USER",
                 time: 10,
                 username: this.props.userSession.username,
                 sessionId: this.props.userSession.sessionId,
-                autoAccept:true
+                autoAccept: true
             }
             this.props.startMatchmaking(matchmakingObject);
 
@@ -250,7 +250,7 @@ const mapStateToProps = (state: RootState) => {
     return {
         matchSession: state.match,
         userSession: state.session,
-        gameState:""
+        gameState: ""
     }
 }
 

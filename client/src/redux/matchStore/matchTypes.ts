@@ -71,6 +71,35 @@ interface ClientGameOverAction {
     }
 }
 
+interface ClientOfferDrawAction {
+    type: typeof CLIENT_OFFER_DRAW;
+    payload: {
+        gameId: string
+    }
+}
+
+interface ClientReplyDrawAction {
+    type: typeof CLIENT_REPLY_DRAW,
+    payload: {
+        reply: boolean
+    }
+}
+
+interface ServerOfferDrawAction {
+    type: typeof SERVER_OFFER_DRAW;
+    payload: {
+        gameId: string
+    }
+}
+
+interface ServerReplyDrawAction {
+    type: typeof SERVER_REPLY_DRAW,
+    payload: {
+        reply: boolean
+        gameId: string
+    }
+}
+
 interface ServerStartMatchmakingAction {
     type: typeof SERVER_START_MATCHMAKING,
     payload: MatchmakingRequest
@@ -100,6 +129,10 @@ export type MatchActionTypes =
     ClientStartGameAction |
     ClientUpdateGameAction |
     ClientGameOverAction |
+    ClientReplyDrawAction |
+    ClientOfferDrawAction |
+    ServerOfferDrawAction |
+    ServerReplyDrawAction |
     ServerStartMatchmakingAction |
     ServerPlayerMoveAction |
     ServerConcedeAction 

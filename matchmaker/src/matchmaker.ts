@@ -64,8 +64,8 @@ matchmakingClient.on('message', (channel, message) => {
                                     const p1s = returnPersonalMatchSession(game, playerOne.sessionId);
                                     const p2s = returnPersonalMatchSession(game, playerTwo.sessionId);
 
-                                    redisClient.publish(playerOne.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: p1s }));
-                                    redisClient.publish(playerTwo.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: p2s }));
+                                    redisClient.publish(playerOne.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: p1s, opponentId: playerTwo.sessionId }));
+                                    redisClient.publish(playerTwo.sessionId, serializeRedisMessage(CLIENT_START_GAME, { game: p2s, opponentId: playerOne.sessionId }));
 
                                 })
                             }

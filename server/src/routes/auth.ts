@@ -77,11 +77,15 @@ router.get('/restore', (req, res) => {
 
                                     username: user.username,
                                     email: user.email,
-                                    
+
                                     inMatch: false,
                                     connected: true,
-                                    
+
                                     matchIds: [],
+
+                                    activeGameId: null,
+
+                                    activeGameOpponentId: null,
 
                                     // user settings
                                     autoAccept: true,
@@ -161,11 +165,16 @@ router.post('/login', (req, res) => {
                                 username: user.username,
                                 email: user.email,
 
-                                
+
                                 inMatch: false,
+
                                 connected: true,
-                                
+
                                 matchIds: [],
+
+                                activeGameId: null,
+
+                                activeGameOpponentId: null,
 
                                 //user settings
                                 autoAccept: true

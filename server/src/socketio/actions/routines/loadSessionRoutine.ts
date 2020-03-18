@@ -26,7 +26,6 @@ export const loadSessionRoutine = function actionCallback(this: EventContext, ac
             //no need for block scope as there is only one action.
             const { payload } = action as AuthRegisterOnSocket
 
-
             this.socketLogger = createLogger(payload.sessionId.slice(-5));
 
             this.socketLogger.info("Session registered: " + payload.sessionId.slice(-5));
@@ -38,45 +37,47 @@ export const loadSessionRoutine = function actionCallback(this: EventContext, ac
                 } else {
                     var parsedUserSessionObject: UserSession = JSON.parse(res);
 
-                    this.socketLogger.info("Socket session retrieved successfully");
+                    if (!_.isNull(parsedUserSessionObject) && !_.isUndefined(parsedUserSessionObject)) {
 
-                    this.userSession = parsedUserSessionObject;
+                        this.socketLogger.info("Socket session retrieved successfully");
 
-                    if ( this.userSession) {
-                         this.userSession.matchIds.forEach(matchId => {
-                            redisClient.get(matchId + "object", (err, reply) => {
+                        this.userSession = parsedUserSessionObject;
+
+                        if (!_.isNull(this.userSession.activeGameId)) {
+                            redisClient.get(this.userSession.activeGameId + "object", (err, reply) => {
+
                                 var parsedMatchSessionObject: ServerMatchSession = JSON.parse(reply);
-                                var personalizedSessionObject = returnPersonalMatchSession(parsedMatchSessionObject, payload.sessionId);
 
-                                if (!personalizedSessionObject.finished) {
+                                var personalizedMatchSessionObject = returnPersonalMatchSession(parsedMatchSessionObject, this.userSession.sessionId);
 
-                                    this.chess = new Chess(personalizedSessionObject.position);
+                                if (!personalizedMatchSessionObject.finished) {
 
-                                    this.activeGame = personalizedSessionObject.matchId;
-                                    this.sessionList[personalizedSessionObject.matchId] = personalizedSessionObject;
+                                    this.chess = new Chess(personalizedMatchSessionObject.position);
+
+                                    this.userSession.activeGameId = personalizedMatchSessionObject.matchId;
+                                    this.sessionList[personalizedMatchSessionObject.matchId] = personalizedMatchSessionObject;
                                     this.socket.emit('action',
                                         new ActionBuilder()
                                             .setType(CLIENT_FOUND_GAME)
-                                            .setPayload({ gameObject: personalizedSessionObject })
+                                            .setPayload({ gameObject: personalizedMatchSessionObject })
                                     );
                                 }
                             })
+                        }
+
+
+                        this.socket.removeAllListeners();
+
+                        this.socket.on('disconnect', mainSocketDisconnectCallback.bind(this));
+                        this.socket.on('action', mainSocketActionCallback.bind(this));
+
+                        this.personalChannel = new redis();
+                        this.personalChannel.subscribe(this.userSession.sessionId).then((res) => {
+
                         });
+
+                        this.personalChannel.on('message', mainRedisMessageCallback.bind(this));
                     }
-
-
-                    this.socket.removeAllListeners();
-
-                    this.socket.on('disconnect', mainSocketDisconnectCallback.bind(this));
-                    this.socket.on('action', mainSocketActionCallback.bind(this));
-
-                    this.personalChannel = new redis();
-                    this.personalChannel.subscribe(this.userSession.sessionId).then((res) => {
-
-                    });
-
-                    this.personalChannel.on('message', mainRedisMessageCallback.bind(this));
-                    // mainRoutine.call(this);
                 }
             })
 

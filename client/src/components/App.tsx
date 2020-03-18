@@ -11,14 +11,15 @@ import Home from "./Home";
 import axios, { AxiosResponse } from 'axios';
 import { registerOnSocket, logoutUser, loginUser } from "../redux/sessionStore/sessionActions";
 import processVariables from '../procVars'
+import UserSession from "../redux/sessionStore/models/UserSession";
 
 const { endpoint, serverUrl, mode } = processVariables
 
 interface AppProps {
     sessionState: SessionState;
-    loginUser?: Function
-    logoutUser?: Function
-    registerOnSocket?: Function
+    loginUser: typeof loginUser
+    logoutUser: typeof logoutUser
+    registerOnSocket: typeof registerOnSocket
 
 }
 interface AppState {
@@ -41,14 +42,13 @@ class App extends React.Component<AppProps, AppState> {
 
             this.state = { loggedIn: true }
         } else {
-            axios.request<AxiosResponse>({
+            axios.request<UserSession>({
                 method: "GET",
                 url: `${serverUrl}${endpoint}/auth/restore`,
-                withCredentials: true,
-
+                withCredentials: true
             }).then((res) => {
                 if (res) {
-                    this.props.loginUser(res.data)
+                    this.props.loginUser(res.data);
                     this.props.registerOnSocket(res.data);
                     this.setState({ loggedIn: true });
                 }

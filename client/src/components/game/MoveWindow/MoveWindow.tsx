@@ -8,8 +8,7 @@ import { MatchSession } from '../../../redux/matchStore/models/MatchSession';
 import { ClientState } from '../../../redux/clientStateStore/clientStateReducer';
 import UserSession from '../../../redux/sessionStore/models/UserSession';
 import * as chess from "chess.js";
-import { concede } from '../../../redux/matchStore/matchActions';
-// import { concedeGame, offerDraw, replyDraw } from '../../redux/actionCreators'
+import { concede, offerDraw, replyDraw } from '../../../redux/matchStore/matchActions';
 interface State {
     proponentTimer: React.RefObject<any>;
     opponentTimer: React.RefObject<any>;
@@ -40,8 +39,8 @@ interface Props {
     lastMove: chess.Move
 
     concedeGame: typeof concede;
-    replyDraw: Function;
-    offerDraw: Function;
+    replyDraw: typeof replyDraw;
+    offerDraw: typeof offerDraw;
 
 }
 
@@ -140,7 +139,7 @@ class MoveWindow extends React.Component<Props, State> {
                             this.state.proponentTimer.current.stop();
                             this.state.opponentTimer.current.stop();
 
-                            this.setState({ proOfferingDraw: false, gameOver: true, active:"none" });
+                            this.setState({ proOfferingDraw: false, gameOver: true, active: "none" });
 
                         }
                         break;
@@ -154,10 +153,9 @@ class MoveWindow extends React.Component<Props, State> {
                         this.setState({ oppOfferingDraw: true });
 
                         break;
-                    case "opp_replied_draw":
+                    case "opp_reply_draw":
 
                         this.setState({ proOfferingDraw: false });
-
                     case "ack":
                         break;
                 }
@@ -173,8 +171,22 @@ class MoveWindow extends React.Component<Props, State> {
 
     }
 
+    offerDraw() {
+        this.setState({ proOfferingDraw: true });
+        this.props.offerDraw(this.props.gameId);
+    }
+
+    replyDraw(reply: boolean) {
+        if (reply) {
+            this.props.replyDraw(true, this.props.gameId);
+        } else {
+            this.setState({ oppOfferingDraw: false });
+            this.props.replyDraw(false, this.props.gameId);
+        }
+    }
+
     render() {
-        let opponentName = this.props.game ? this.props.game.opponent.name : "None";
+        var opponentName = this.props.game ? this.props.game.opponent.name : "None";
         return (
 
             <Grid className="MoveWindow">
@@ -234,12 +246,12 @@ class MoveWindow extends React.Component<Props, State> {
                         </Menu.Item>
                         <Menu.Item>
                             <Button
-                                color={this.state.proOfferingDraw ? "green" : "grey"}
+                                color={this.state.oppOfferingDraw ? "green" : "grey"}
                                 loading={this.state.proOfferingDraw}
                                 onClick={() => {
-                                    this.state.proOfferingDraw ?
-                                        this.props.replyDraw(true) :
-                                        this.props.offerDraw();
+                                    this.state.oppOfferingDraw ?
+                                        this.replyDraw(true) :
+                                        this.offerDraw();
                                 }}>
 
                                 <Icon size={"large"} name={this.state.proOfferingDraw ? "thumbs up" : "handshake outline"}></Icon>
@@ -249,7 +261,7 @@ class MoveWindow extends React.Component<Props, State> {
                         {
                             this.state.oppOfferingDraw ?
                                 <Menu.Item>
-                                    <Button color={"red"} onClick={() => { this.props.replyDraw(false); }}>
+                                    <Button color={"red"} onClick={() => { this.replyDraw(false); }}>
                                         <Icon size={"large"} name={"thumbs down"}></Icon>
                                     </Button>
                                 </Menu.Item>
@@ -286,7 +298,7 @@ const mapStateToProps = (state: RootState) => ({
     lastMove: state.match.lastMove
 })
 
-const mapDispatchToProps = { concedeGame: concede, offerDraw: () => { }, replyDraw: () => { } }
+const mapDispatchToProps = { concedeGame: concede, offerDraw: offerDraw, replyDraw: replyDraw }
 
 export default connect(
     mapStateToProps,

@@ -10,7 +10,7 @@ import processVariables from '../../procVars'
 const { endpoint, serverUrl, mode } = processVariables
 
 interface Props extends RouteComponentProps {
-    loginUser: Function;
+    loginUser: typeof loginUser;
 }
 interface State {
     authenticationError: boolean;

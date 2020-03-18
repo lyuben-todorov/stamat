@@ -22,8 +22,8 @@ interface Props {
     game: MatchSession;
     clientState: ClientState;
 
-    playerMove: (move: Chess.Move, gameId: string) => void
-    acknowledge: () => void
+    playerMove: typeof playerMove
+    acknowledge: typeof acknowledge
 }
 interface State {
 
@@ -66,6 +66,7 @@ class ChessGame extends React.Component<Props, State> {
             this.props
             this.state = {
                 ...state,
+                turnColor: "undefined",
                 orientation: "white",
                 chess: chess,
             }
@@ -128,6 +129,12 @@ class ChessGame extends React.Component<Props, State> {
                             this.props.acknowledge();
                         }
                         break;
+                    case "game_over":
+                        {
+                            console.log("da");
+
+                        }
+                        break;
                 }
             }
         }
@@ -153,16 +160,19 @@ class ChessGame extends React.Component<Props, State> {
 
     // already verified
     onMove = (from: any, to: any) => {
-        var moveObject: Chess.ShortMove = { from: from, to: to, promotion: 'q' }
+        if (this.props.gameId) {
 
-        var move = this.state.chess.move(moveObject);
+            var moveObject: Chess.ShortMove = { from: from, to: to, promotion: 'q' }
 
-        const newState = this.makeState(this.state.chess);
+            var move = this.state.chess.move(moveObject);
 
-        this.props.playerMove(move, this.props.gameId);
-        this.setState({
-            ...newState,
-        })
+            const newState = this.makeState(this.state.chess);
+
+            this.props.playerMove(move, this.props.gameId);
+            this.setState({
+                ...newState,
+            })
+        }
     }
     render() {
 
