@@ -1,6 +1,7 @@
 import { MatchSession } from "./models/MatchSession";
 import MatchmakingRequest from "./models/MatchmakingRequest";
 import { Move } from "chess.js";
+import { Server } from "http";
 
 /* Client-Server actions */
 export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
@@ -53,6 +54,23 @@ interface ClientStartGameAction {
     }
 }
 
+interface ClientUpdateGameAction {
+    type: typeof CLIENT_UPDATE_GAME,
+    payload: {
+        gameId: string,
+        move: Move,
+        newGame: MatchSession
+    }
+}
+
+interface ClientGameOverAction {
+    type: typeof CLIENT_GAME_OVER,
+    payload: {
+        winner: string,
+        game: MatchSession
+    }
+}
+
 interface ServerStartMatchmakingAction {
     type: typeof SERVER_START_MATCHMAKING,
     payload: MatchmakingRequest
@@ -66,12 +84,10 @@ interface ServerPlayerMoveAction {
     }
 }
 
-interface ClientUpdateGameAction {
-    type: typeof CLIENT_UPDATE_GAME,
+interface ServerConcedeAction {
+    type: typeof SERVER_CONCEDE,
     payload: {
-        gameId: string,
-        move: Move,
-        newGame: MatchSession
+        gameId: string
     }
 }
 
@@ -82,6 +98,8 @@ export type MatchActionTypes =
     Acknowledge |
     ClientFoundGameAction |
     ClientStartGameAction |
+    ClientUpdateGameAction |
+    ClientGameOverAction |
     ServerStartMatchmakingAction |
     ServerPlayerMoveAction |
-    ClientUpdateGameAction
+    ServerConcedeAction 

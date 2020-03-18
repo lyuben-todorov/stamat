@@ -1,5 +1,5 @@
 import { SessionActionTypes } from "../sessionStore/sessionTypes";
-import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME, SERVER_PLAYER_MOVE } from "../matchStore/matchTypes";
+import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER } from "../matchStore/matchTypes";
 
 export interface ClientState {
     gameState: "ongoing" |
@@ -33,6 +33,8 @@ export function clientStateReducer(
             return { gameState: "ack" }
         case SERVER_PLAYER_MOVE:
             return { gameState: "client_update" }
+        case CLIENT_GAME_OVER:
+            return { gameState: "game_over" }
         default:
             return state;
     }

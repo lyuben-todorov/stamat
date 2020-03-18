@@ -11,6 +11,7 @@ export default function mainRedisMessageCallback(this: EventContext, channel: st
         case CLIENT_START_GAME:
             {
                 const { payload } = messageObject as ClientStartGame
+                this.activeGame = payload.game.matchId;
                 this.sessionList[payload.game.matchId] = payload.game;
                 this.userSession.inMatch = true;
                 console.log(payload.game.matchId);
@@ -60,10 +61,18 @@ export default function mainRedisMessageCallback(this: EventContext, channel: st
                 this.socket.emit('action', { type: CLIENT_REPLY_DRAW, payload: payload })
                 break;
             }
+
         case CLIENT_GAME_OVER:
 
             {
                 const { payload } = messageObject as ClientGameOver
+                this.activeGame = null;
+                delete this.sessionList[payload.game.matchId];
+                var index = this.userSession.matchIds.indexOf(payload.game.matchId);
+                console.log(this.userSession.matchIds)
+                this.userSession.matchIds.splice(index, 1);
+                console.log(this.userSession.matchIds)
+
                 this.socket.emit('action', { type: CLIENT_GAME_OVER, payload: payload });
                 break;
             }

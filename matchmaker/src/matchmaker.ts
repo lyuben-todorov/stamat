@@ -33,8 +33,6 @@ matchmakingClient.on('message', (channel, message) => {
 
             var vreq = JSON.stringify(matchmakingRequest);
 
-            console.log(matchmakingRequest);
-
             redisClient.sadd(`mode${mode}queue`, vreq).then((added) => {
 
                 if (added == 1) {
@@ -62,7 +60,6 @@ matchmakingClient.on('message', (channel, message) => {
                                     var game: ServerMatchSession = createGame(gameId, playerOne, playerTwo);
 
                                     redisClient.set(gameId + "object", JSON.stringify(game));
-
 
                                     const p1s = returnPersonalMatchSession(game, playerOne.sessionId);
                                     const p2s = returnPersonalMatchSession(game, playerTwo.sessionId);

@@ -1,6 +1,6 @@
 import { MatchSession } from "./models/MatchSession";
 import MatchSessionList from "./models/MatchSessionList";
-import { MatchActionTypes, SERVER_START_MATCHMAKING, CLIENT_START_GAME, CLIENT_UPDATE_GAME, SERVER_PLAYER_MOVE } from "./matchTypes";
+import { MatchActionTypes, SERVER_START_MATCHMAKING, CLIENT_START_GAME, CLIENT_UPDATE_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER } from "./matchTypes";
 import { CLIENT_FOUND_GAME } from './matchTypes'
 import { match } from "assert";
 import { Move } from "chess.js";
@@ -22,6 +22,7 @@ export function matchReducer(
     switch (action.type) {
         case CLIENT_FOUND_GAME:
             {
+                console.log(action.payload.gameObject);
                 var matches = state.matches;
                 var matchId = action.payload.gameObject.matchId;
                 matches[matchId] = action.payload.gameObject;
@@ -45,6 +46,14 @@ export function matchReducer(
                 state.matches[matchId] = action.payload.newGame;
 
                 return { ...state, lastMove: action.payload.move }
+            }
+        case CLIENT_GAME_OVER:
+            {
+                var matchId = action.payload.game.matchId;
+
+                state.matches[matchId] = action.payload.game;
+                
+                return { ...state }
             }
         case SERVER_PLAYER_MOVE:
             {

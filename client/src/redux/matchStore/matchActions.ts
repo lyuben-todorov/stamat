@@ -1,4 +1,4 @@
-import { SERVER_START_MATCHMAKING, MatchActionTypes, SERVER_PLAYER_MOVE } from "./matchTypes";
+import { SERVER_START_MATCHMAKING, MatchActionTypes, SERVER_PLAYER_MOVE, SERVER_CONCEDE } from "./matchTypes";
 import MatchmakingRequest from "./models/MatchmakingRequest";
 import { Move } from "chess.js";
 
@@ -15,6 +15,15 @@ export function playerMove(move: Move, gameId: string): MatchActionTypes {
         payload: {
             gameId: gameId,
             move: move
+        }
+    }
+}
+
+export function concede(gameId: string): MatchActionTypes {
+    return {
+        type: SERVER_CONCEDE,
+        payload: {
+            gameId: gameId
         }
     }
 }

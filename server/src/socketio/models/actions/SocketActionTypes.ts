@@ -1,4 +1,4 @@
-import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE } from "./ActionTypes";
+import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, SERVER_CONCEDE } from "./ActionTypes";
 import Action from "./RedisActionTypes";
 import { GameTypes } from "../GameType";
 import { GameTime } from "../GameTime";
@@ -35,8 +35,16 @@ export interface ServerPlayerMove extends Action {
     }
 
 }
+
+export interface ServerConcede extends Action {
+    type: typeof SERVER_CONCEDE,
+    payload:{
+        gameId:string
+    }
+}
 export type SocketActionTypes =
     ServerSendChatMessage |
     ServerStartMatchmaking |
     ServerPlayerReady |
-    ServerPlayerMove
+    ServerPlayerMove |
+    ServerConcede

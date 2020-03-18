@@ -31,8 +31,6 @@ export const loadSessionRoutine = function actionCallback(this: EventContext, ac
 
             this.socketLogger.info("Session registered: " + payload.sessionId.slice(-5));
 
-
-
             redisClient.get(payload.sessionId, (err, res) => {
                 if (!err && _.isEmpty(res)) {
                     this.socketLogger.info("No session to restore found");
@@ -44,20 +42,24 @@ export const loadSessionRoutine = function actionCallback(this: EventContext, ac
 
                     this.userSession = parsedUserSessionObject;
 
-                    if (parsedUserSessionObject.inMatch) {
-                        parsedUserSessionObject.matchIds.forEach(matchId => {
+                    if ( this.userSession) {
+                         this.userSession.matchIds.forEach(matchId => {
                             redisClient.get(matchId + "object", (err, reply) => {
                                 var parsedMatchSessionObject: ServerMatchSession = JSON.parse(reply);
                                 var personalizedSessionObject = returnPersonalMatchSession(parsedMatchSessionObject, payload.sessionId);
 
-                                this.chess = new Chess(personalizedSessionObject.position);
-                                
-                                this.sessionList[personalizedSessionObject.matchId] = personalizedSessionObject;
-                                this.socket.emit('action',
-                                    new ActionBuilder()
-                                        .setType(CLIENT_FOUND_GAME)
-                                        .setPayload({ gameObject: personalizedSessionObject })
-                                );
+                                if (!personalizedSessionObject.finished) {
+
+                                    this.chess = new Chess(personalizedSessionObject.position);
+
+                                    this.activeGame = personalizedSessionObject.matchId;
+                                    this.sessionList[personalizedSessionObject.matchId] = personalizedSessionObject;
+                                    this.socket.emit('action',
+                                        new ActionBuilder()
+                                            .setType(CLIENT_FOUND_GAME)
+                                            .setPayload({ gameObject: personalizedSessionObject })
+                                    );
+                                }
                             })
                         });
                     }

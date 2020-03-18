@@ -8,7 +8,7 @@ import { MatchSession } from '../../../redux/matchStore/models/MatchSession';
 import { ClientState } from '../../../redux/clientStateStore/clientStateReducer';
 import UserSession from '../../../redux/sessionStore/models/UserSession';
 import * as chess from "chess.js";
-
+import { concede } from '../../../redux/matchStore/matchActions';
 // import { concedeGame, offerDraw, replyDraw } from '../../redux/actionCreators'
 interface State {
     proponentTimer: React.RefObject<any>;
@@ -39,7 +39,7 @@ interface Props {
     userSession: UserSession;
     lastMove: chess.Move
 
-    concedeGame: Function;
+    concedeGame: typeof concede;
     replyDraw: Function;
     offerDraw: Function;
 
@@ -136,10 +136,11 @@ class MoveWindow extends React.Component<Props, State> {
                     case "game_over":
                         {
 
+                            console.log("i stop");
                             this.state.proponentTimer.current.stop();
                             this.state.opponentTimer.current.stop();
 
-                            this.setState({ proOfferingDraw: false, gameOver: true });
+                            this.setState({ proOfferingDraw: false, gameOver: true, active:"none" });
 
                         }
                         break;
@@ -156,7 +157,7 @@ class MoveWindow extends React.Component<Props, State> {
                     case "opp_replied_draw":
 
                         this.setState({ proOfferingDraw: false });
-                        
+
                     case "ack":
                         break;
                 }
@@ -227,7 +228,7 @@ class MoveWindow extends React.Component<Props, State> {
                             </div>
                         </Menu.Item>
                         <Menu.Item>
-                            <Button color={"red"} onClick={() => this.props.concedeGame()}>
+                            <Button color={"red"} onClick={() => this.props.concedeGame(this.props.gameId)}>
                                 <Icon size={"large"} name={"flag outline"}></Icon>
                             </Button>
                         </Menu.Item>
@@ -285,7 +286,7 @@ const mapStateToProps = (state: RootState) => ({
     lastMove: state.match.lastMove
 })
 
-const mapDispatchToProps = { concedeGame: () => { }, offerDraw: () => { }, replyDraw: () => { } }
+const mapDispatchToProps = { concedeGame: concede, offerDraw: () => { }, replyDraw: () => { } }
 
 export default connect(
     mapStateToProps,

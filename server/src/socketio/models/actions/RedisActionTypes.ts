@@ -79,7 +79,8 @@ export interface ClientReplyDraw extends Action {
 export interface ClientGameOver extends Action{
     type: typeof CLIENT_GAME_OVER;
     payload:{
-        winner: string
+        winner: string,
+        game:PersonalMatchSession
     }
 }
 export type RedisActionTypes =

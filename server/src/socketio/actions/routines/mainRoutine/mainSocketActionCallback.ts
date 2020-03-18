@@ -1,8 +1,8 @@
 import { EventContext } from "../../../../socketio/EventContext";
-import { SocketActionTypes, ServerStartMatchmaking, ServerSendChatMessage, ServerPlayerMove, ServerPlayerReady } from "../../../models/actions/SocketActionTypes";
+import { SocketActionTypes, ServerStartMatchmaking, ServerSendChatMessage, ServerPlayerMove, ServerPlayerReady, ServerConcede } from "../../../models/actions/SocketActionTypes";
 import _ from 'lodash'
 import redisClient from "../../../../redis/redisClient";
-import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, CLIENT_UPDATE_GAME, CLIENT_GAME_OVER, MATCHMAKER_ADD_TO_QUEUE } from "../../../../socketio/models/actions/ActionTypes";
+import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, CLIENT_UPDATE_GAME, CLIENT_GAME_OVER, MATCHMAKER_ADD_TO_QUEUE, SERVER_CONCEDE } from "../../../../socketio/models/actions/ActionTypes";
 import serializeRedisMessage from "../../../../util/serializeRedisMessage";
 import ServerMatchSession from "../../../../socketio/models/chess/ServerMatchSession";
 import returnPersonalMatchSession from "../../../../util/returnPersonalMatchSession";
@@ -26,7 +26,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
                 switch (payload.channel) {
                     case "opponent":
                         // rework
-                        redisClient.publish(this.activeGame.opponent.name, serializeRedisMessage({
+                        redisClient.publish(this.sessionList[this.activeGame].opponent.name, serializeRedisMessage({
                             type: SERVER_SEND_CHAT_MESSAGE,
                             payload: payload
                         }));
@@ -39,6 +39,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
 
         case SERVER_PLAYER_READY:
             // player has received game state 
+
             break;
         case SERVER_PLAYER_MOVE:
             {
@@ -133,21 +134,41 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
                 })
                 break;
             }
-        // case GAME_CONCEDE:
-        //     if(!_.isUndefined(gameId) && !_.isNull(gameId)){
+        case SERVER_CONCEDE:
+            {
+                const { payload } = action as ServerConcede;
 
-        //         redisClient.get(gameId + "object", (err, reply) => {
-        //             let finishedGame = JSON.parse(reply)
-        //             finishedGame.winner = opponentId;
-        //             finishedGame.finished = true;
-        //             // save game to static storage here;
-        //             redisClient.set(gameId + "object", JSON.stringify(finishedGame));
-        //             redisClient.publish(finishedGame.playerOne, serializeRedisMessage(CLIENT_GAME_OVER, { winner: opponentId }));
-        //             redisClient.publish(finishedGame.playerTwo, serializeRedisMessage(CLIENT_GAME_OVER, { winner: opponentId }));
+                if (!_.isUndefined(payload.gameId) && !_.isNull(payload.gameId)) {
 
-        //         })
-        //     }
-        //     break;
+                    redisClient.get(payload.gameId + "object", (err, reply: string) => {
+                        var finishedGame: ServerMatchSession = JSON.parse(reply);
+
+                        console.log(this.sessionList);
+                        console.log(this.activeGame);
+                        finishedGame.winner = this.sessionList[this.activeGame].opponent.name;
+                        finishedGame.finished = true;
+                        // save game to static storage here;
+                        redisClient.set(payload.gameId + "object", JSON.stringify(finishedGame));
+
+                        redisClient.publish(finishedGame.whiteId, serializeRedisMessage({
+                            type: CLIENT_GAME_OVER,
+                            payload: {
+                                winner: finishedGame.winner,
+                                game: returnPersonalMatchSession(finishedGame, finishedGame.whiteId)
+                            }
+                        }));
+                        redisClient.publish(finishedGame.blackId, serializeRedisMessage({
+                            type: CLIENT_GAME_OVER,
+                            payload: {
+                                winner: finishedGame.winner,
+                                game: returnPersonalMatchSession(finishedGame, finishedGame.blackId)
+                            }
+                        }));
+
+                    })
+                }
+            }
+            break;
         // case GAME_REPLY_DRAW:
         //     redisClient.get(gameId + "object", (err, reply) => {
         //         if (action.payload.reply) {
