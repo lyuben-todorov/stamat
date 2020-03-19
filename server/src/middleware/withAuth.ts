@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { VerifyErrors } from 'jsonwebtoken';
 import createLogger from '../createLogger';
 import env from '../env';
 import { Request, Response } from 'express';
@@ -10,7 +10,7 @@ const withAuth = function (req: Request, res: Response, next: Function) {
                 logger.error("No token");
                 res.status(401).send('Unauthorized: No token provided');
         } else {
-                jwt.verify(token, secret, function (err: Error, decoded: string) {
+                jwt.verify(token, secret, (err: VerifyErrors, decoded: object) => {
                         if (err) {
 
                                 logger.error("Invalid token");
