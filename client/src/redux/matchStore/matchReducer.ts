@@ -1,19 +1,22 @@
 import { MatchSession } from "./models/MatchSession";
 import MatchSessionList from "./models/MatchSessionList";
-import { MatchActionTypes, SERVER_START_MATCHMAKING, CLIENT_START_GAME, CLIENT_UPDATE_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW } from "./matchTypes";
+import { MatchActionTypes, SERVER_START_MATCHMAKING, CLIENT_START_GAME, CLIENT_UPDATE_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW, CLIENT_SEND_CHAT_MESSAGE } from "./matchTypes";
 import { CLIENT_FOUND_GAME } from './matchTypes'
 import { match } from "assert";
 import { Move } from "chess.js";
+import ChatMessage from "./models/ChatMessage";
 export interface MatchState {
     activeMatch: string,
     matches: MatchSessionList,
     lastMove: Move
+    chatHistory: ChatMessage[]
 }
 
 const initialState: MatchState = {
     activeMatch: null,
     matches: {},
     lastMove: null,
+    chatHistory: []
 }
 export function matchReducer(
     state = initialState,
@@ -39,14 +42,6 @@ export function matchReducer(
 
                 return { ...state, activeMatch: matchId, matches: matches }
             }
-        case CLIENT_UPDATE_GAME:
-            {
-
-                var matchId = action.payload.gameId;
-                state.matches[matchId] = action.payload.newGame;
-
-                return { ...state, lastMove: action.payload.move }
-            }
         case CLIENT_GAME_OVER:
             {
                 var matchId = action.payload.game.matchId;
@@ -63,9 +58,24 @@ export function matchReducer(
             {
                 return { ...state }
             }
-        case SERVER_PLAYER_MOVE:
+        case CLIENT_SEND_CHAT_MESSAGE:
             {
-                console.log(action.payload.gameId);
+                let chatHistory: ChatMessage[] = state.chatHistory;
+                chatHistory.push(action.payload);
+                return { ...state, chatHistory: chatHistory }
+            }
+        case CLIENT_UPDATE_GAME:
+            {
+                // handle client update when recieving move data from server
+
+                var matchId = action.payload.gameId;
+                state.matches[matchId] = action.payload.newGame;
+
+                return { ...state, lastMove: action.payload.move }
+            }
+        case SERVER_PLAYER_MOVE:
+            // handle client update when sending move data to server
+            {
                 if (action.payload.gameId && state.activeMatch && state.matches[action.payload.gameId]) {
 
                     var move = action.payload.move

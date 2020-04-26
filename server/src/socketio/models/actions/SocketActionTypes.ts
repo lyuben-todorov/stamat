@@ -19,7 +19,8 @@ export interface ServerStartMatchmaking extends Action {
 export interface ServerSendChatMessage extends Action {
     type: typeof SERVER_SEND_CHAT_MESSAGE,
     payload: {
-        channel: "opponent" | "global"
+        channel: "opponent" | "global",
+        message: string
     }
 }
 

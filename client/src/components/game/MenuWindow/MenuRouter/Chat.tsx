@@ -2,12 +2,12 @@ import * as React from 'react'
 import { Input, Divider, InputOnChangeData } from 'semantic-ui-react'
 import MessageBox from './MessageBox/MessageBox';
 import { connect } from 'react-redux'
-//import { sendChatMessage } from '../../../redux/actionCreators'
 import { RootState } from '../../../../redux/rootReducer';
+import { sendChatMessage } from '../../../../redux/matchStore/matchActions';
 
 interface Props {
 
-    sendChatMessage: Function;
+    sendChatMessage: typeof sendChatMessage;
 }
 
 interface State {
@@ -23,7 +23,7 @@ class Chat extends React.Component<Props, State> {
     }
     handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && this.state.currentMessage !== "") {
-            this.props.sendChatMessage({ message: this.state.currentMessage, channel: "opponent" });
+            this.props.sendChatMessage( "opponent",this.state.currentMessage );
             this.setState({ currentMessage: "" })
         }
     }
@@ -56,7 +56,7 @@ const mapStateToProps = (state: RootState) => ({
 })
 
 const mapDispatchToProps = {
-    sendChatMessage: () => { }
+    sendChatMessage: sendChatMessage
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Chat)

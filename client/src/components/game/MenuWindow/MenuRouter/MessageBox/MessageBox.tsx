@@ -5,41 +5,39 @@ import Message from './Message';
 import { connect } from 'react-redux';
 import { CLIENT_PROPOSE_MATCHUP, CLIENT_GAME_OVER, CLIENT_SEND_CHAT_MESSAGE } from '../../../../../redux/matchStore/matchTypes';
 import { RootState } from '../../../../../redux/rootReducer';
+import ChatMessage from '../../../../../redux/matchStore/models/ChatMessage';
 
 interface Props {
 
         action: string;
-        chatHistory: any;
+        chatHistory: ChatMessage[];
         winner: string;
-        opponentName: string;
-        latestMessage: any;
-        sessionId: string;
         username: string;
 }
 interface State {
-        messages: any;
+        messages: ChatMessage[];
 }
-
+export type ChatMessageTypes = "gameOver" | "initiateGame" | "resumeGame" | "chat" | "ping";
+export type ChatMessageChannels = "currentMatch" | "private" | "global";
 class MessageBox extends React.Component<Props, State> {
         constructor(props: Props) {
                 super(props);
                 this.state = {
                         messages: [],
                 }
-                this.addTextMessage = this.addTextMessage.bind(this);
                 this.addMessage = this.addMessage.bind(this);
         }
 
         componentDidMount() {
-                this.addMessage("greet", "hi");
+                this.addMessage("ping", "currentMatch", "hi");
         }
-        addMessage(type: string, message?: string, level = "server") {
+        addMessage(type: ChatMessageTypes, channel?: ChatMessageChannels, message?: string) {
 
                 this.setState(state => {
                         const messages = [...state.messages, {
                                 type: type,
+                                channel: channel,
                                 message: message,
-                                level: level
                         }]
                         return { messages }
                 })
@@ -54,19 +52,17 @@ class MessageBox extends React.Component<Props, State> {
                                 case "gameOver":
 
                                         if (this.props.winner === "draw") {
-                                                this.addMessage("draw")
+                                                this.addMessage("gameOver", "currentMatch", "Draw")
 
                                         } else {
 
-                                                this.addMessage(CLIENT_GAME_OVER, this.props.winner === this.props.sessionId ? this.props.username : this.props.opponentName)
+                                                this.addMessage("gameOver", "currentMatch", "");
                                         }
-                                        break;
-                                case "serverMessage":
-                                        this.addMessage("server", this.props.latestMessage.message, this.props.latestMessage.sender)
-                                        break;
-                                case "ownMessage":
-                                        this.addMessage("client", this.props.latestMessage.message, "opponent")
-                                        break;
+
+                                case "receive_chat_message":
+                                        this.addMessage("chat",
+                                                this.props.chatHistory[this.props.chatHistory.length - 1].channel,
+                                                this.props.chatHistory[this.props.chatHistory.length - 1].message)
                                 default:
                                         break;
                         }
@@ -74,19 +70,6 @@ class MessageBox extends React.Component<Props, State> {
                 }
         }
 
-        addMatchupProposalButton() {
-                this.setState(state => {
-                        const messages = [...state.messages, { type: CLIENT_PROPOSE_MATCHUP, message: this.props.opponentName }]
-
-                        return { messages }
-                })
-        }
-        addTextMessage(message: string) {
-                this.setState(state => {
-                        const messages = [...state.messages, { type: CLIENT_SEND_CHAT_MESSAGE, message: message }]
-                        return { messages }
-                })
-        }
 
         render() {
                 return (
@@ -103,17 +86,14 @@ class MessageBox extends React.Component<Props, State> {
 
 const mapStateToProps = (state: RootState) => {
         return {
-                action: "string",
-                chatHistory: "",
-                winner: "",
-                opponentName: "",
-                latestMessage: "any",
-                sessionId: "string",
-                username: "string"
+                action: state.clientState.gameState,
+                chatHistory: state.match.chatHistory,
+                winner: "winner chicken dinner",
+                username: state.session.username,
         }
 }
 
-const mapDispatchToProps = { startMatchmaking: () => { }, replyMatchmaking: () => { } }
+const mapDispatchToProps = {}
 
 export default connect(
         mapStateToProps,

@@ -1,7 +1,6 @@
 import createLogger from './createLogger';
-import env from './env';
 import redis from 'ioredis'
-import { MATCHMAKER_ADD_TO_QUEUE, CLIENT_START_GAME, CLIENT_ALREADY_IN_QUEUE } from './ActionTypes';
+import { MATCHMAKER_ADD_TO_QUEUE, CLIENT_START_GAME } from './ActionTypes';
 import redisClient from './redis/redisClient'
 import returnPersonalMatchSession from './util/returnPersonalMatchSession';
 import serializeRedisMessage from './util/serializeRedisMessage';
@@ -29,7 +28,7 @@ matchmakingClient.on('message', (channel, message) => {
         case MATCHMAKER_ADD_TO_QUEUE:
             var matchmakingRequest: MatchmakingRequest = messageObject.payload;
 
-            var { sessionId, username, opponentType, mode, time } = matchmakingRequest;
+            var { username, mode,  } = matchmakingRequest;
 
             var vreq = JSON.stringify(matchmakingRequest);
 

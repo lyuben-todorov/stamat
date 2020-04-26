@@ -2,7 +2,7 @@ import { EventContext } from "../../../../socketio/EventContext";
 import { SocketActionTypes, ServerStartMatchmaking, ServerSendChatMessage, ServerPlayerMove, ServerConcede, ServerOfferDraw, ServerReplyDraw } from "../../../models/actions/SocketActionTypes";
 import _ from 'lodash'
 import redisClient from "../../../../redis/redisClient";
-import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, CLIENT_UPDATE_GAME, CLIENT_GAME_OVER, MATCHMAKER_ADD_TO_QUEUE, SERVER_CONCEDE, SERVER_OFFER_DRAW, CLIENT_OFFER_DRAW, SERVER_REPLY_DRAW, CLIENT_REPLY_DRAW } from "../../../../socketio/models/actions/ActionTypes";
+import { SERVER_START_MATCHMAKING, SERVER_SEND_CHAT_MESSAGE, SERVER_PLAYER_READY, SERVER_PLAYER_MOVE, CLIENT_UPDATE_GAME, CLIENT_GAME_OVER, MATCHMAKER_ADD_TO_QUEUE, SERVER_CONCEDE, SERVER_OFFER_DRAW, CLIENT_OFFER_DRAW, SERVER_REPLY_DRAW, CLIENT_REPLY_DRAW, CLIENT_SEND_CHAT_MESSAGE } from "../../../../socketio/models/actions/ActionTypes";
 import serializeRedisMessage from "../../../../util/serializeRedisMessage";
 import ServerMatchSession from "../../../../socketio/models/chess/ServerMatchSession";
 import returnPersonalMatchSession from "../../../../util/returnPersonalMatchSession";
@@ -27,8 +27,12 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
                 switch (payload.channel) {
                     case "opponent":
                         // rework
-                        redisClient.publish(this.sessionList[this.userSession.activeGameId].opponent.name, serializeRedisMessage({
-                            type: SERVER_SEND_CHAT_MESSAGE,
+                        console.log(this.userSession.activeGameOpponentId, serializeRedisMessage({
+                            type: CLIENT_SEND_CHAT_MESSAGE,
+                            payload: payload
+                        }))
+                        redisClient.publish(this.userSession.activeGameOpponentId, serializeRedisMessage({
+                            type: CLIENT_SEND_CHAT_MESSAGE,
                             payload: payload
                         }));
                         break;

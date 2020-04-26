@@ -120,9 +120,24 @@ interface ServerConcedeAction {
     }
 }
 
+interface ServerSendChatMessageAction {
+    type: typeof SERVER_SEND_CHAT_MESSAGE,
+    payload: {
+        channel: "opponent" | "global",
+        message: string
+    }
+}
+interface ClientSendChatMessageAction {
+    type: typeof CLIENT_SEND_CHAT_MESSAGE,
+    payload: {
+        channel: "opponent" | "global",
+        message: string
+    }
+}
 interface Acknowledge {
     type: typeof ACKNOWLEDGE,
 }
+
 export type MatchActionTypes =
     Acknowledge |
     ClientFoundGameAction |
@@ -135,4 +150,6 @@ export type MatchActionTypes =
     ServerReplyDrawAction |
     ServerStartMatchmakingAction |
     ServerPlayerMoveAction |
+    ServerSendChatMessageAction |
+    ClientSendChatMessageAction |
     ServerConcedeAction 

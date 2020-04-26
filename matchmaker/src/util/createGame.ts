@@ -1,4 +1,4 @@
-import { ChessParticipant, MatchmakingRequest, MessageObject, ServerMatchSession, GameType } from "../types";
+import { MatchmakingRequest, MessageObject, ServerMatchSession, GameType } from "../types";
 import { Move } from "chess.js";
 
 export default function createGame(gameId: string, playerOne: MatchmakingRequest, playerTwo: MatchmakingRequest): ServerMatchSession {
