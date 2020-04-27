@@ -2,6 +2,7 @@ import { MatchSession } from "./models/MatchSession";
 import MatchmakingRequest from "./models/MatchmakingRequest";
 import { Move } from "chess.js";
 import { Server } from "http";
+import ChatMessage from "./models/ChatMessage";
 
 /* Client-Server actions */
 export const SERVER_START_MATCHMAKING = "server/START_MATCHMAKING";
@@ -122,17 +123,11 @@ interface ServerConcedeAction {
 
 interface ServerSendChatMessageAction {
     type: typeof SERVER_SEND_CHAT_MESSAGE,
-    payload: {
-        channel: "opponent" | "global",
-        message: string
-    }
+    payload: ChatMessage
 }
 interface ClientSendChatMessageAction {
     type: typeof CLIENT_SEND_CHAT_MESSAGE,
-    payload: {
-        channel: "opponent" | "global",
-        message: string
-    }
+    payload: ChatMessage
 }
 interface Acknowledge {
     type: typeof ACKNOWLEDGE,

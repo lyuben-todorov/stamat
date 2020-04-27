@@ -19,6 +19,7 @@ interface State {
 }
 export type ChatMessageTypes = "gameOver" | "initiateGame" | "resumeGame" | "chat" | "ping";
 export type ChatMessageChannels = "currentMatch" | "private" | "global";
+
 class MessageBox extends React.Component<Props, State> {
         constructor(props: Props) {
                 super(props);
@@ -29,16 +30,19 @@ class MessageBox extends React.Component<Props, State> {
         }
 
         componentDidMount() {
-                this.addMessage("ping", "currentMatch", "hi");
+                var mount: ChatMessage = {
+                        channel: "currentMatch",
+                        message: "hi",
+                        sender: "game",
+                        type: "ping"
+                }
+                this.addMessage(mount);
         }
-        addMessage(type: ChatMessageTypes, channel?: ChatMessageChannels, message?: string) {
+        addMessage(message: ChatMessage) {
+
 
                 this.setState(state => {
-                        const messages = [...state.messages, {
-                                type: type,
-                                channel: channel,
-                                message: message,
-                        }]
+                        const messages = [...state.messages, message]
                         return { messages }
                 })
         }
@@ -52,17 +56,28 @@ class MessageBox extends React.Component<Props, State> {
                                 case "gameOver":
 
                                         if (this.props.winner === "draw") {
-                                                this.addMessage("gameOver", "currentMatch", "Draw")
+                                                var message: ChatMessage = {
+                                                        channel: "currentMatch",
+                                                        message: "Draw",
+                                                        sender: "server",
+                                                        type: "gameOver"
+                                                }
+                                                this.addMessage(message)
 
                                         } else {
-
-                                                this.addMessage("gameOver", "currentMatch", "");
+                                                var message: ChatMessage = {
+                                                        channel: "currentMatch",
+                                                        message: "Win",
+                                                        sender: "server",
+                                                        type: "gameOver"
+                                                }
+                                                this.addMessage(message);
                                         }
 
                                 case "receive_chat_message":
-                                        this.addMessage("chat",
-                                                this.props.chatHistory[this.props.chatHistory.length - 1].channel,
-                                                this.props.chatHistory[this.props.chatHistory.length - 1].message)
+                                        var message = this.props.chatHistory.slice(-1)[0]
+
+                                        this.addMessage(message);
                                 default:
                                         break;
                         }
@@ -74,8 +89,8 @@ class MessageBox extends React.Component<Props, State> {
         render() {
                 return (
                         <div className="ChatHistory">
-                                {this.state.messages.map((message: any, index: number) => (
-                                        <Message type={message.type} level={message.level} key={index} message={message.message}></Message>
+                                {this.state.messages.map((message: ChatMessage, index: number) => (
+                                        <Message message={message} ></Message>
                                 ))}
 
                         </div>
