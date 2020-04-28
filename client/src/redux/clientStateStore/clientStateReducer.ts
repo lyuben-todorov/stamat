@@ -1,8 +1,7 @@
 import { SessionActionTypes } from "../sessionStore/sessionTypes";
-import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW, CLIENT_SEND_CHAT_MESSAGE } from "../matchStore/matchTypes";
+import { MatchActionTypes, CLIENT_START_GAME, CLIENT_UPDATE_GAME, ACKNOWLEDGE, CLIENT_FOUND_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW, CLIENT_SEND_CHAT_MESSAGE, SERVER_SEND_CHAT_MESSAGE } from "../matchStore/matchTypes";
 
-export interface ClientState {
-    gameState: "ongoing" |
+export type gameState = "ongoing" |
     "starting" |
     "default" |
     "server_update" |
@@ -13,7 +12,9 @@ export interface ClientState {
     "pro_offer_draw" |
     "opp_offer_draw" |
     "opp_reply_draw" |
-    "receive_chat_message"
+    "receive_chat_message";
+export interface ClientState {
+    gameState: gameState
 }
 
 const initialState: ClientState = {
@@ -39,6 +40,9 @@ export function clientStateReducer(
         case ACKNOWLEDGE:
             return { gameState: "ack" }
         case CLIENT_SEND_CHAT_MESSAGE:
+            return { gameState: "receive_chat_message" }
+        case SERVER_SEND_CHAT_MESSAGE:
+            console.log("yes")
             return { gameState: "receive_chat_message" }
         case SERVER_PLAYER_MOVE:
             return { gameState: "client_update" }

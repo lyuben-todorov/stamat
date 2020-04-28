@@ -25,12 +25,9 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
 
                 const { payload } = action as ServerSendChatMessage;
                 switch (payload.channel) {
-                    case "opponent":
+                    case "currentMatch":
                         // rework
-                        console.log(this.userSession.activeGameOpponentId, serializeRedisMessage({
-                            type: CLIENT_SEND_CHAT_MESSAGE,
-                            payload: payload
-                        }))
+
                         redisClient.publish(this.userSession.activeGameOpponentId, serializeRedisMessage({
                             type: CLIENT_SEND_CHAT_MESSAGE,
                             payload: payload

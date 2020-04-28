@@ -3,6 +3,7 @@ import Action from "./RedisActionTypes";
 import { GameTypes } from "../GameType";
 import { GameTime } from "../GameTime";
 import { Move } from "chess.js";
+import ChatMessage from "../chat/ChatMessage";
 
 export interface ServerStartMatchmaking extends Action {
     type: typeof SERVER_START_MATCHMAKING;
@@ -18,10 +19,7 @@ export interface ServerStartMatchmaking extends Action {
 
 export interface ServerSendChatMessage extends Action {
     type: typeof SERVER_SEND_CHAT_MESSAGE,
-    payload: {
-        channel: "opponent" | "global",
-        message: string
-    }
+    payload: ChatMessage
 }
 
 export interface ServerPlayerReady extends Action {

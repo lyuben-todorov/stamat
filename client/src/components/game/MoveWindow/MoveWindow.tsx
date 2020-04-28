@@ -100,7 +100,7 @@ class MoveWindow extends React.Component<Props, State> {
                             var proTime = this.props.game.proponent.timeLeft;
 
 
-                            if (this.props.game.lastPlayerMoveTime) {
+                            if (this.props.game.lastPlayerMoveTime !== -1) {
                                 if (this.props.game.proponent.color === this.props.game.onMove) {
 
                                     proTime += this.props.game.lastPlayerMoveTime - Date.now();
@@ -112,22 +112,26 @@ class MoveWindow extends React.Component<Props, State> {
                                 }
                             }
 
+
                             this.state.opponentTimer.current.setTime(oppTime);
                             this.state.proponentTimer.current.setTime(proTime);
 
-                            if (this.props.game.proponent.color === this.props.game.onMove) {
+                            if (this.props.game.lastPlayerMoveTime !== -1) {
 
-                                this.state.proponentTimer.current.start();
-                                this.state.opponentTimer.current.stop();
+                                if (this.props.game.proponent.color === this.props.game.onMove) {
 
-                                this.setState({ active: "proponent" })
-                            } else {
+                                    this.state.proponentTimer.current.start();
+                                    this.state.opponentTimer.current.stop();
 
-                                this.state.opponentTimer.current.start();
-                                this.state.proponentTimer.current.stop();
+                                    this.setState({ active: "proponent" })
+                                } else {
 
-                                this.setState({ active: "opponent" })
+                                    this.state.opponentTimer.current.start();
+                                    this.state.proponentTimer.current.stop();
 
+                                    this.setState({ active: "opponent" })
+
+                                }
                             }
                         }
                         break;

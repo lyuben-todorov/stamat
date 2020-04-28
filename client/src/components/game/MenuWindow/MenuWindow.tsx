@@ -20,8 +20,10 @@ interface MenuState {
 class MenuWindow extends React.Component<MenuProps, MenuState> {
     constructor(props: MenuProps) {
         super(props);
+        console.log(this.props.clientState.gameState);
+
         switch (this.props.clientState.gameState) {
-            case "ongoing":
+            case "continue" || "starting":
                 this.state = { activeItem: "chat" }
                 break;
             case "default":
@@ -34,7 +36,7 @@ class MenuWindow extends React.Component<MenuProps, MenuState> {
     componentDidUpdate(prevProps: MenuProps) {
         if (this.props !== prevProps) {
             switch (this.props.clientState.gameState) {
-                case "ongoing" || "starting":
+                case "continue" || "starting":
                     this.setState({ activeItem: "chat" })
                     break;
                 case "default":

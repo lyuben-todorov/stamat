@@ -131,7 +131,7 @@ class ChessGame extends React.Component<Props, State> {
                         break;
                     case "game_over":
                         {
-                            console.log("da");
+                            this.props.acknowledge();
 
                         }
                         break;

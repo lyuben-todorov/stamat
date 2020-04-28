@@ -1,7 +1,7 @@
 import { GameTypes } from "../GameType";
 import ChessParticipant from "../chess/ChessParticipant";
-import MessageObject from "../chat/MessageObject";
 import { Move } from "chess.js";
+import ChatMessage from "../chat/ChatMessage";
 
 export default interface PersonalMatchSession {
 
@@ -19,7 +19,7 @@ export default interface PersonalMatchSession {
 
     finished: boolean
     winner: string
-    chatHistory: MessageObject[]  // 
+    chatHistory: ChatMessage[];  // 
     moveCount: number;
     moveHistory: Move[] //not verbose
 

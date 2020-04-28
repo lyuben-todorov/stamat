@@ -1,6 +1,6 @@
 import { MatchSession } from "./models/MatchSession";
 import MatchSessionList from "./models/MatchSessionList";
-import { MatchActionTypes, SERVER_START_MATCHMAKING, CLIENT_START_GAME, CLIENT_UPDATE_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW, CLIENT_SEND_CHAT_MESSAGE } from "./matchTypes";
+import { MatchActionTypes, SERVER_START_MATCHMAKING, CLIENT_START_GAME, CLIENT_UPDATE_GAME, SERVER_PLAYER_MOVE, CLIENT_GAME_OVER, CLIENT_OFFER_DRAW, CLIENT_REPLY_DRAW, CLIENT_SEND_CHAT_MESSAGE, SERVER_SEND_CHAT_MESSAGE } from "./matchTypes";
 import { CLIENT_FOUND_GAME } from './matchTypes'
 import { match } from "assert";
 import { Move } from "chess.js";
@@ -90,6 +90,13 @@ export function matchReducer(
                 } else {
                     return state;
                 }
+            }
+        case SERVER_SEND_CHAT_MESSAGE:
+            // handle client update when sending chat message
+            {
+                let chatHistory: ChatMessage[] = state.chatHistory;
+                chatHistory.push(action.payload);
+                return { ...state, chatHistory: chatHistory }
             }
         default:
             return state;

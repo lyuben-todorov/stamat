@@ -1,7 +1,7 @@
 import { GameTypes } from "../GameType";
-import MessageObject from "../chat/MessageObject";
 import ChessParticipant from "./ChessParticipant";
 import { Move } from "chess.js";
+import ChatMessage from "../chat/ChatMessage";
 export default interface ServerMatchSession {
     matchId: string
 
@@ -19,7 +19,7 @@ export default interface ServerMatchSession {
 
     finished: boolean;
     winner?: string | "draw" | "none";
-    chatHistory: MessageObject[];  // 
+    chatHistory: ChatMessage[];  // 
     position: string; // fen string
     moveCount: number;
     moveHistory: Move[] //not verbose

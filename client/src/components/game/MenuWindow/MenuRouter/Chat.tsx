@@ -4,10 +4,12 @@ import MessageBox from './MessageBox/MessageBox';
 import { connect } from 'react-redux'
 import { RootState } from '../../../../redux/rootReducer';
 import { sendChatMessage } from '../../../../redux/matchStore/matchActions';
+import ChatMessage from '../../../../redux/matchStore/models/ChatMessage';
 
 interface Props {
 
     sendChatMessage: typeof sendChatMessage;
+    proponentName: string
 }
 
 interface State {
@@ -23,7 +25,13 @@ class Chat extends React.Component<Props, State> {
     }
     handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && this.state.currentMessage !== "") {
-            this.props.sendChatMessage( "opponent",this.state.currentMessage );
+            var message: ChatMessage = {
+                channel: "currentMatch",
+                message: this.state.currentMessage,
+                sender: this.props.proponentName,
+                type: "chat"
+            }
+            this.props.sendChatMessage(message);
             this.setState({ currentMessage: "" })
         }
     }
@@ -52,7 +60,7 @@ class Chat extends React.Component<Props, State> {
 
 
 const mapStateToProps = (state: RootState) => ({
-
+    proponentName: state.session.username
 })
 
 const mapDispatchToProps = {

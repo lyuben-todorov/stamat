@@ -1,18 +1,19 @@
 import * as React from 'react'
 import Message from './Message';
-
-// import { startMatchmaking, replyMatchmaking } from '../../../redux/actionCreators'
 import { connect } from 'react-redux';
 import { CLIENT_PROPOSE_MATCHUP, CLIENT_GAME_OVER, CLIENT_SEND_CHAT_MESSAGE } from '../../../../../redux/matchStore/matchTypes';
 import { RootState } from '../../../../../redux/rootReducer';
 import ChatMessage from '../../../../../redux/matchStore/models/ChatMessage';
+import { acknowledge, ClientState, gameState } from '../../../../../redux/clientStateStore/clientStateReducer';
 
 interface Props {
 
-        action: string;
+        action: gameState;
         chatHistory: ChatMessage[];
         winner: string;
         username: string;
+
+        acknowledge: typeof acknowledge;
 }
 interface State {
         messages: ChatMessage[];
@@ -32,8 +33,8 @@ class MessageBox extends React.Component<Props, State> {
         componentDidMount() {
                 var mount: ChatMessage = {
                         channel: "currentMatch",
-                        message: "hi",
-                        sender: "game",
+                        message: " ACAB",
+                        sender: "MOTD:",
                         type: "ping"
                 }
                 this.addMessage(mount);
@@ -50,10 +51,10 @@ class MessageBox extends React.Component<Props, State> {
         componentDidUpdate(prevProps: Props) {
                 if (this.props.action !== prevProps.action || this.props.chatHistory !== prevProps.chatHistory) {
                         switch (this.props.action) {
-                                case "initiateGame" || "resumeGame":
+                                case "starting":
                                         //this.addMessage(CLIENT_START_GAME)
                                         break;
-                                case "gameOver":
+                                case "game_over":
 
                                         if (this.props.winner === "draw") {
                                                 var message: ChatMessage = {
@@ -67,7 +68,7 @@ class MessageBox extends React.Component<Props, State> {
                                         } else {
                                                 var message: ChatMessage = {
                                                         channel: "currentMatch",
-                                                        message: "Win",
+                                                        message: "Game Over",
                                                         sender: "server",
                                                         type: "gameOver"
                                                 }
@@ -77,7 +78,10 @@ class MessageBox extends React.Component<Props, State> {
                                 case "receive_chat_message":
                                         var message = this.props.chatHistory.slice(-1)[0]
 
+                                        console.log(message);
                                         this.addMessage(message);
+
+                                        this.props.acknowledge();
                                 default:
                                         break;
                         }
@@ -90,7 +94,7 @@ class MessageBox extends React.Component<Props, State> {
                 return (
                         <div className="ChatHistory">
                                 {this.state.messages.map((message: ChatMessage, index: number) => (
-                                        <Message message={message} ></Message>
+                                        <Message message={message} key={index} ></Message>
                                 ))}
 
                         </div>
@@ -108,7 +112,9 @@ const mapStateToProps = (state: RootState) => {
         }
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = {
+        acknowledge: acknowledge
+}
 
 export default connect(
         mapStateToProps,

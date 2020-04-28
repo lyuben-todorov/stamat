@@ -1,6 +1,7 @@
 import { SERVER_START_MATCHMAKING, MatchActionTypes, SERVER_PLAYER_MOVE, SERVER_CONCEDE, SERVER_OFFER_DRAW, SERVER_REPLY_DRAW, SERVER_SEND_CHAT_MESSAGE } from "./matchTypes";
 import MatchmakingRequest from "./models/MatchmakingRequest";
 import { Move } from "chess.js";
+import ChatMessage from "./models/ChatMessage";
 
 export function startMatchmaking(payload: MatchmakingRequest): MatchActionTypes {
     return {
@@ -47,13 +48,10 @@ export function replyDraw(reply: boolean, gameId: string): MatchActionTypes {
     }
 }
 
-export function sendChatMessage(channel: "opponent" | "global", message: string): MatchActionTypes {
+export function sendChatMessage(chatMessage: ChatMessage): MatchActionTypes {
 
     return {
-        type:SERVER_SEND_CHAT_MESSAGE,
-        payload:{
-            channel:channel,
-            message:message
-        }
+        type: SERVER_SEND_CHAT_MESSAGE,
+        payload: chatMessage
     }
 }

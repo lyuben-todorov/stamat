@@ -8,18 +8,21 @@ interface State {
     className: string;
 }
 interface Props {
-     message:ChatMessage
+    message: ChatMessage
 }
 export default class Message extends React.Component<Props, State> {
     constructor(props: Props) {
-        super(props)
+        super(props);
+
         const time = new Date().toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
-        let className
-        if (this.props.message.type === "chat") {
-            className = "Message"
-        } else {
-            className = "Message Server";
+
+        let className;
+
+        console.log(this.props.message)
+        if (this.props.message.type !== "chat") {
+            className = "Server";
         }
+
         this.state = {
             time: time.toString(),
             className: className,
@@ -29,12 +32,14 @@ export default class Message extends React.Component<Props, State> {
     render() {
         var messageBody =
             <React.Fragment>
-                <div className="Sender">You:</div>
-                {this.props.message.message}
+                <div className="Sender">{this.props.message.sender}</div>
+                <div className="MessageText">
+                    {this.props.message.message}
+                </div>
             </React.Fragment>
 
         return (
-            <SemanticMessage className={this.state.className}>
+            <SemanticMessage className={"Message " + this.state.className}>
 
                 <div className="MessageBody flexbox">
                     {messageBody}
