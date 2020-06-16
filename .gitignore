@@ -5,4 +5,4 @@ dist
 ./matchmaker/dist/
 ./client/build/
 .env
-package-lock.json
+**/package-lock.json
