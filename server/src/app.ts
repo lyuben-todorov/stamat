@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import morgan from 'morgan'
 import redisClient from './redis/redisClient'
 
@@ -14,11 +15,7 @@ const app = express();
 
 mongoClient.startSession();
 //middleware
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
+app.use(cors({ credentials: true, origin: 'http://chess.glamav.systems' }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
