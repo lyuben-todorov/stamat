@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
 import morgan from 'morgan'
 import redisClient from './redis/redisClient'
 
@@ -19,7 +18,6 @@ const app = express();
 
 mongoClient.startSession();
 //middleware
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
