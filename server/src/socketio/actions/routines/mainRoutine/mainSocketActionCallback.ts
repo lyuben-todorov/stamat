@@ -168,8 +168,6 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
                     redisClient.get(payload.gameId + "object", (err, reply: string) => {
                         var finishedGame: ServerMatchSession = JSON.parse(reply);
 
-                        console.log(this.sessionList);
-                        console.log(this.userSession.activeGameId);
                         finishedGame.winner = this.sessionList[this.userSession.activeGameId].opponent.name;
                         finishedGame.finished = true;
                         // save game to static storage here;
@@ -236,6 +234,5 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
             break;
 
         default:
-            console.log(action);
     }
 }
