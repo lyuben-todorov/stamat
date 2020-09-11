@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BrowserRouter, NavLink, Link, Switch, Route, Redirect } from "react-router-dom";
+import { BrowserRouter, NavLink, Link, Switch, Route, Redirect, RouteComponentProps, withRouter } from "react-router-dom";
 import { Menu, Container, Button } from 'semantic-ui-react';
 import Register from "./auth/Register";
 import Login from "./auth/Login";
@@ -15,7 +15,7 @@ import UserSession from "../redux/sessionStore/models/UserSession";
 
 const { endpoint, serverUrl, mode } = processVariables
 
-interface AppProps {
+interface AppProps extends RouteComponentProps {
     sessionState: SessionState;
     loginUser: typeof loginUser
     logoutUser: typeof logoutUser
@@ -29,7 +29,6 @@ interface AppState {
 class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
         super(props);
-
         this.state = {
             loggedIn: this.props.sessionState.connected
         }
@@ -52,17 +51,22 @@ class App extends React.Component<AppProps, AppState> {
                     this.props.registerOnSocket(res.data);
                     this.setState({ loggedIn: true });
                 }
-            }).catch((err) => {
-
-            })
-
+            }).catch((err) => { })
 
         }
 
+        this.handleLogout = this.handleLogout.bind(this);
     }
 
     handleLogout() {
         this.props.logoutUser();
+        axios.request({
+            method: "GET",
+            url: `${serverUrl}${endpoint}/auth/logout`,
+            withCredentials: true
+        }).then((res) => { }).catch((err) => { })
+        window.location.reload(false);
+
     }
     render() {
         return (
@@ -77,8 +81,7 @@ class App extends React.Component<AppProps, AppState> {
                             <NavLink to={"/"}>Home</NavLink>
                         </Menu.Item>
                         <Menu.Item >
-
-                            <NavLink to={"/game"}>Game</NavLink>
+                            <NavLink to={"/game"}>Play</NavLink>
                         </Menu.Item>
                         <Menu.Item position='right'>
                             {this.state.loggedIn ?
@@ -101,8 +104,7 @@ class App extends React.Component<AppProps, AppState> {
                     <Route path="/login" render={() => <Login />} />
                     <Route path="/register" render={() => <Register />} />
                     <Route path="/game" render={() => <Game />} />
-                    <Route path="/" render={() => <Home />} />
-
+                    <Route path="/*" render={() => <Home />} />
                 </Switch>
             </div>
         )
@@ -122,4 +124,4 @@ const mapDispatch = {
 export default connect(
     mapState,
     mapDispatch
-)(App)
+)(withRouter(App))

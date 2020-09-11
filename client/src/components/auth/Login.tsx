@@ -54,10 +54,9 @@ class Login extends React.Component<Props, State> {
             // set session token
             this.props.loginUser(res.data);
             localStorage.setItem('sessionId', res.data.sessionId);
-            this.props.history.push('/profile')
+            this.props.history.push('/game')
             window.location.reload();
         }).catch(err => {
-            console.log(err)
             this.setState({ authenticationError: true })
         })
     }

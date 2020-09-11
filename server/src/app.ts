@@ -15,7 +15,7 @@ const app = express();
 
 mongoClient.startSession();
 //middleware
-app.use(cors({ credentials: true, origin: 'http://chess.glamav.systems' }))
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

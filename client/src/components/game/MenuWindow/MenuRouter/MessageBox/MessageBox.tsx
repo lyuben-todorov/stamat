@@ -78,7 +78,6 @@ class MessageBox extends React.Component<Props, State> {
                                 case "receive_chat_message":
                                         var message = this.props.chatHistory.slice(-1)[0]
 
-                                        console.log(message);
                                         this.addMessage(message);
 
                                         this.props.acknowledge();

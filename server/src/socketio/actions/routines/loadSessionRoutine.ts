@@ -88,7 +88,6 @@ export const loadSessionRoutine = function actionCallback(this: EventContext, ac
                     .build())
             break;
         default:
-            console.log(action)
             this.socket.emit('action',
                 new ActionBuilder()
                     .setType(SESSION_UNKNOWN)

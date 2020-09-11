@@ -139,7 +139,6 @@ class MoveWindow extends React.Component<Props, State> {
                     case "game_over":
                         {
 
-                            console.log("i stop");
                             this.state.proponentTimer.current.stop();
                             this.state.opponentTimer.current.stop();
 

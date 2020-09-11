@@ -18,7 +18,6 @@ export default class Message extends React.Component<Props, State> {
 
         let className;
 
-        console.log(this.props.message)
         if (this.props.message.type !== "chat") {
             className = "Server";
         }

@@ -20,7 +20,6 @@ interface MenuState {
 class MenuWindow extends React.Component<MenuProps, MenuState> {
     constructor(props: MenuProps) {
         super(props);
-        console.log(this.props.clientState.gameState);
 
         switch (this.props.clientState.gameState) {
             case "continue" || "starting":

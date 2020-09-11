@@ -46,7 +46,6 @@ class ChessGame extends React.Component<Props, State> {
         super(props)
         if (this.props.clientState.gameState === "ongoing") {
             const game = this.props.game;
-            console.log(this.props.gameId);
             //@ts-ignore broken chess.js types
             const chess: ChessInstance = new Chess(game.position);
 
@@ -74,7 +73,6 @@ class ChessGame extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        console.log(this.props.clientState.gameState);
         if (prevProps !== this.props) {
             if (prevProps.clientState.gameState !== this.props.clientState.gameState) {
 
@@ -177,7 +175,6 @@ class ChessGame extends React.Component<Props, State> {
     render() {
 
         let { position, movableDestinations, turnColor, orientation } = this.state;
-        console.log
         return (
             <div className="MainChessboard">
 

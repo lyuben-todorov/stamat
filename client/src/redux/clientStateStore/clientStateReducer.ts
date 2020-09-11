@@ -42,7 +42,6 @@ export function clientStateReducer(
         case CLIENT_SEND_CHAT_MESSAGE:
             return { gameState: "receive_chat_message" }
         case SERVER_SEND_CHAT_MESSAGE:
-            console.log("yes")
             return { gameState: "receive_chat_message" }
         case SERVER_PLAYER_MOVE:
             return { gameState: "client_update" }

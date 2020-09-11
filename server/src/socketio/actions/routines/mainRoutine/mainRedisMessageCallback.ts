@@ -20,7 +20,6 @@ export default function mainRedisMessageCallback(this: EventContext, channel: st
                 
                 this.userSession.inMatch = true;
                 
-                console.log(payload.game.matchId);
                 
                 this.userSession.matchIds.push(payload.game.matchId);
 
@@ -74,7 +73,6 @@ export default function mainRedisMessageCallback(this: EventContext, channel: st
             {
                 const { payload } = messageObject as ClientGameOver
                 
-                console.log(payload);
                 
                 this.userSession.activeGameId = null;
                 

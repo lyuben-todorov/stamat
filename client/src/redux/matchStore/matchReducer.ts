@@ -25,7 +25,6 @@ export function matchReducer(
     switch (action.type) {
         case CLIENT_FOUND_GAME:
             {
-                console.log(action.payload.gameObject);
                 var matches = state.matches;
                 var matchId = action.payload.gameObject.matchId;
                 matches[matchId] = action.payload.gameObject;
@@ -36,7 +35,6 @@ export function matchReducer(
             {
 
                 var matches = state.matches;
-                console.log(action.payload);
                 var matchId = action.payload.game.matchId;
                 matches[matchId] = action.payload.game;
 
