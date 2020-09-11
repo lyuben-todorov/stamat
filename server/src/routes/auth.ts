@@ -7,10 +7,9 @@ import redisClient from '../redis/redisClient';
 import { UserSession } from '../socketio/models/sessions/UserSession';
 const secret = env.APP_SECRET;
 const logger = createLogger("User Authentication");
+
 var router = express.Router();
 /* GET home page. */
-
-
 
 router.post('/register', (req, res) => {
     const { email, password, username } = req.body;
