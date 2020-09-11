@@ -33,7 +33,7 @@ class MessageBox extends React.Component<Props, State> {
         componentDidMount() {
                 var mount: ChatMessage = {
                         channel: "currentMatch",
-                        message: " ACAB",
+                        message: " Please be kind and respectful to other players.",
                         sender: "MOTD:",
                         type: "ping"
                 }
