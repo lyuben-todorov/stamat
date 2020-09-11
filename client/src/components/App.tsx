@@ -65,7 +65,6 @@ class App extends React.Component<AppProps, AppState> {
             url: `${serverUrl}${endpoint}/auth/logout`,
             withCredentials: true
         }).then((res) => { }).catch((err) => { })
-        window.location.reload(false);
 
     }
     render() {
@@ -121,7 +120,4 @@ const mapDispatch = {
 }
 
 
-export default connect(
-    mapState,
-    mapDispatch
-)(withRouter(App))
+export default connect(mapState, mapDispatch)(withRouter(App))

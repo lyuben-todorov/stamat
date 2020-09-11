@@ -60,7 +60,17 @@ export function sessionReducer(
             };
 
         case LOG_OUT_USER:
-            return state;
+            return {
+                ...state,
+                sessionId: "",
+                username: "",
+                email: "",
+                inMatch: false,
+                connected: false,
+                matchIds: [],
+                userType: "GUEST",
+                autoAccept: false
+            }
         case RESPOND_SESSION:
             return state;
         default:
