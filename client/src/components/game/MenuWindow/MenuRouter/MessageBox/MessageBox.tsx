@@ -60,7 +60,7 @@ class MessageBox extends React.Component<Props, State> {
                                                 var message: ChatMessage = {
                                                         channel: "currentMatch",
                                                         message: "Draw",
-                                                        sender: "server",
+                                                        sender: "",
                                                         type: "gameOver"
                                                 }
                                                 this.addMessage(message)
@@ -69,7 +69,7 @@ class MessageBox extends React.Component<Props, State> {
                                                 var message: ChatMessage = {
                                                         channel: "currentMatch",
                                                         message: "Game Over",
-                                                        sender: "server",
+                                                        sender: "",
                                                         type: "gameOver"
                                                 }
                                                 this.addMessage(message);

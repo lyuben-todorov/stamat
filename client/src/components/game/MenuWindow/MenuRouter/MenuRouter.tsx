@@ -20,7 +20,7 @@ export class MenuRouter extends React.Component<Props, State> {
                         case 'chat':
                             return <Chat />
                         case 'history':
-                            return "no"
+                            return ""
                         default:
                             break;
                     }

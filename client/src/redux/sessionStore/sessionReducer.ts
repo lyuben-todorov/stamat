@@ -42,7 +42,6 @@ export function sessionReducer(
         case AUTH_REGISTER_ON_SOCKET:
             return state;
         case AUTH_TEST_CONNECTION:
-            console.log(action.payload);
             return state;
 
         case LOG_IN_USER:
