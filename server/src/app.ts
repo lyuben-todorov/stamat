@@ -15,7 +15,22 @@ const app = express();
 
 mongoClient.startSession();
 //middleware
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
+
+//cors
+
+let whitelist = ['http://chess.glamav.systems', 'http://chessapi.glamav.systems', 'http://chess.glamav.systems/']
+let corsOptions = {
+  origin: function (origin: any, callback: any) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true
+}
+app.use(cors(corsOptions))
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
