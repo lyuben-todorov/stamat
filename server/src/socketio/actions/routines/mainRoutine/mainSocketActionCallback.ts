@@ -163,7 +163,7 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
             {
                 const { payload } = action as ServerConcede;
 
-                if (!_.isUndefined(payload.gameId) && !_.isNull(payload.gameId)) {
+                if (!_.isUndefined(payload.gameId) && !_.isNull(payload.gameId) && !_.isUndefined(this.sessionList[this.userSession.activeGameId])) {
 
                     redisClient.get(payload.gameId + "object", (err, reply: string) => {
                         var finishedGame: ServerMatchSession = JSON.parse(reply);
