@@ -27,7 +27,6 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
                 switch (payload.channel) {
                     case "currentMatch":
                         // rework
-
                         redisClient.publish(this.userSession.activeGameOpponentId, serializeRedisMessage({
                             type: CLIENT_SEND_CHAT_MESSAGE,
                             payload: payload
@@ -47,7 +46,8 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
             {
 
                 const { payload } = action as ServerPlayerMove;
-                if (payload.gameId !== "none" && !_.isUndefined(payload.gameId)) {
+                if (!_.isUndefined(payload.gameId) && !_.isNull(payload.gameId)
+                && !_.isUndefined(this.sessionList[this.userSession.activeGameId]) && !_.isUndefined(this.userSession.activeGameId)) {
 
                     redisClient.get(payload.gameId + "object", (err, reply) => {
                         var oldGame: ServerMatchSession = JSON.parse(reply);
@@ -163,7 +163,8 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
             {
                 const { payload } = action as ServerConcede;
 
-                if (!_.isUndefined(payload.gameId) && !_.isNull(payload.gameId) && !_.isUndefined(this.sessionList[this.userSession.activeGameId])) {
+                if (!_.isUndefined(payload.gameId) && !_.isNull(payload.gameId)
+                    && !_.isUndefined(this.sessionList[this.userSession.activeGameId]) && !_.isUndefined(this.userSession.activeGameId)) {
 
                     redisClient.get(payload.gameId + "object", (err, reply: string) => {
                         var finishedGame: ServerMatchSession = JSON.parse(reply);
@@ -195,41 +196,46 @@ export default function mainSocketActionCallback(this: EventContext, action: Soc
         case SERVER_OFFER_DRAW:
             {
                 const { payload } = action as ServerOfferDraw;
+                if (!_.isUndefined(payload.gameId) && !_.isNull(payload.gameId)
+                    && !_.isUndefined(this.sessionList[this.userSession.activeGameId]) && !_.isUndefined(this.userSession.activeGameId)) {
 
-                if (this.userSession.activeGameOpponentId) {
-                    redisClient.publish(this.userSession.activeGameOpponentId, serializeRedisMessage({ type: CLIENT_OFFER_DRAW, payload: { gameId: payload.gameId } }));
+                    if (this.userSession.activeGameOpponentId) {
+                        redisClient.publish(this.userSession.activeGameOpponentId, serializeRedisMessage({ type: CLIENT_OFFER_DRAW, payload: { gameId: payload.gameId } }));
+                    }
                 }
-
             }
             break;
         case SERVER_REPLY_DRAW:
             {
                 const { payload } = action as ServerReplyDraw;
+                if (!_.isUndefined(payload.gameId) && !_.isNull(payload.gameId)
+                    && !_.isUndefined(this.sessionList[this.userSession.activeGameId]) && !_.isUndefined(this.userSession.activeGameId)) {
 
-                redisClient.get(payload.gameId + "object", (err, reply) => {
-                    if (payload.reply) {
-                        var finishedGame: ServerMatchSession = JSON.parse(reply)
-                        finishedGame.finished = true;
-                        finishedGame.winner = "draw";
-                        // save game to static storage here;
-                        redisClient.set(payload.gameId + "object", JSON.stringify(finishedGame));
-                        redisClient.publish(finishedGame.whiteId, serializeRedisMessage({
-                            type: CLIENT_GAME_OVER, payload: {
-                                winner: "draw",
-                                game: returnPersonalMatchSession(finishedGame, finishedGame.whiteId)
-                            }
-                        }));
-                        redisClient.publish(finishedGame.blackId, serializeRedisMessage({
-                            type: CLIENT_GAME_OVER, payload: {
-                                winner: "draw",
-                                game: returnPersonalMatchSession(finishedGame, finishedGame.blackId)
-                            }
-                        }));
+                    redisClient.get(payload.gameId + "object", (err, reply) => {
+                        if (payload.reply) {
+                            var finishedGame: ServerMatchSession = JSON.parse(reply)
+                            finishedGame.finished = true;
+                            finishedGame.winner = "draw";
+                            // save game to static storage here;
+                            redisClient.set(payload.gameId + "object", JSON.stringify(finishedGame));
+                            redisClient.publish(finishedGame.whiteId, serializeRedisMessage({
+                                type: CLIENT_GAME_OVER, payload: {
+                                    winner: "draw",
+                                    game: returnPersonalMatchSession(finishedGame, finishedGame.whiteId)
+                                }
+                            }));
+                            redisClient.publish(finishedGame.blackId, serializeRedisMessage({
+                                type: CLIENT_GAME_OVER, payload: {
+                                    winner: "draw",
+                                    game: returnPersonalMatchSession(finishedGame, finishedGame.blackId)
+                                }
+                            }));
 
-                    } else {
-                        redisClient.publish(this.userSession.activeGameOpponentId, serializeRedisMessage({ type: CLIENT_REPLY_DRAW, payload: { reply: false } }));
-                    }
-                })
+                        } else {
+                            redisClient.publish(this.userSession.activeGameOpponentId, serializeRedisMessage({ type: CLIENT_REPLY_DRAW, payload: { reply: false } }));
+                        }
+                    })
+                }
             }
             break;
 

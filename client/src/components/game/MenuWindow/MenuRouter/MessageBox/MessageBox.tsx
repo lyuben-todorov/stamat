@@ -32,21 +32,20 @@ class MessageBox extends React.Component<Props, State> {
 
         componentDidMount() { }
         addMessage(message: ChatMessage) {
-                this.setState(state => {
-                        console.log("message")
-                        const messages = [...state.messages, message]
-                        return { messages }
-                })
+                if(message){
+                        this.setState(state => {
+                                const messages = [...state.messages, message]
+                                return { messages }
+                        })
+                }
         }
 
         componentDidUpdate(prevProps: Props) {
                 if (this.props.action !== prevProps.action || this.props.chatHistory !== prevProps.chatHistory) {
                         switch (this.props.action) {
                                 case "starting":
-                                        //this.addMessage(CLIENT_START_GAME)
                                         break;
                                 case "game_over":
-                                        console.log("no")
                                         if (this.props.winner === "draw") {
                                                 var message: ChatMessage = {
                                                         channel: "currentMatch",

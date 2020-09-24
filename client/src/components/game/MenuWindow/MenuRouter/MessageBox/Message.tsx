@@ -18,7 +18,6 @@ export default class Message extends React.Component<Props, State> {
 
         let className;
 
-        console.log(this.props.message)
         if (this.props.message.type !== "chat") {
             className = "Server";
         }
@@ -32,7 +31,10 @@ export default class Message extends React.Component<Props, State> {
     render() {
         var messageBody =
             <React.Fragment>
-                <div className="Sender">{this.props.message.sender}</div>
+                {
+                    this.props.message.sender == "server" ? "" :
+                        <div className="Sender">{this.props.message.sender}</div>
+                }
                 <div className="MessageText">
                     {this.props.message.message}
                 </div>
