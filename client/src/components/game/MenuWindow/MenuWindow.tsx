@@ -35,7 +35,10 @@ class MenuWindow extends React.Component<MenuProps, MenuState> {
     componentDidUpdate(prevProps: MenuProps) {
         if (this.props !== prevProps) {
             switch (this.props.clientState.gameState) {
-                case "continue" || "starting":
+                case "starting":
+                    this.setState({ activeItem: "chat" })
+                    break;
+                case "continue":
                     this.setState({ activeItem: "chat" })
                     break;
                 case "default":
@@ -66,7 +69,7 @@ class MenuWindow extends React.Component<MenuProps, MenuState> {
                         </Menu.Item>
 
                     <Menu.Item
-                        name={"chat"}
+                        name='chat'
                         active={activeItem === 'chat'}
                         onClick={this.handleItemClick}>
                         Chat

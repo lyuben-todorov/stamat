@@ -9,7 +9,8 @@ import ChatMessage from '../../../../redux/matchStore/models/ChatMessage';
 interface Props {
 
     sendChatMessage: typeof sendChatMessage;
-    proponentName: string
+    proponentName: string,
+    inMatch: boolean
 }
 
 interface State {
@@ -24,7 +25,7 @@ class Chat extends React.Component<Props, State> {
         }
     }
     handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && this.state.currentMessage !== "") {
+        if (this.props.inMatch && e.key === "Enter" && this.state.currentMessage !== "") {
             var message: ChatMessage = {
                 channel: "currentMatch",
                 message: this.state.currentMessage,
@@ -60,7 +61,8 @@ class Chat extends React.Component<Props, State> {
 
 
 const mapStateToProps = (state: RootState) => ({
-    proponentName: state.session.username
+    proponentName: state.session.username,
+    inMatch: state.session.inMatch
 })
 
 const mapDispatchToProps = {

@@ -30,19 +30,10 @@ class MessageBox extends React.Component<Props, State> {
                 this.addMessage = this.addMessage.bind(this);
         }
 
-        componentDidMount() {
-                var mount: ChatMessage = {
-                        channel: "currentMatch",
-                        message: " Please be kind and respectful to other players.",
-                        sender: "MOTD:",
-                        type: "ping"
-                }
-                this.addMessage(mount);
-        }
+        componentDidMount() { }
         addMessage(message: ChatMessage) {
-
-
                 this.setState(state => {
+                        console.log("message")
                         const messages = [...state.messages, message]
                         return { messages }
                 })
@@ -55,7 +46,7 @@ class MessageBox extends React.Component<Props, State> {
                                         //this.addMessage(CLIENT_START_GAME)
                                         break;
                                 case "game_over":
-
+                                        console.log("no")
                                         if (this.props.winner === "draw") {
                                                 var message: ChatMessage = {
                                                         channel: "currentMatch",
