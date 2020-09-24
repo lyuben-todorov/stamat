@@ -7,7 +7,7 @@ import serializeRedisMessage from './util/serializeRedisMessage';
 import createGame from './util/createGame';
 import { MatchmakingRequest, ServerMatchSession } from './types';
 
-var init = redisClient.pipeline();
+const init = redisClient.pipeline();
 init.set("mode0count", 0) // number
     .del("mode0queue") // set
     .set("totalcount", 0)
@@ -21,16 +21,16 @@ const matchmakingClient = new redis();
 matchmakingClient.subscribe('matchmaking')
 
 matchmakingClient.on('message', (channel, message) => {
-    var messageObject = JSON.parse(message);
+    const messageObject = JSON.parse(message);
 
-    var { type } = messageObject;
+    const { type } = messageObject;
     switch (type) {
         case MATCHMAKER_ADD_TO_QUEUE:
-            var matchmakingRequest: MatchmakingRequest = messageObject.payload;
+            const matchmakingRequest: MatchmakingRequest = messageObject.payload;
 
-            var { username, mode,  } = matchmakingRequest;
+            const { username, mode,  } = matchmakingRequest;
 
-            var vreq = JSON.stringify(matchmakingRequest);
+            const vreq = JSON.stringify(matchmakingRequest);
 
             redisClient.sadd(`mode${mode}queue`, vreq).then((added) => {
 
@@ -45,18 +45,18 @@ matchmakingClient.on('message', (channel, message) => {
                                 redisClient.spop(`mode${mode}queue`, 2).then((players) => {
                                     redisClient.decrby(`mode${mode}count`, 2);
 
-                                    var playerOneString = players[0];
-                                    var playerTwoString = players[1];
+                                    const playerOneString = players[0];
+                                    const playerTwoString = players[1];
 
-                                    var playerOne: MatchmakingRequest = JSON.parse(playerOneString);
-                                    var playerTwo: MatchmakingRequest = JSON.parse(playerTwoString);
+                                    const playerOne: MatchmakingRequest = JSON.parse(playerOneString);
+                                    const playerTwo: MatchmakingRequest = JSON.parse(playerTwoString);
 
-                                    var gameId = Math.random().toString(36).substring(2, 14) +
+                                    const gameId = Math.random().toString(36).substring(2, 14) +
                                         Math.random().toString(32).substring(2, 15) +
                                         Math.random().toString(33).substring(2, 15);
                                     matchmakingLogger.info(`Starting game ${gameId}: ${playerOne.username} vs ${playerTwo.username}`);
 
-                                    var game: ServerMatchSession = createGame(gameId, playerOne, playerTwo);
+                                    const game: ServerMatchSession = createGame(gameId, playerOne, playerTwo);
 
                                     redisClient.set(gameId + "object", JSON.stringify(game));
 

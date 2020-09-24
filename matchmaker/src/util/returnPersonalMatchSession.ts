@@ -1,7 +1,7 @@
 import { ServerMatchSession } from "../types";
 
 export default function returnPersonalMatchSession(session: ServerMatchSession, playerId: string) {
-    var color = session.whiteId === playerId;
+    const color = session.whiteId === playerId;
     return {
         matchId: session.matchId,
 

@@ -4,7 +4,7 @@ import { Move } from "chess.js";
 export default function createGame(gameId: string, playerOne: MatchmakingRequest, playerTwo: MatchmakingRequest): ServerMatchSession {
 
     const startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    let white = Math.floor(Math.random() * 2);
+    const white = Math.floor(Math.random() * 2);
     const gameObject: ServerMatchSession = {
 
         matchId: gameId,
