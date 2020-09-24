@@ -92,6 +92,10 @@ class MoveWindow extends React.Component<Props, State> {
                         }
                         break;
                     case "starting":
+                        console.log("asd")
+                        this.state.proponentTimer.current.setTime(600000);
+                        this.state.opponentTimer.current.setTime(600000);
+
                         break;
                     case "continue":
                         {
