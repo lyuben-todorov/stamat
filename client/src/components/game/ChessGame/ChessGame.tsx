@@ -35,6 +35,7 @@ interface State {
     movableDestinations: {
 
     }
+    lastMove?: []
 }
 
 const boardStyle = {
@@ -83,7 +84,7 @@ class ChessGame extends React.Component<Props, State> {
                             const game = this.props.game;
 
                             //@ts-ignore
-                            const chess: ChessInstance = new Chess(game.position);
+                            const chess: ChessInstance = new Chess();
                             const state = this.makeState(chess);
                             this.setState({
                                 ...state,
@@ -129,6 +130,10 @@ class ChessGame extends React.Component<Props, State> {
                         break;
                     case "game_over":
                         {
+                            this.setState({
+
+                                lastMove: []
+                            })
                             this.props.acknowledge();
 
                         }
@@ -174,7 +179,7 @@ class ChessGame extends React.Component<Props, State> {
     }
     render() {
 
-        let { position, movableDestinations, turnColor, orientation } = this.state;
+        let { position, movableDestinations, turnColor, orientation, lastMove } = this.state;
         return (
             <div className="MainChessboard">
 
@@ -186,7 +191,8 @@ class ChessGame extends React.Component<Props, State> {
                     fen={position}
                     style={boardStyle}
                     height={"740px"}
-                    width={"740px"} />
+                    width={"740px"}
+                    lastMove={lastMove} />
             </div>
 
         )
